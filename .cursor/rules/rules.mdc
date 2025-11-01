@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+---
+---
+alwaysApply: true
+---
+
+# Rules
+
+- Kod üretirken mevcut dosya yapısına sadık kal.
+- TypeScript + React kullan.
+- Tailwind tercih et.
+- Component isimleri PascalCase olsun.
+- API istekleri `services/` klasöründe.
+- Gereksiz kütüphane ekleme.
+- Responsive öncelikli.
+- Yorum az olsun.

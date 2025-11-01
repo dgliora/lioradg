@@ -1,0 +1,52 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getUserByEmail, verifyPassword } from '@/lib/auth'
+
+export async function POST(request: NextRequest) {
+  try {
+    const { email, password } = await request.json()
+
+    // Validate input
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: 'E-posta ve şifre gerekli' },
+        { status: 400 }
+      )
+    }
+
+    // Get user
+    const user = await getUserByEmail(email)
+    if (!user) {
+      return NextResponse.json(
+        { error: 'E-posta veya şifre hatalı' },
+        { status: 401 }
+      )
+    }
+
+    // Verify password
+    const isValid = await verifyPassword(password, user.password)
+    if (!isValid) {
+      return NextResponse.json(
+        { error: 'E-posta veya şifre hatalı' },
+        { status: 401 }
+      )
+    }
+
+    // Return user (without password)
+    return NextResponse.json({
+      message: 'Giriş başarılı',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    })
+  } catch (error) {
+    console.error('Login error:', error)
+    return NextResponse.json(
+      { error: 'Giriş sırasında bir hata oluştu' },
+      { status: 500 }
+    )
+  }
+}
+
