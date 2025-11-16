@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react'
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -58,13 +58,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   )
 }
 
-function ToastItem({
-  toast,
-  onClose,
-}: {
+const ToastItem = React.forwardRef<HTMLDivElement, {
   toast: Toast
   onClose: (id: string) => void
-}) {
+}>(({ toast, onClose }, ref) => {
   const icons = {
     success: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -142,7 +139,9 @@ function ToastItem({
       </button>
     </motion.div>
   )
-}
+})
+
+ToastItem.displayName = 'ToastItem'
 
 export function useToast() {
   const context = useContext(ToastContext)

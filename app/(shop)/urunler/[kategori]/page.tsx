@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getCategoryBySlug, getAllCategories } from '@/lib/api/categories'
 import { getAllProducts } from '@/lib/api/products'
-import { ProductGrid } from '@/components/shop/ProductGrid'
-import { ProductFilters } from '@/components/shop/ProductFilters'
+import { ProductsPageClient } from '@/components/shop/ProductsPageClient'
 import { Metadata } from 'next'
 
 interface ProductListingPageProps {
@@ -96,15 +95,13 @@ export default async function ProductListingPage({
 
       {/* Products with Filters */}
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <ProductFilters categories={allCategories} currentCategorySlug={params.kategori} />
-          <ProductGrid
-            products={paginatedProducts}
-            currentPage={page}
-            totalPages={totalPages}
-            categorySlug={params.kategori}
-          />
-        </div>
+        <ProductsPageClient
+          categories={allCategories}
+          currentCategorySlug={params.kategori}
+          products={paginatedProducts}
+          currentPage={page}
+          totalPages={totalPages}
+        />
       </div>
     </div>
   )

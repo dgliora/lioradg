@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Category } from '@/types'
 import { Card } from '@/components/ui'
@@ -60,19 +59,25 @@ export function CategoryGrid({ categories }: CategoryGridProps) {
                     padding="none"
                     className="group overflow-hidden cursor-pointer h-full relative"
                   >
-                    <div className="relative h-56 bg-warm-50">
-                      <Image
-                        src={category.image || '/placeholder.jpg'}
-                        alt={category.name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-600"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-neutral/80 via-neutral/40 to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <h3 className="font-serif font-semibold text-lg text-white mb-1">
+                    <div className="relative h-56 bg-gradient-to-br from-sage/10 via-warm-50 to-rose/10 overflow-hidden">
+                      {/* Emoji Background */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-8xl group-hover:scale-110 transition-transform duration-600 opacity-90">
+                          {category.icon || '🏷️'}
+                        </div>
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white/95 via-white/80 to-transparent">
+                        <h3 className="font-serif font-semibold text-lg mb-1 text-neutral group-hover:text-sage transition-colors">
                           {category.name}
                         </h3>
-                        <span className="text-xs text-white/80 flex items-center gap-1 group-hover:gap-2 transition-all">
+                        {category.description && (
+                          <p className="text-xs text-neutral-light mb-2 line-clamp-1">
+                            {category.description}
+                          </p>
+                        )}
+                        <span className="text-xs text-sage font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
                           Keşfet
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

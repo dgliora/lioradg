@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { LogoLioraDG } from '@/components/LogoLioraDG'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -16,7 +17,15 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Company Info */}
           <div>
-            <h3 className="text-xl font-serif font-semibold text-rose mb-6">LIORADG</h3>
+            <div className="mb-6">
+              <LogoLioraDG 
+                variant="full"
+                width={160}
+                height={40}
+                className="text-rose brightness-150"
+                showImage={true}
+              />
+            </div>
             <p className="text-sm leading-relaxed mb-6 text-neutral-light">
               Kişisel bakım ve temizlik kategorilerinde güvenilir, şeffaf ve erişilebilir ürünler sunuyoruz.
             </p>

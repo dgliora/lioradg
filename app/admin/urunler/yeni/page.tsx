@@ -1,12 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Card, Input, Button } from '@/components/ui'
+
+interface Category {
+  id: string
+  name: string
+}
 
 export default function NewProductPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [uploadedImages, setUploadedImages] = useState<string[]>([])
+  const [dragActive, setDragActive] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -17,24 +27,168 @@ export default function NewProductPage() {
     salePrice: '',
     sku: '',
     stock: '',
+    images: '',
     categoryId: '',
     featured: false,
     active: true,
   })
 
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      const data = await response.json()
+      setCategories(data)
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (uploadedImages.length === 0) {
+      alert('En az bir fotoğraf yüklemelisiniz!')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-      // TODO: API call to create product
-      console.log('Create product:', formData)
-      alert('Ürün başarıyla oluşturuldu! (API yakında eklenecek)')
+      // Fotoğrafları virgülle ayırarak string'e çevir
+      const imagesString = uploadedImages.join(',')
+      
+      const response = await fetch('/api/admin/products/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          images: imagesString,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        alert(data.error || 'Hata oluştu!')
+        setIsSubmitting(false)
+        return
+      }
+
+      alert('Ürün başarıyla oluşturuldu!')
       router.push('/admin/urunler')
     } catch (error) {
-      alert('Hata oluştu!')
-    } finally {
+      alert('Ürün oluşturulurken hata oluştu!')
       setIsSubmitting(false)
+    }
+  }
+
+  const handleFileUpload = async (files: FileList) => {
+    const filesArray = Array.from(files)
+    
+    // Her dosyayı kontrol et
+    for (const file of filesArray) {
+      if (!file.type.startsWith('image/')) {
+        alert(`${file.name} bir resim dosyası değil!`)
+        continue
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`${file.name} dosyası 5MB'dan büyük!`)
+        continue
+      }
+    }
+
+    setIsUploading(true)
+
+    try {
+      // Her dosyayı sırayla yükle
+      const uploadedUrls: string[] = []
+      
+      for (const file of filesArray) {
+        if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
+          continue
+        }
+
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+
+        const data = await response.json()
+
+        if (response.ok) {
+          uploadedUrls.push(data.url)
+        }
+      }
+
+      if (uploadedUrls.length > 0) {
+        setUploadedImages(prev => [...prev, ...uploadedUrls])
+      }
+
+      setIsUploading(false)
+    } catch (error) {
+      alert('Dosya yüklenirken hata oluştu!')
+      setIsUploading(false)
+    }
+  }
+
+  const removeImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', index.toString())
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleImageDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault()
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'))
+    
+    if (dragIndex === dropIndex) return
+
+    const newImages = [...uploadedImages]
+    const [draggedImage] = newImages.splice(dragIndex, 1)
+    newImages.splice(dropIndex, 0, draggedImage)
+    
+    setUploadedImages(newImages)
+  }
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true)
+    } else if (e.type === 'dragleave') {
+      setDragActive(false)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileUpload(e.dataTransfer.files)
+    }
+  }
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFileUpload(e.target.files)
     }
   }
 
@@ -186,13 +340,137 @@ export default function NewProductPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage"
                 >
                   <option value="">Seçiniz...</option>
-                  <option value="1">Parfümler</option>
-                  <option value="2">Tonikler</option>
-                  <option value="3">Şampuan & Saç Bakım</option>
-                  <option value="4">Krem Bakım</option>
-                  <option value="5">Bitkisel Yağlar</option>
-                  <option value="6">Oda ve Tekstil Kokuları</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
+              </div>
+            </Card>
+
+            <Card>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Ürün Görselleri
+                {uploadedImages.length > 0 && (
+                  <span className="ml-2 text-sm text-gray-500">({uploadedImages.length} fotoğraf)</span>
+                )}
+              </h2>
+              <div className="space-y-4">
+                {/* Drag & Drop Upload Area */}
+                <div
+                  className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+                    dragActive
+                      ? 'border-sage bg-sage/5'
+                      : 'border-gray-300 hover:border-sage hover:bg-gray-50'
+                  } ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                >
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileInput}
+                    className="hidden"
+                    disabled={isUploading}
+                  />
+                  
+                  {isUploading ? (
+                    <div className="py-4">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sage mx-auto mb-4"></div>
+                      <p className="text-sm text-gray-600">Yükleniyor...</p>
+                    </div>
+                  ) : (
+                    <>
+                      <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <p className="text-sm text-gray-700 mb-2 font-semibold">
+                        Fotoğraf Yüklemek İçin Tıklayın
+                      </p>
+                      <p className="text-xs text-gray-500 mb-1">
+                        veya sürükleyip bırakın
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Birden fazla fotoğraf seçebilirsiniz • PNG, JPG, GIF, WEBP (max. 5MB)
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {/* Uploaded Images Grid */}
+                {uploadedImages.length > 0 && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {uploadedImages.map((url, index) => (
+                      <div
+                        key={index}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleImageDrop(e, index)}
+                        className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden group cursor-move"
+                      >
+                        <Image
+                          src={url}
+                          alt={`Ürün görseli ${index + 1}`}
+                          fill
+                          className="object-cover pointer-events-none"
+                        />
+                        {/* Ana Fotoğraf Badge */}
+                        {index === 0 && (
+                          <div className="absolute top-2 left-2 bg-sage text-white text-xs px-2 py-1 rounded">
+                            Ana Fotoğraf
+                          </div>
+                        )}
+                        {/* Drag Handle */}
+                        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          <div className="bg-black/70 text-white p-1.5 rounded">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+                            </svg>
+                          </div>
+                        </div>
+                        {/* Delete Button */}
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                          title="Sil"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                        {/* Sıra Numarası */}
+                        <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                          {index + 1}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Info */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="text-xs text-gray-700">
+                      <p className="font-semibold mb-1">💡 İpucu:</p>
+                      <ul className="list-disc list-inside space-y-0.5">
+                        <li>İlk fotoğraf ana görsel olacaktır</li>
+                        <li>Fotoğrafları sürükleyerek sırasını değiştirebilirsiniz 🎯</li>
+                        <li>Her fotoğrafın üzerine gelip silebilirsiniz</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Card>
 
@@ -224,21 +502,6 @@ export default function NewProductPage() {
                     <p className="text-sm text-gray-600">Sitede yayında</p>
                   </div>
                 </label>
-              </div>
-            </Card>
-
-            <Card className="bg-yellow-50 border-yellow-200">
-              <div className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-yellow-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div className="text-sm text-gray-700">
-                  <p className="font-semibold mb-1">Görsel Yükleme</p>
-                  <p>
-                    Görsel yükleme özelliği yakında eklenecektir.
-                    Şimdilik görseller manuel olarak public/images klasörüne eklenmeli.
-                  </p>
-                </div>
               </div>
             </Card>
 

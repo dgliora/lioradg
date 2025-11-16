@@ -7,11 +7,22 @@ import { useCartStore } from '@/lib/store/cartStore'
 import { useFavoritesStore } from '@/lib/store/favoritesStore'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { MiniCart } from './MiniCart'
+import { LogoLioraDG } from '@/components/LogoLioraDG'
+
+type Category = {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  icon: string | null
+  order: number
+}
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
   const cartItems = useCartStore((state) => state.items)
   const favoriteItems = useFavoritesStore((state) => state.items)
   const { user } = useAuth()
@@ -27,17 +38,25 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    // Kategorileri API'den çek
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data)
+        }
+      } catch (error) {
+        console.error('Kategoriler yüklenirken hata:', error)
+      }
+    }
+    
+    fetchCategories()
+  }, [])
+
   const totalCartItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
   const totalFavorites = favoriteItems.length
-
-  const categories = [
-    { name: 'Parfümler', slug: 'parfumler', icon: '🌸' },
-    { name: 'Tonikler', slug: 'tonikler', icon: '💧' },
-    { name: 'Şampuan & Saç Bakım', slug: 'sampuan-sac-bakim', icon: '🧴' },
-    { name: 'Krem Bakım', slug: 'krem-bakim', icon: '✨' },
-    { name: 'Bitkisel Yağlar', slug: 'bitkisel-yaglar', icon: '🌿' },
-    { name: 'Oda ve Tekstil Kokuları', slug: 'oda-tekstil-kokulari', icon: '🏠' },
-  ]
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-warm-100">
@@ -97,15 +116,14 @@ export function Header() {
       }`}>
         <div className="flex items-center justify-between h-full">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 transition-all duration-300">
-            <div className="w-10 h-10 gradient-sage rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">L</span>
-            </div>
-            <span className={`font-serif font-bold text-sage transition-all duration-300 ${
-              isScrolled ? 'text-2xl' : 'text-3xl'
-            }`}>
-              LIORADG
-            </span>
+          <Link href="/" className="flex items-center transition-all duration-300">
+            <LogoLioraDG 
+              variant="full"
+              width={isScrolled ? 140 : 180}
+              height={isScrolled ? 35 : 45}
+              className="text-sage transition-all duration-300"
+              showImage={true}
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -134,7 +152,7 @@ export function Header() {
                       className="flex flex-col gap-3 p-5 rounded-lg hover:bg-warm-50 transition-all group/item hover:shadow-soft"
                     >
                       <div className="w-14 h-14 bg-warm-50 rounded-lg flex items-center justify-center text-3xl group-hover/item:bg-sage group-hover/item:scale-110 transition-all duration-300">
-                        {category.icon}
+                        {category.icon || '🏷️'}
                       </div>
                       <div>
                         <h4 className="font-serif font-semibold text-neutral mb-1 group-hover/item:text-sage transition-colors">
@@ -299,7 +317,13 @@ export function Header() {
         <div className="lg:hidden fixed inset-0 z-50 bg-white">
           <div className="p-4">
             <div className="flex items-center justify-between mb-8">
-              <span className="text-2xl font-serif font-bold text-sage">LIORADG</span>
+              <LogoLioraDG 
+                variant="full"
+                width={140}
+                height={35}
+                className="text-sage"
+                showImage={true}
+              />
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="w-10 h-10 flex items-center justify-center hover:bg-warm-50 rounded-lg"
@@ -320,7 +344,7 @@ export function Header() {
                   href={`/urunler/${category.slug}`}
                   className="flex items-center gap-3 px-4 py-4 hover:bg-warm-50 rounded-lg"
                 >
-                  <span className="text-xl">{category.icon}</span>
+                  <span className="text-xl">{category.icon || '🏷️'}</span>
                   <span className="text-base text-neutral-medium">{category.name}</span>
                 </Link>
               ))}

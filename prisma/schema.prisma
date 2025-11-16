@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = "file:./prisma/dev.db"
 }
 
 enum Role {
@@ -28,6 +28,13 @@ enum CampaignType {
   FREE_SHIPPING
 }
 
+enum CampaignScope {
+  ALL
+  CATEGORY
+  PRODUCT
+  CART
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String
@@ -37,6 +44,8 @@ model User {
   emailVerified DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  resetToken    String?
+  resetTokenExpiry DateTime?
 
   addresses Address[]
   orders    Order[]
@@ -51,6 +60,7 @@ model Category {
   name        String
   slug        String    @unique
   description String?
+  icon        String?
   image       String?
   order       Int       @default(0)
   createdAt   DateTime  @default(now())
@@ -81,6 +91,9 @@ model Product {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
+  activeCampaignId String?
+  activeCampaign   Campaign? @relation(fields: [activeCampaignId], references: [id], onDelete: SetNull)
+
   cartItems  CartItem[]
   orderItems OrderItem[]
   reviews    Review[]
@@ -91,18 +104,26 @@ model Product {
 }
 
 model Campaign {
-  id          String       @id @default(cuid())
-  title       String
-  description String?
-  type        CampaignType
-  value       Float
-  code        String?      @unique
-  minAmount   Float?
-  startDate   DateTime
-  endDate     DateTime
-  active      Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id                String        @id @default(cuid())
+  title             String
+  description       String?
+  type              CampaignType
+  scope             CampaignScope @default(ALL)
+  value             Float
+  code              String?       @unique
+  minAmount         Float?
+  maxDiscount       Float?
+  targetCategories  String?
+  targetProducts    String?
+  usageLimit        Int?
+  usageCount        Int           @default(0)
+  startDate         DateTime
+  endDate           DateTime
+  active            Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  products Product[]
 
   @@map("campaigns")
 }

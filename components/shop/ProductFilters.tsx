@@ -47,7 +47,7 @@ export function ProductFilters({ categories, currentCategorySlug }: ProductFilte
   }
 
   return (
-    <aside className="lg:w-64 flex-shrink-0 space-y-4">
+    <aside className="hidden lg:block lg:w-64 flex-shrink-0 space-y-4">
       {/* Search */}
       <Card>
         <h3 className="text-base font-semibold text-neutral-900 mb-4">Ürün Ara</h3>

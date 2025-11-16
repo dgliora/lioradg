@@ -32,7 +32,7 @@ export function ProductCard({ product }: ProductCardProps) {
     ? Math.round(((product.price - product.salePrice) / product.price) * 100)
     : 0
 
-  const mainImage = product.images || '/placeholder.jpg'
+  const mainImage = product.images?.split(',')[0] || '/placeholder.jpg'
   const finalPrice = product.salePrice || product.price
 
   return (
@@ -56,28 +56,29 @@ export function ProductCard({ product }: ProductCardProps) {
               src={mainImage}
               alt={product.name}
               fill
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               className="object-cover p-6 group-hover:scale-105 transition-transform duration-600"
               style={{ filter: 'brightness(1.05) saturate(1.1)' }}
             />
             
-            {/* Badges */}
+            {/* Badges - Responsive padding */}
             {hasDiscount && (
-              <div className="absolute top-3 right-3">
-                <div className="px-4 py-1.5 gradient-rose text-white text-xs font-semibold rounded-full backdrop-blur-sm">
-                  %{discountPercent} İndirim
+              <div className="absolute top-2 right-2 md:top-3 md:right-3">
+                <div className="px-2 py-1 md:px-4 md:py-1.5 gradient-rose text-white text-[10px] md:text-xs font-semibold rounded-full backdrop-blur-sm whitespace-nowrap">
+                  %{discountPercent}
                 </div>
               </div>
             )}
             {product.featured && !hasDiscount && (
-              <div className="absolute top-3 right-3">
-                <div className="px-4 py-1.5 bg-gradient-to-r from-yellow-200 to-yellow-300 text-neutral text-xs font-semibold rounded-full backdrop-blur-sm">
+              <div className="absolute top-2 right-2 md:top-3 md:right-3">
+                <div className="px-2 py-1 md:px-4 md:py-1.5 bg-gradient-to-r from-yellow-200 to-yellow-300 text-neutral text-[10px] md:text-xs font-semibold rounded-full backdrop-blur-sm whitespace-nowrap">
                   ⭐ Öne Çıkan
                 </div>
               </div>
             )}
             
-            {/* Quick Actions - Always Visible */}
-            <div className="absolute top-3 left-3">
+            {/* Quick Actions - Always Visible - Responsive */}
+            <div className="absolute top-2 left-2 md:top-3 md:left-3 z-10">
               <button 
                 onClick={(e) => {
                   e.preventDefault()
@@ -90,14 +91,14 @@ export function ProductCard({ product }: ProductCardProps) {
                     showToast('Favorilere eklendi!', 'success')
                   }
                 }}
-                className={`w-10 h-10 rounded-full shadow-soft transition-all flex items-center justify-center ${
+                className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-soft transition-all flex items-center justify-center ${
                   isFav 
                     ? 'bg-rose text-white hover:bg-rose-dark' 
                     : 'bg-white text-rose hover:bg-rose hover:text-white border-2 border-rose/30'
                 }`}
               >
                 <svg 
-                  className="w-5 h-5" 
+                  className="w-4 h-4 md:w-5 md:h-5" 
                   fill={isFav ? 'currentColor' : 'none'} 
                   viewBox="0 0 24 24" 
                   stroke="currentColor"
@@ -107,6 +108,26 @@ export function ProductCard({ product }: ProductCardProps) {
                 </svg>
               </button>
             </div>
+
+            {/* Add to Cart Button - Mobile: Bottom Right Icon, Desktop: On Hover */}
+            {product.stock > 0 && (
+              <>
+                {/* Mobile: Sepet Icon (Sag Alt) */}
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    addItem(product, 1)
+                    showToast('Ürün sepete eklendi!', 'success')
+                  }}
+                  className="md:hidden absolute bottom-2 right-2 w-10 h-10 bg-sage text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-10"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </button>
+              </>
+            )}
 
             {product.stock === 0 && (
               <div className="absolute inset-0 bg-neutral/70 flex items-center justify-center backdrop-blur-sm">
@@ -156,9 +177,9 @@ export function ProductCard({ product }: ProductCardProps) {
               )}
             </div>
 
-            {/* Add to Cart - Shows on Hover */}
+            {/* Add to Cart - Desktop: Shows on Hover */}
             {product.stock > 0 && (
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <Button
                   fullWidth
                   size="md"

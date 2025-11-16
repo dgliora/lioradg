@@ -1,7 +1,6 @@
 import { getAllProducts } from '@/lib/api/products'
 import { getAllCategories } from '@/lib/api/categories'
-import { ProductGrid } from '@/components/shop/ProductGrid'
-import { ProductFilters } from '@/components/shop/ProductFilters'
+import { ProductsPageClient } from '@/components/shop/ProductsPageClient'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -66,15 +65,13 @@ export default async function AllProductsPage({ searchParams }: AllProductsPageP
 
       {/* Products with Filters */}
       <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <ProductFilters categories={allCategories} currentCategorySlug="all" />
-          <ProductGrid
-            products={paginatedProducts}
-            currentPage={page}
-            totalPages={totalPages}
-            categorySlug="all"
-          />
-        </div>
+        <ProductsPageClient
+          categories={allCategories}
+          currentCategorySlug="all"
+          products={paginatedProducts}
+          currentPage={page}
+          totalPages={totalPages}
+        />
       </div>
     </div>
   )

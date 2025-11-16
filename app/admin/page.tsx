@@ -10,6 +10,9 @@ async function getDashboardStats() {
     pendingOrders,
     totalRevenue,
     lowStockProducts,
+    ordersByStatus,
+    topProducts,
+    revenueByDay,
   ] = await Promise.all([
     prisma.product.count(),
     prisma.order.count(),
@@ -20,7 +23,56 @@ async function getDashboardStats() {
       where: { status: { in: ['DELIVERED', 'SHIPPED'] } },
     }),
     prisma.product.count({ where: { stock: { lte: 10 } } }),
+    // Sipariş durumlarına göre istatistik
+    prisma.order.groupBy({
+      by: ['status'],
+      _count: { id: true },
+    }),
+    // En çok satan ürünler
+    prisma.orderItem.groupBy({
+      by: ['productId'],
+      _sum: { quantity: true },
+      orderBy: { _sum: { quantity: 'desc' } },
+      take: 5,
+    }),
+    // Son 7 günlük gelir (basit)
+    prisma.order.findMany({
+      where: {
+        createdAt: {
+          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
+        status: { in: ['DELIVERED', 'SHIPPED'] },
+      },
+      select: {
+        createdAt: true,
+        total: true,
+      },
+    }),
   ])
+
+  // Top products'ı detaylı bilgiyle birleştir
+  const topProductsWithDetails = await Promise.all(
+    topProducts.map(async (item) => {
+      const product = await prisma.product.findUnique({
+        where: { id: item.productId },
+        select: { name: true, image: true },
+      })
+      return {
+        ...item,
+        product,
+      }
+    })
+  )
+
+  // Geliri günlere göre grupla
+  const revenueByDayMap = new Map<string, number>()
+  revenueByDay.forEach((order) => {
+    const day = new Date(order.createdAt).toLocaleDateString('tr-TR', { 
+      day: '2-digit', 
+      month: '2-digit' 
+    })
+    revenueByDayMap.set(day, (revenueByDayMap.get(day) || 0) + order.total)
+  })
 
   return {
     totalProducts,
@@ -29,6 +81,12 @@ async function getDashboardStats() {
     pendingOrders,
     totalRevenue: totalRevenue._sum.total || 0,
     lowStockProducts,
+    ordersByStatus,
+    topProducts: topProductsWithDetails,
+    revenueByDay: Array.from(revenueByDayMap.entries()).map(([day, total]) => ({
+      day,
+      total,
+    })),
   }
 }
 
@@ -43,9 +101,28 @@ async function getRecentOrders() {
   })
 }
 
+async function getActiveCampaigns() {
+  return await prisma.campaign.findMany({
+    where: {
+      active: true,
+      startDate: {
+        lte: new Date()
+      },
+      endDate: {
+        gte: new Date()
+      }
+    },
+    take: 5,
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+}
+
 export default async function AdminDashboard() {
   const stats = await getDashboardStats()
   const recentOrders = await getRecentOrders()
+  const activeCampaigns = await getActiveCampaigns()
 
   const statCards = [
     {
@@ -126,6 +203,112 @@ export default async function AdminDashboard() {
         </Card>
       </div>
 
+      {/* Sipariş Durumları & En Çok Satanlar */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Sipariş Durumları */}
+        <Card>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Sipariş Durumları</h2>
+          <div className="space-y-4">
+            {stats.ordersByStatus.map((item) => {
+              const statusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
+                PENDING: { label: 'Bekleyen', color: 'text-yellow-700', bgColor: 'bg-yellow-500' },
+                CONFIRMED: { label: 'Onaylanan', color: 'text-blue-700', bgColor: 'bg-blue-500' },
+                PROCESSING: { label: 'Hazırlanan', color: 'text-purple-700', bgColor: 'bg-purple-500' },
+                SHIPPED: { label: 'Kargoda', color: 'text-indigo-700', bgColor: 'bg-indigo-500' },
+                DELIVERED: { label: 'Teslim Edilen', color: 'text-green-700', bgColor: 'bg-green-500' },
+                CANCELLED: { label: 'İptal Edilen', color: 'text-red-700', bgColor: 'bg-red-500' },
+              }
+              
+              const config = statusConfig[item.status] || { label: item.status, color: 'text-gray-700', bgColor: 'bg-gray-500' }
+              const percentage = stats.totalOrders > 0 ? (item._count.id / stats.totalOrders) * 100 : 0
+
+              return (
+                <div key={item.status}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`text-sm font-medium ${config.color}`}>
+                      {config.label}
+                    </span>
+                    <span className="text-sm font-semibold text-gray-900">
+                      {item._count.id} ({percentage.toFixed(0)}%)
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`${config.bgColor} h-2 rounded-full transition-all duration-500`}
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+            {stats.ordersByStatus.length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-4">Henüz sipariş yok</p>
+            )}
+          </div>
+        </Card>
+
+        {/* En Çok Satanlar */}
+        <Card>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">En Çok Satanlar</h2>
+          <div className="space-y-4">
+            {stats.topProducts.map((item, index) => (
+              <div key={item.productId} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sage to-sage-dark flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  {index + 1}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {item.product?.name || 'Bilinmeyen Ürün'}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {item._sum.quantity} adet satıldı
+                  </p>
+                </div>
+                <div className="w-24 bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-sage to-sage-dark h-2 rounded-full"
+                    style={{ 
+                      width: `${((item._sum.quantity || 0) / (stats.topProducts[0]._sum.quantity || 1)) * 100}%` 
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+            {stats.topProducts.length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-4">Henüz satış yok</p>
+            )}
+          </div>
+        </Card>
+      </div>
+
+      {/* Gelir Grafiği (Son 7 Gün) */}
+      {stats.revenueByDay.length > 0 && (
+        <Card>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Son 7 Günlük Gelir</h2>
+          <div className="flex items-end justify-between gap-2 h-64">
+            {stats.revenueByDay.map((item) => {
+              const maxRevenue = Math.max(...stats.revenueByDay.map(d => d.total))
+              const heightPercentage = maxRevenue > 0 ? (item.total / maxRevenue) * 100 : 0
+
+              return (
+                <div key={item.day} className="flex-1 flex flex-col items-center gap-2">
+                  <div className="relative w-full group">
+                    <div 
+                      className="bg-gradient-to-t from-sage to-sage-light rounded-t-lg transition-all duration-300 hover:from-sage-dark hover:to-sage"
+                      style={{ height: `${Math.max(heightPercentage, 5)}%` }}
+                    />
+                    <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                      {formatPrice(item.total)}
+                    </div>
+                  </div>
+                  <span className="text-xs text-gray-600 font-medium">{item.day}</span>
+                </div>
+              )
+            })}
+          </div>
+        </Card>
+      )}
+
       {/* Recent Orders */}
       <Card>
         <div className="flex items-center justify-between mb-6">
@@ -194,6 +377,43 @@ export default async function AdminDashboard() {
             </tbody>
           </table>
         </div>
+      </Card>
+
+      {/* Aktif Kampanyalar */}
+      <Card>
+        <div className="p-6 border-b border-gray-100">
+          <h2 className="text-xl font-semibold text-gray-900">🎁 Aktif Kampanyalar</h2>
+        </div>
+        {activeCampaigns.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            Şu an aktif kampanya bulunmuyor
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {activeCampaigns.map((campaign) => (
+              <div key={campaign.id} className="p-6 hover:bg-gray-50 transition">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{campaign.title}</h3>
+                    {campaign.description && (
+                      <p className="text-sm text-gray-600 mt-1">{campaign.description}</p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-green-600">
+                      {campaign.type === 'PERCENTAGE' && `%${campaign.value}`}
+                      {campaign.type === 'FIXED' && `${campaign.value} TL`}
+                      {campaign.type === 'FREE_SHIPPING' && 'Ücretsiz Kargo'}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(campaign.startDate).toLocaleDateString('tr-TR')} - {new Date(campaign.endDate).toLocaleDateString('tr-TR')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
     </div>
   )

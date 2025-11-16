@@ -6,13 +6,13 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: process.env.SMTP_USER || 'demo@lioradg.com.tr',
-    pass: process.env.SMTP_PASSWORD || 'demo-password',
+    user: process.env.SMTP_USER || 'rboguz06@gmail.com',
+    pass: process.env.SMTP_PASSWORD || 'temp-password',
   },
 })
 
-// Development modda console'a yaz
-const isDevelopment = process.env.NODE_ENV === 'development'
+// Production modda gerçek email gönder (development check kaldırıldı)
+const isDevelopment = false
 
 export async function sendWelcomeEmail(to: string, name: string) {
   const mailOptions = {
@@ -44,7 +44,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
               <p>Lioradg ailesine katıldığınız için teşekkür ederiz. 🌿</p>
               <p>Hesabınız başarıyla oluşturuldu. Artık %100 doğal ve organik ürünlerimizi keşfedebilir, özel kampanyalardan yararlanabilirsiniz.</p>
               
-              <a href="http://localhost:3001/urunler" class="button">Ürünleri Keşfet</a>
+              <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/urunler" class="button">Ürünleri Keşfet</a>
               
               <div style="background: #F5F1ED; padding: 20px; border-radius: 12px; margin: 20px 0;">
                 <h3 style="margin-top: 0; color: #2C2C2C;">İlk Siparişinize Özel</h3>
@@ -60,8 +60,8 @@ export async function sendWelcomeEmail(to: string, name: string) {
             <div class="footer">
               <p>© 2025 LIORADG. Tüm hakları saklıdır.</p>
               <p>
-                <a href="http://localhost:3001/gizlilik-politikasi" style="color: #8B9D83; text-decoration: none;">Gizlilik Politikası</a> | 
-                <a href="http://localhost:3001/kvkk" style="color: #8B9D83; text-decoration: none;">KVKK</a>
+                <a href="https://lioradg.com.tr/gizlilik-politikasi" style="color: #8B9D83; text-decoration: none;">Gizlilik Politikası</a> | 
+                <a href="https://lioradg.com.tr/kvkk" style="color: #8B9D83; text-decoration: none;">KVKK</a>
               </p>
             </div>
           </div>
@@ -128,7 +128,7 @@ export async function sendOrderConfirmationEmail(
                 <p><strong>Tahmini Teslimat:</strong> 2-5 iş günü</p>
               </div>
               
-              <p>Sipariş durumunuzu <a href="http://localhost:3001/siparis-takip" style="color: #8B9D83;">sipariş takip</a> sayfasından takip edebilirsiniz.</p>
+              <p>Sipariş durumunuzu <a href="https://lioradg.com.tr/siparis-takip" style="color: #8B9D83;">sipariş takip</a> sayfasından takip edebilirsiniz.</p>
               
               <p style="margin-top: 30px;">Teşekkür ederiz!</p>
               <p><strong>Lioradg Ekibi</strong></p>
@@ -157,6 +157,74 @@ export async function sendOrderConfirmationEmail(
   } catch (error) {
     console.error('Email send error:', error)
     return { success: false, error }
+  }
+}
+
+export async function sendResetEmail(to: string, token: string, name?: string) {
+  // Production'da domain değişecek (deployment sırasında)
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const resetUrl = `${baseUrl}/sifre-sifirla?token=${token}`;
+  const mailOptions = {
+    from: '"Lioradg" <info@lioradg.com.tr>',
+    to,
+    subject: 'Şifre Sıfırlama Talebiniz',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #2C2C2C; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #D4A5A5 0%, #C89F9C 100%); color: white; padding: 40px 20px; text-align: center; border-radius: 16px 16px 0 0; }
+            .content { background: white; padding: 40px 20px; border: 1px solid #E8E1D9; border-top: none; border-radius: 0 0 16px 16px; }
+            .button { display: inline-block; background: #D4A5A5; color: white; padding: 14px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; margin: 20px 0; }
+            .footer { text-align: center; padding: 20px; color: #5A5A5A; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="margin: 0; font-size: 32px; font-family: Georgia, serif;">Şifre Sıfırlama</h1>
+            </div>
+            <div class="content">
+              <h2 style="color: #D4A5A5; font-family: Georgia, serif;">Merhaba${name ? `, ${name}` : ''},</h2>
+              <p>Şifre sıfırlama talebinizi aldık. Aşağıdaki link ile yeni şifrenizi belirleyebilirsiniz.</p>
+              
+              <a href="${resetUrl}" class="button">Şifremi Sıfırla</a>
+              
+              <div style="background: #F5F1ED; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                <p><strong>Not:</strong> Bu link 1 saat içinde geçerlidir. Eğer bu talebi siz yapmadıysanız, dikkate almayabilirsiniz.</p>
+              </div>
+              
+              <p style="margin-top: 30px;">Sorularınız için bizimle iletişime geçebilirsiniz.</p>
+              <p><strong>Lioradg Ekibi</strong></p>
+            </div>
+            <div class="footer">
+              <p>© 2025 LIORADG. Tüm hakları saklıdır.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+  };
+
+  if (isDevelopment) {
+    console.log('📧 [DEV MODE] Şifre sıfırlama e-postası gönderildi:', {
+      to,
+      token,
+      resetUrl,
+      subject: mailOptions.subject,
+    });
+    return { success: true, dev: true };
+  }
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return { success: true };
+  } catch (error) {
+    console.error('Reset email send error:', error);
+    return { success: false, error };
   }
 }
 

@@ -1,0 +1,146 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { checkAdminAuth } from '@/lib/auth-server'
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const auth = await checkAdminAuth()
+    if (!auth.isAdmin) {
+      return NextResponse.json(
+        { error: 'Yetkisiz erişim' },
+        { status: 401 }
+      )
+    }
+
+    const campaign = await prisma.campaign.findUnique({
+      where: { id: params.id }
+    })
+
+    if (!campaign) {
+      return NextResponse.json(
+        { error: 'Kampanya bulunamadı' },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json(campaign)
+  } catch (error) {
+    console.error('Kampanya yüklenirken hata:', error)
+    return NextResponse.json(
+      { error: 'Kampanya yüklenirken hata oluştu' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const auth = await checkAdminAuth()
+    if (!auth.isAdmin) {
+      return NextResponse.json(
+        { error: 'Yetkisiz erişim' },
+        { status: 401 }
+      )
+    }
+
+    const data = await request.json()
+
+    // Partial update için: eğer sadece active field'ı güncelliyorsa
+    if (Object.keys(data).length === 1 && data.active !== undefined) {
+      const campaign = await prisma.campaign.update({
+        where: { id: params.id },
+        data: {
+          active: data.active
+        }
+      })
+      return NextResponse.json(campaign)
+    }
+
+    // Full update için
+    if (!data.title || !data.type || !data.scope || !data.value) {
+      return NextResponse.json(
+        { error: 'Gerekli alanlar eksik' },
+        { status: 400 }
+      )
+    }
+
+    // Kupon kodu kontrolü (farklı kampanya için kullanılmış mı?)
+    if (data.code) {
+      const existingCampaign = await prisma.campaign.findFirst({
+        where: {
+          code: data.code,
+          NOT: { id: params.id }
+        }
+      })
+
+      if (existingCampaign) {
+        return NextResponse.json(
+          { error: 'Bu kupon kodu başka bir kampanya tarafından kullanılıyor' },
+          { status: 400 }
+        )
+      }
+    }
+
+    const campaign = await prisma.campaign.update({
+      where: { id: params.id },
+      data: {
+        title: data.title,
+        description: data.description || null,
+        type: data.type,
+        scope: data.scope,
+        value: parseFloat(data.value),
+        code: data.code || null,
+        minAmount: data.minAmount ? parseFloat(data.minAmount) : null,
+        maxDiscount: data.maxDiscount ? parseFloat(data.maxDiscount) : null,
+        targetCategories: data.targetCategories || null,
+        targetProducts: data.targetProducts || null,
+        usageLimit: data.usageLimit ? parseInt(data.usageLimit) : null,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        active: data.active !== undefined ? data.active : undefined,
+      }
+    })
+
+    return NextResponse.json(campaign)
+  } catch (error) {
+    console.error('Kampanya güncellenirken hata:', error)
+    return NextResponse.json(
+      { error: 'Kampanya güncellenirken hata oluştu' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const auth = await checkAdminAuth()
+    if (!auth.isAdmin) {
+      return NextResponse.json(
+        { error: 'Yetkisiz erişim' },
+        { status: 401 }
+      )
+    }
+
+    await prisma.campaign.delete({
+      where: { id: params.id }
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Kampanya silinirken hata:', error)
+    return NextResponse.json(
+      { error: 'Kampanya silinirken hata oluştu' },
+      { status: 500 }
+    )
+  }
+}
+

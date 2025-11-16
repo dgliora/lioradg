@@ -2,85 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
-
 @layer base {
-  body {
-    @apply bg-warm-50 text-neutral font-sans antialiased;
+  :root {
+    --sage: #8B9D83;
+    --rose: #D4A5A5;
+    --warm-50: #F5F1ED;
+    --warm-100: #E8E1D9;
+    --neutral: #2C2C2C;
+    --neutral-light: #5A5A5A;
+    --neutral-medium: #7A7A7A;
   }
-  
-  h1, h2, h3 {
-    @apply font-serif;
-  }
-  
-  h1 {
-    @apply text-h1 text-neutral;
-  }
-  
-  h2 {
-    @apply text-h2 text-neutral;
-  }
-  
-  h3 {
-    @apply text-h3 text-neutral;
-  }
-}
 
-@layer components {
-  .btn-primary {
-    @apply h-12 px-8 rounded-button font-semibold text-base bg-sage text-white;
-    @apply shadow-button hover:bg-sage-dark hover:scale-[1.02];
-    @apply focus:outline-none focus:ring-4 focus:ring-sage/20;
-    @apply transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-  
-  .btn-secondary {
-    @apply h-12 px-8 rounded-button font-semibold text-base;
-    @apply border-2 border-sage text-sage hover:bg-sage hover:text-white;
-    @apply focus:outline-none focus:ring-4 focus:ring-sage/20;
-    @apply transition-all duration-300;
-  }
-  
-  .card-premium {
-    @apply bg-white rounded-card shadow-soft;
-    @apply hover:shadow-hover hover:-translate-y-2;
-    @apply transition-all duration-400;
-  }
-  
-  .input-premium {
-    @apply h-[52px] px-5 rounded-button border-[1.5px] border-warm-100;
-    @apply text-base bg-white;
-    @apply focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10;
-    @apply transition-all duration-300;
-  }
-  
-  .section-padding {
-    @apply py-32 lg:py-128;
-  }
-  
-  .glassmorphism {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-  }
-  
-  .gradient-sage {
-    background: linear-gradient(135deg, #8B9D83 0%, #A8B99C 100%);
-  }
-  
-  .gradient-rose {
-    background: linear-gradient(135deg, #D4A5A5 0%, #C89F9C 100%);
-  }
-  
-  .gradient-hero {
-    background: linear-gradient(135deg, #F5F1ED 0%, #E8E1D9 100%);
+  body {
+    @apply bg-white text-neutral antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
 @layer utilities {
+  /* Safe area for mobile bottom nav */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Gradient utilities */
+  .gradient-sage {
+    @apply bg-gradient-to-r from-sage to-sage/90;
+  }
+
+  .gradient-rose {
+    @apply bg-gradient-to-r from-rose to-rose/90;
+  }
+
+  /* Shadow utilities */
+  .shadow-soft {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .shadow-hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .shadow-button {
+    box-shadow: 0 2px 12px rgba(212, 165, 165, 0.3);
+  }
+
+  /* Text utilities */
   .text-balance {
     text-wrap: balance;
   }
 }
-

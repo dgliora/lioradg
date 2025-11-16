@@ -18,6 +18,7 @@ interface ProductDetailProps {
 export function ProductDetail({ product }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState<'description' | 'content' | 'usage' | 'reviews'>('description')
+  const [selectedImage, setSelectedImage] = useState(0)
   const addItem = useCartStore((state) => state.addItem)
   const { showToast } = useToast()
 
@@ -27,6 +28,9 @@ export function ProductDetail({ product }: ProductDetailProps) {
     : 0
 
   const finalPrice = product.salePrice || product.price
+  
+  // Çoklu fotoğrafları array'e çevir
+  const images = product.images ? product.images.split(',').filter(img => img.trim()) : ['/placeholder.jpg']
 
   const incrementQuantity = () => {
     if (quantity < product.stock) {
@@ -67,13 +71,15 @@ export function ProductDetail({ product }: ProductDetailProps) {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
-          {/* Image */}
-          <div>
+          {/* Image Gallery */}
+          <div className="space-y-4">
+            {/* Ana Görsel */}
             <div className="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden">
               <Image
-                src={product.images || '/placeholder.jpg'}
-                alt={product.name}
+                src={images[selectedImage]}
+                alt={`${product.name} - ${selectedImage + 1}`}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px"
                 className="object-cover"
                 priority
               />
@@ -89,7 +95,38 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   </Badge>
                 </div>
               )}
+              {/* Fotoğraf Sayısı */}
+              {images.length > 1 && (
+                <div className="absolute bottom-4 right-4 bg-black/50 text-white text-sm px-3 py-1 rounded-full">
+                  {selectedImage + 1} / {images.length}
+                </div>
+              )}
             </div>
+
+            {/* Thumbnail Gallery */}
+            {images.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`relative aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-all ${
+                      selectedImage === index
+                        ? 'border-sage scale-95'
+                        : 'border-transparent hover:border-gray-300'
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${product.name} thumbnail ${index + 1}`}
+                      fill
+                      sizes="100px"
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Info */}

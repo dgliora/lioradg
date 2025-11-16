@@ -280,6 +280,7 @@ export default function CheckoutPage() {
                             src={item.product.images || '/placeholder.jpg'}
                             alt={item.product.name}
                             fill
+                            sizes="64px"
                             className="object-contain p-4"
                           />
                         </div>
