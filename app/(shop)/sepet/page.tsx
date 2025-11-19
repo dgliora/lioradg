@@ -23,6 +23,7 @@ export default function CartPage() {
   // Store'dan verileri al (mounted olduktan sonra)
   const [cartItems, setCartItems] = useState([])
   const [totalPrice, setTotalPrice] = useState(0)
+  const shippingFee = 89.90
 
   useEffect(() => {
     if (mounted) {
@@ -226,13 +227,18 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-neutral-medium">Kargo Bedeli</span>
-                    <span className="text-success font-medium">Ücretsiz</span>
+                    <span className="font-medium text-neutral">
+                      {shippingFee.toLocaleString('tr-TR', {
+                        style: 'currency',
+                        currency: 'TRY',
+                      })}
+                    </span>
                   </div>
                   <div className="h-px bg-warm-200" />
                   <div className="flex justify-between text-xl font-serif font-bold">
                     <span className="text-neutral">Toplam Tutar</span>
                     <span className="text-sage">
-                      {totalPrice.toLocaleString('tr-TR', {
+                      {(totalPrice + shippingFee).toLocaleString('tr-TR', {
                         style: 'currency',
                         currency: 'TRY',
                       })}
@@ -248,7 +254,7 @@ export default function CartPage() {
                   disabled={cartItems.length === 0}
                   className="bg-gradient-to-r from-sage to-sage-dark hover:from-sage-dark hover:to-sage text-white font-semibold py-3 mb-4"
                 >
-                  {isSubmitting ? 'Yönlendiriliyor...' : `Ödemeye Geç - ${totalPrice.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}`}
+                  {isSubmitting ? 'Yönlendiriliyor...' : `Ödemeye Geç - ${(totalPrice + shippingFee).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}`}
                 </Button>
 
                 <div className="text-center text-xs text-neutral-medium space-y-1">

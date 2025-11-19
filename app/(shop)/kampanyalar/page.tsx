@@ -19,9 +19,6 @@ export default async function CampaignsPage() {
     },
   })
 
-  // Özel Banner için Ücretsiz Kargo kampanyasını bul
-  const freeShippingCampaign = activeCampaigns.find(c => c.type === 'FREE_SHIPPING')
-
   // İndirimli ürünleri getir
   const { products: saleProducts } = await getAllProducts({
     limit: 12,
@@ -80,30 +77,6 @@ export default async function CampaignsPage() {
             </div>
           </div>
         )}
-
-        {/* Campaign Banners */}
-        <div className="mb-12">
-          <Link href="/urunler">
-            <Card hover padding="none" className="overflow-hidden group cursor-pointer">
-              <div className="relative h-64 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                <div className="text-center p-8">
-                  <Badge variant="success" size="lg" className="mb-4">
-                    {freeShippingCampaign ? 'Fırsat' : 'Ücretsiz Kargo'}
-                  </Badge>
-                  <h2 className="text-h2 font-bold text-neutral-900 mb-2">
-                    {freeShippingCampaign ? freeShippingCampaign.title : '500 TL Üzeri Alışverişlerde'}
-                  </h2>
-                  <p className="text-neutral-600 mb-4">
-                    {freeShippingCampaign ? freeShippingCampaign.description : 'Kargo bedava!'}
-                  </p>
-                  <span className="text-primary font-semibold group-hover:underline">
-                    Hemen Alışverişe Başla →
-                  </span>
-                </div>
-              </div>
-            </Card>
-          </Link>
-        </div>
 
         {/* Discounted Products */}
         {discountedProducts.length > 0 && (
