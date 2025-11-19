@@ -233,3 +233,15 @@ model Review {
   @@index([userId])
   @@map("reviews")
 }
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  label     String?
+  type      String   @default("text") // text, number, boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}

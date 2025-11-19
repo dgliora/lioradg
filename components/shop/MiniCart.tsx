@@ -15,6 +15,15 @@ export function MiniCart() {
 
   useEffect(() => {
     setMounted(true)
+    // Kargo ücreti ayarını yükle
+    fetch('/api/settings/shipping-fee')
+      .then(res => res.json())
+      .then(data => {
+        if (data.shippingFee) {
+          setShippingCost(data.shippingFee)
+        }
+      })
+      .catch(() => {}) // Hata durumunda default değer kalır
   }, [])
 
   useEffect(() => {
@@ -24,7 +33,15 @@ export function MiniCart() {
         setShippingCost(fee)
       })
     } else if (mounted && items.length === 0) {
-      setShippingCost(89.90)
+      // Sepet boş olduğunda da ayardan kargo ücretini al
+      fetch('/api/settings/shipping-fee')
+        .then(res => res.json())
+        .then(data => {
+          if (data.shippingFee) {
+            setShippingCost(data.shippingFee)
+          }
+        })
+        .catch(() => {})
     }
     // items array'inin içeriğini serialize ederek dependency olarak kullan
     // eslint-disable-next-line react-hooks/exhaustive-deps

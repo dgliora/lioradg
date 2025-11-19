@@ -479,6 +479,19 @@ async function main() {
     console.log(`✅ Ürün oluşturuldu: ${product.name}`)
   }
 
+  // Ayarları oluştur
+  const shippingFee = await prisma.setting.upsert({
+    where: { key: 'shipping_fee' },
+    update: {},
+    create: {
+      key: 'shipping_fee',
+      value: '89.90',
+      label: 'Kargo Ücreti (TL)',
+      type: 'number',
+    },
+  })
+  console.log('✅ Kargo ücreti ayarı oluşturuldu:', shippingFee.value, 'TL')
+
   console.log('🎉 Seeding tamamlandı!')
 }
 

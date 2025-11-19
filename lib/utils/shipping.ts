@@ -1,8 +1,26 @@
 /**
+ * Kargo ücreti ayarını getirir
+ */
+async function getShippingFeeSetting(): Promise<number> {
+  try {
+    const response = await fetch('/api/settings/shipping-fee', {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      const data = await response.json()
+      return data.shippingFee || 89.90
+    }
+  } catch (error) {
+    console.error('Kargo ücreti ayarı getirilirken hata:', error)
+  }
+  return 89.90 // Fallback
+}
+
+/**
  * Aktif ücretsiz kargo kampanyalarını kontrol eder ve kargo ücretini hesaplar
  */
 export async function calculateShippingFee(cartTotal: number): Promise<number> {
-  const defaultShippingFee = 89.90
+  const defaultShippingFee = await getShippingFeeSetting()
 
   try {
     // Aktif kampanyaları getir (detaylı bilgi ile)

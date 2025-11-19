@@ -26,6 +26,20 @@ export default function CartPage() {
   const [totalPrice, setTotalPrice] = useState(0)
   const [shippingFee, setShippingFee] = useState(89.90)
 
+  // Kargo ücreti ayarını yükle
+  useEffect(() => {
+    if (mounted) {
+      fetch('/api/settings/shipping-fee')
+        .then(res => res.json())
+        .then(data => {
+          if (data.shippingFee) {
+            setShippingFee(data.shippingFee)
+          }
+        })
+        .catch(() => {}) // Hata durumunda default değer kalır
+    }
+  }, [mounted])
+
   useEffect(() => {
     if (mounted) {
       setCartItems(cartStore.items)
