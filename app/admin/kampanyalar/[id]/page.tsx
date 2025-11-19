@@ -341,18 +341,20 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Minimum Sepet Tutarı (TL)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.minAmount}
-                    onChange={(e) => setFormData({ ...formData, minAmount: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
-                  />
-                </div>
+                {formData.scope !== 'CART' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Minimum Sepet Tutarı (TL)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.minAmount}
+                      onChange={(e) => setFormData({ ...formData, minAmount: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
+                    />
+                  </div>
+                )}
 
                 {formData.type === 'PERCENTAGE' && (
                   <div>
@@ -475,9 +477,21 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
               )}
 
               {formData.scope === 'CART' && (
-                <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                  <p className="text-sm text-blue-900">
-                    💡 <strong>Sepet Tutarına Göre:</strong> Yukarıda girdiğiniz "Minimum Sepet Tutarı" ve "Maksimum İndirim Tutarı" ayarları bu seçenek için geçerlidir. Örneğin: 500 TL üzeri alışverişlerde %10 indirim (max 50 TL).
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Minimum Sepet Tutarı (TL) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.minAmount}
+                    onChange={(e) => setFormData({ ...formData, minAmount: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
+                    placeholder="Örn: 1000"
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Kampanyanın uygulanması için sepette olması gereken minimum tutar
                   </p>
                 </div>
               )}
