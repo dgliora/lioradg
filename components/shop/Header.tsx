@@ -8,6 +8,7 @@ import { useFavoritesStore } from '@/lib/store/favoritesStore'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { MiniCart } from './MiniCart'
 import { LogoLioraDG } from '@/components/LogoLioraDG'
+import { ActiveCampaignsBanner } from './ActiveCampaignsBanner'
 
 type Category = {
   id: string
@@ -59,9 +60,12 @@ export function Header() {
   const totalFavorites = favoriteItems.length
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-warm-100">
+    <header className="sticky top-0 z-40 bg-white">
+      {/* Kampanyalar Banner */}
+      <ActiveCampaignsBanner />
+
       {/* Top Bar */}
-      <div className="bg-sage text-white">
+      <div className="bg-sage text-white border-b border-sage-dark/20">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-9 text-xs">
             {/* Left: Contact Info */}
@@ -111,7 +115,7 @@ export function Header() {
       </div>
 
       {/* Main Header */}
-      <div className={`container mx-auto px-4 transition-all duration-300 ${
+      <div className={`container mx-auto px-4 transition-all duration-300 border-b border-warm-100 ${
         isScrolled ? 'h-16' : 'h-20'
       }`}>
         <div className="flex items-center justify-between h-full">

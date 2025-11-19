@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Card, Button } from '@/components/ui'
 
@@ -17,8 +17,23 @@ type Product = {
   price: number
 }
 
+type CampaignTemplate = {
+  id: string
+  name: string
+  startMonth: number
+  startDay: number
+  endMonth: number
+  endDay: number
+  description: string
+  recommendedDiscount: number
+  tags: string[]
+}
+
 export default function NewCampaignPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const templateId = searchParams.get('template')
+  
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
@@ -43,7 +58,10 @@ export default function NewCampaignPage() {
   useEffect(() => {
     fetchCategories()
     fetchProducts()
-  }, [])
+    if (templateId) {
+      loadTemplateData(templateId)
+    }
+  }, [templateId])
 
   const fetchCategories = async () => {
     try {
@@ -62,13 +80,46 @@ export default function NewCampaignPage() {
       const response = await fetch('/api/products')
       if (response.ok) {
         const data = await response.json()
-        console.log('Ürünler yüklendi:', data)
         setProducts(data.products || [])
       } else {
         console.error('API hatası:', response.status)
       }
     } catch (error) {
       console.error('Ürünler yüklenirken hata:', error)
+    }
+  }
+
+  const loadTemplateData = async (id: string) => {
+    try {
+      const response = await fetch('/api/admin/campaign-templates')
+      if (response.ok) {
+        const templates: CampaignTemplate[] = await response.json()
+        const template = templates.find(t => t.id === id)
+        
+        if (template) {
+          const now = new Date()
+          const currentYear = now.getFullYear()
+          
+          let startDate = new Date(currentYear, template.startMonth - 1, template.startDay)
+          let endDate = new Date(currentYear, template.endMonth - 1, template.endDay)
+          
+          if (endDate < now) {
+            startDate = new Date(currentYear + 1, template.startMonth - 1, template.startDay)
+            endDate = new Date(currentYear + 1, template.endMonth - 1, template.endDay)
+          }
+
+          setFormData(prev => ({
+            ...prev,
+            title: template.name,
+            description: template.description,
+            value: template.recommendedDiscount.toString(),
+            startDate: startDate.toISOString().slice(0, 16),
+            endDate: endDate.toISOString().slice(0, 16),
+          }))
+        }
+      }
+    } catch (error) {
+      console.error('Şablon yüklenirken hata:', error)
     }
   }
 
@@ -142,8 +193,12 @@ export default function NewCampaignPage() {
           </button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Yeni Kampanya Ekle</h1>
-          <p className="text-gray-600 mt-1">Yeni bir kampanya ve indirim kodu oluşturun</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {templateId ? '🎁 Şablondan Kampanya' : 'Yeni Kampanya Ekle'}
+          </h1>
+          <p className="text-gray-600 mt-1">
+            {templateId ? 'Şablondaki bilgiler önceden doldurulmuştur' : 'Yeni bir kampanya ve indirim kodu oluşturun'}
+          </p>
         </div>
       </div>
 

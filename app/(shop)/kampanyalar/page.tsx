@@ -3,8 +3,22 @@ import Image from 'next/image'
 import { Card, Badge, Button } from '@/components/ui'
 import { getAllProducts } from '@/lib/api/products'
 import { formatPrice } from '@/lib/utils'
+import { prisma } from '@/lib/prisma'
 
 export default async function CampaignsPage() {
+  // Aktif kampanyaları getir
+  const activeCampaigns = await prisma.campaign.findMany({
+    where: {
+      active: true,
+      endDate: {
+        gte: new Date(),
+      }
+    },
+    orderBy: {
+      startDate: 'desc',
+    },
+  })
+
   // İndirimli ürünleri getir
   const { products: saleProducts } = await getAllProducts({
     limit: 12,
@@ -24,6 +38,43 @@ export default async function CampaignsPage() {
             Özel indirimler ve kampanyalarımızdan yararlanın
           </p>
         </div>
+
+        {/* Aktif Kampanyalar */}
+        {activeCampaigns.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-h2 font-serif font-bold text-neutral mb-6">
+              ✨ Şu Anda Aktif Kampanyalar
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {activeCampaigns.map((campaign) => (
+                <Card key={campaign.id} className="bg-gradient-to-br from-sage/5 to-sage/10 border-2 border-sage/30 hover:border-sage transition-all">
+                  <div>
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-neutral-900">{campaign.title}</h3>
+                        {campaign.description && (
+                          <p className="text-sm text-neutral-600 mt-1">{campaign.description}</p>
+                        )}
+                      </div>
+                      <Badge variant="success" className="whitespace-nowrap ml-2">
+                        {campaign.type === 'PERCENTAGE' ? `%${campaign.value}` : 
+                         campaign.type === 'FIXED' ? `₺${campaign.value}` :
+                         'Ücretsiz Kargo'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm text-neutral-600 mt-4 pt-4 border-t border-sage/20">
+                      <span>
+                        {new Date(campaign.startDate).toLocaleDateString('tr-TR')} - {new Date(campaign.endDate).toLocaleDateString('tr-TR')}
+                      </span>
+                      <span className="text-sage font-semibold">Devam Ediyor</span>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Campaign Banners */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
