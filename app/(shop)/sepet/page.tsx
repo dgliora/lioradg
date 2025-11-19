@@ -30,7 +30,8 @@ export default function CartPage() {
     if (mounted) {
       setCartItems(cartStore.items)
       const total = cartStore.items.reduce((sum, item) => {
-        return sum + (item.product.price * item.quantity)
+        const itemPrice = item.product.salePrice || item.product.price
+        return sum + (itemPrice * item.quantity)
       }, 0)
       setTotalPrice(total)
     }

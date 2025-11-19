@@ -35,12 +35,17 @@ export async function POST(request: NextRequest) {
     for (const campaign of campaigns) {
       // Eğer kampanya "Sepet Tutarına Göre" ise
       if (campaign.scope === 'CART') {
-        if (campaign.minAmount && cartTotal >= campaign.minAmount) {
+        const minAmount = campaign.minAmount ? parseFloat(campaign.minAmount.toString()) : null
+        if (minAmount !== null && cartTotal >= minAmount) {
+          console.log(`✅ Ücretsiz kargo: Sepet ${cartTotal} >= Minimum ${minAmount}`)
           return NextResponse.json({ freeShipping: true })
+        } else {
+          console.log(`❌ Ücretsiz kargo yok: Sepet ${cartTotal} < Minimum ${minAmount}`)
         }
       }
       // Eğer kampanya "Tüm Ürünler" ise
       else if (campaign.scope === 'ALL') {
+        console.log(`✅ Ücretsiz kargo: Tüm ürünler kampanyası aktif`)
         return NextResponse.json({ freeShipping: true })
       }
     }

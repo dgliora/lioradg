@@ -14,10 +14,12 @@ export async function calculateShippingFee(cartTotal: number): Promise<number> {
     })
 
     if (!response.ok) {
+      console.warn('Kargo kontrolü API hatası:', response.status)
       return defaultShippingFee
     }
 
     const data = await response.json()
+    console.log(`📦 Sepet tutarı: ${cartTotal} TL, Ücretsiz kargo: ${data.freeShipping ? 'EVET' : 'HAYIR'}`)
     return data.freeShipping ? 0 : defaultShippingFee
   } catch (error) {
     console.error('Kargo ücreti hesaplanırken hata:', error)
