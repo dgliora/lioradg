@@ -1,13 +1,29 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { LogoLioraDG } from '@/components/LogoLioraDG'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
+  const [contactInfo, setContactInfo] = useState({
+    phone: '+90 530 208 47 47',
+    email: 'info@lioradg.com.tr',
+    address: 'İstanbul, Türkiye',
+    instagram: 'https://instagram.com/lioradg',
+    facebook: 'https://facebook.com/lioradg',
+  })
+
+  useEffect(() => {
+    fetch('/api/settings/contact', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => setContactInfo(data))
+      .catch(() => {})
+  }, [])
 
   const socialLinks = [
-    { icon: 'facebook', href: '#' },
-    { icon: 'instagram', href: '#' },
-    { icon: 'twitter', href: '#' },
+    { icon: 'facebook', href: contactInfo.facebook },
+    { icon: 'instagram', href: contactInfo.instagram },
   ]
 
   return (
@@ -84,10 +100,9 @@ export function Footer() {
               İletişim
             </h4>
             <ul className="space-y-3 text-sm text-neutral-light">
-              <li>ARDIÇLI MAH. DOĞAN ARASLI BLV.</li>
-              <li>ESENYURT/İSTANBUL</li>
-              <li><a href="tel:+905302084747" className="hover:text-rose transition-colors">+90 530 208 47 47</a></li>
-              <li><a href="mailto:info@lioradg.com.tr" className="hover:text-rose transition-colors">info@lioradg.com.tr</a></li>
+              <li>{contactInfo.address}</li>
+              <li><a href={`tel:${contactInfo.phone.replace(/\s/g, '')}`} className="hover:text-rose transition-colors">{contactInfo.phone}</a></li>
+              <li><a href={`mailto:${contactInfo.email}`} className="hover:text-rose transition-colors">{contactInfo.email}</a></li>
             </ul>
           </div>
         </div>
