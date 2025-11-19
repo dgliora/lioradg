@@ -26,13 +26,43 @@ export default function SettingsPage() {
       const response = await fetch('/api/admin/settings')
       if (response.ok) {
         const data = await response.json()
-        setSettings(data)
-        // Başlangıç değerlerini set et
-        const initialValues: Record<string, string> = {}
-        data.forEach((setting: Setting) => {
-          initialValues[setting.key] = setting.value
-        })
-        setEditedValues(initialValues)
+        console.log('Ayarlar yüklendi:', data)
+        
+        // Eğer shipping_fee yoksa oluştur
+        if (!data.find((s: Setting) => s.key === 'shipping_fee')) {
+          console.log('shipping_fee ayarı yok, oluşturuluyor...')
+          const createResponse = await fetch('/api/admin/settings', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              key: 'shipping_fee',
+              value: '89.90',
+              label: 'Kargo Ücreti (TL)',
+              type: 'number',
+            }),
+          })
+          if (createResponse.ok) {
+            // Yeniden yükle
+            const newResponse = await fetch('/api/admin/settings')
+            if (newResponse.ok) {
+              const newData = await newResponse.json()
+              setSettings(newData)
+              const initialValues: Record<string, string> = {}
+              newData.forEach((setting: Setting) => {
+                initialValues[setting.key] = setting.value
+              })
+              setEditedValues(initialValues)
+            }
+          }
+        } else {
+          setSettings(data)
+          // Başlangıç değerlerini set et
+          const initialValues: Record<string, string> = {}
+          data.forEach((setting: Setting) => {
+            initialValues[setting.key] = setting.value
+          })
+          setEditedValues(initialValues)
+        }
       }
     } catch (error) {
       console.error('Ayarlar yüklenirken hata:', error)
@@ -88,7 +118,17 @@ export default function SettingsPage() {
       <Card>
         <h2 className="text-xl font-bold text-gray-900 mb-6">Kargo Ayarları</h2>
         <div className="space-y-4">
-          {settings
+          {settings.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p className="mb-4">Ayar bulunamadı. Lütfen sayfayı yenileyin.</p>
+              <Button onClick={fetchSettings}>Yeniden Yükle</Button>
+            </div>
+          ) : settings.filter(s => s.key === 'shipping_fee').length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p className="mb-4">Kargo ücreti ayarı bulunamadı. Otomatik oluşturuluyor...</p>
+            </div>
+          ) : (
+            settings
             .filter(s => s.key === 'shipping_fee')
             .map((setting) => (
               <div key={setting.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
@@ -116,15 +156,10 @@ export default function SettingsPage() {
                   {saving === setting.key ? 'Kaydediliyor...' : 'Kaydet'}
                 </Button>
               </div>
-            ))}
+            ))
+          )}
         </div>
       </Card>
-
-      {settings.length === 0 && (
-        <Card className="text-center py-12">
-          <p className="text-gray-600">Henüz ayar bulunmuyor</p>
-        </Card>
-      )}
     </div>
   )
 }
