@@ -63,9 +63,25 @@ export async function PUT(
     }
 
     // Full update için
-    if (!data.title || !data.type || !data.scope || !data.value) {
+    if (!data.title || !data.type || !data.scope) {
       return NextResponse.json(
-        { error: 'Gerekli alanlar eksik' },
+        { error: 'Kampanya adı, tipi ve kapsamı gereklidir' },
+        { status: 400 }
+      )
+    }
+
+    // Ücretsiz kargo değilse değer zorunlu
+    if (data.type !== 'FREE_SHIPPING' && !data.value) {
+      return NextResponse.json(
+        { error: 'İndirim değeri gereklidir' },
+        { status: 400 }
+      )
+    }
+
+    // Sepet tutarına göre ise minimum tutar zorunlu
+    if (data.scope === 'CART' && !data.minAmount) {
+      return NextResponse.json(
+        { error: 'Sepet tutarı kampanyası için minimum tutar gereklidir' },
         { status: 400 }
       )
     }
