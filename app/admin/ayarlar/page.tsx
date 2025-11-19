@@ -117,6 +117,12 @@ export default function SettingsPage() {
           return 'Header ve footer\'da gösterilecek email adresi'
         case 'contact_address':
           return 'Footer\'da gösterilecek adres bilgisi'
+        case 'social_instagram':
+          return 'Footer\'da gösterilecek Instagram profil linki'
+        case 'social_facebook':
+          return 'Footer\'da gösterilecek Facebook sayfa linki'
+        case 'social_whatsapp':
+          return 'WhatsApp iletişim için telefon numarası (ülke kodu ile, örn: 905302084747)'
         default:
           return ''
       }
@@ -186,6 +192,16 @@ export default function SettingsPage() {
           {renderSettingField('contact_phone')}
           {renderSettingField('contact_email')}
           {renderSettingField('contact_address')}
+        </div>
+      </Card>
+
+      {/* Sosyal Medya */}
+      <Card>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Sosyal Medya</h2>
+        <div className="space-y-4">
+          {renderSettingField('social_instagram')}
+          {renderSettingField('social_facebook')}
+          {renderSettingField('social_whatsapp')}
         </div>
       </Card>
     </div>

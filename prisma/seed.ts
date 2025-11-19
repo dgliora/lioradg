@@ -505,6 +505,24 @@ async function main() {
       label: 'Adres',
       type: 'text',
     },
+    {
+      key: 'social_instagram',
+      value: 'https://instagram.com/lioradg',
+      label: 'Instagram Linki',
+      type: 'text',
+    },
+    {
+      key: 'social_facebook',
+      value: 'https://facebook.com/lioradg',
+      label: 'Facebook Linki',
+      type: 'text',
+    },
+    {
+      key: 'social_whatsapp',
+      value: '905302084747',
+      label: 'WhatsApp Numarası',
+      type: 'text',
+    },
   ]
 
   for (const setting of settings) {
