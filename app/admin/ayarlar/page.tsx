@@ -111,6 +111,10 @@ export default function SettingsPage() {
       switch (key) {
         case 'shipping_fee':
           return 'Sepet sayfasında ve mini sepette gösterilecek kargo ücreti'
+        case 'free_shipping_min_amount':
+          return 'Bu tutarın üzerindeki alışverişlerde kargo ücretsiz olacak (kampanyalar hariç)'
+        case 'delivery_time':
+          return 'Sepet ve ürün sayfalarında gösterilecek teslimat süresi bilgisi'
         case 'contact_phone':
           return 'Header ve footer\'da gösterilecek telefon numarası'
         case 'contact_email':
@@ -182,6 +186,8 @@ export default function SettingsPage() {
         <h2 className="text-xl font-bold text-gray-900 mb-6">Kargo Ayarları</h2>
         <div className="space-y-4">
           {renderSettingField('shipping_fee')}
+          {renderSettingField('free_shipping_min_amount')}
+          {renderSettingField('delivery_time')}
         </div>
       </Card>
 

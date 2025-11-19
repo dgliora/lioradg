@@ -523,6 +523,18 @@ async function main() {
       label: 'WhatsApp Numarası',
       type: 'text',
     },
+    {
+      key: 'free_shipping_min_amount',
+      value: '500',
+      label: 'Ücretsiz Kargo Minimum Tutarı (TL)',
+      type: 'number',
+    },
+    {
+      key: 'delivery_time',
+      value: '2-3 iş günü',
+      label: 'Teslimat Süresi',
+      type: 'text',
+    },
   ]
 
   for (const setting of settings) {
