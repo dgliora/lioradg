@@ -110,7 +110,7 @@ export async function PUT(
         description: data.description || null,
         type: data.type,
         scope: data.scope,
-        value: parseFloat(data.value),
+        value: data.type === 'FREE_SHIPPING' ? 0 : (data.value ? parseFloat(data.value) : 0),
         code: data.code || null,
         minAmount: data.minAmount ? parseFloat(data.minAmount) : null,
         maxDiscount: data.maxDiscount ? parseFloat(data.maxDiscount) : null,
