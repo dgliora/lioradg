@@ -535,6 +535,18 @@ async function main() {
       label: 'Teslimat Süresi',
       type: 'text',
     },
+    {
+      key: 'min_order_amount',
+      value: '0',
+      label: 'Minimum Sipariş Tutarı (TL)',
+      type: 'number',
+    },
+    {
+      key: 'cash_on_delivery',
+      value: 'true',
+      label: 'Kapıda Ödeme',
+      type: 'boolean',
+    },
   ]
 
   for (const setting of settings) {

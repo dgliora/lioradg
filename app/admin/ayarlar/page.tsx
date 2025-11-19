@@ -104,6 +104,7 @@ export default function SettingsPage() {
     const getInputType = () => {
       if (setting.type === 'email') return 'email'
       if (setting.type === 'number') return 'number'
+      if (setting.type === 'boolean') return 'checkbox'
       return 'text'
     }
 
@@ -127,10 +128,19 @@ export default function SettingsPage() {
           return 'Footer\'da gösterilecek Facebook sayfa linki'
         case 'social_whatsapp':
           return 'WhatsApp iletişim için telefon numarası (ülke kodu ile, örn: 905302084747)'
+        case 'min_order_amount':
+          return 'Bu tutarın altındaki siparişler kabul edilmeyecek (0 = limit yok)'
+        case 'cash_on_delivery':
+          return 'Kapıda ödeme seçeneğinin aktif/pasif durumu'
         default:
           return ''
       }
     }
+
+    const isBoolean = setting.type === 'boolean'
+    const booleanValue = editedValues[setting.key] !== undefined 
+      ? editedValues[setting.key] === 'true' 
+      : setting.value === 'true'
 
     return (
       <div key={setting.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
@@ -138,14 +148,28 @@ export default function SettingsPage() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {setting.label || setting.key}
           </label>
-          <input
-            type={getInputType()}
-            step={setting.type === 'number' ? '0.01' : undefined}
-            value={editedValues[setting.key] || setting.value}
-            onChange={(e) => setEditedValues({ ...editedValues, [setting.key]: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
-            placeholder={setting.value}
-          />
+          {isBoolean ? (
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={booleanValue}
+                onChange={(e) => setEditedValues({ ...editedValues, [setting.key]: e.target.checked ? 'true' : 'false' })}
+                className="w-5 h-5 text-sage border-gray-300 rounded focus:ring-sage"
+              />
+              <span className="text-sm text-gray-600">
+                {booleanValue ? 'Aktif' : 'Pasif'}
+              </span>
+            </div>
+          ) : (
+            <input
+              type={getInputType()}
+              step={setting.type === 'number' ? '0.01' : undefined}
+              value={editedValues[setting.key] || setting.value}
+              onChange={(e) => setEditedValues({ ...editedValues, [setting.key]: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
+              placeholder={setting.value}
+            />
+          )}
           {getDescription() && (
             <p className="text-xs text-gray-500 mt-1">
               {getDescription()}
@@ -208,6 +232,15 @@ export default function SettingsPage() {
           {renderSettingField('social_instagram')}
           {renderSettingField('social_facebook')}
           {renderSettingField('social_whatsapp')}
+        </div>
+      </Card>
+
+      {/* Ödeme Ayarları */}
+      <Card>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Ödeme Ayarları</h2>
+        <div className="space-y-4">
+          {renderSettingField('min_order_amount')}
+          {renderSettingField('cash_on_delivery')}
         </div>
       </Card>
     </div>
