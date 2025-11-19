@@ -26,7 +26,9 @@ export function MiniCart() {
     } else if (mounted && items.length === 0) {
       setShippingCost(89.90)
     }
-  }, [items, mounted])
+    // items array'inin içeriğini serialize ederek dependency olarak kullan
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(items.map(item => ({ id: item.product.id, quantity: item.quantity }))), mounted])
 
   if (!mounted) return null
 

@@ -33,13 +33,17 @@ export default function CartPage() {
         return sum + (item.product.price * item.quantity)
       }, 0)
       setTotalPrice(total)
-      
-      // Kargo ücretini hesapla
-      calculateShippingFee(total).then(fee => {
+    }
+  }, [cartStore.items, mounted])
+
+  // Sepet tutarı değiştiğinde kargo ücretini yeniden hesapla
+  useEffect(() => {
+    if (mounted && totalPrice >= 0) {
+      calculateShippingFee(totalPrice).then(fee => {
         setShippingFee(fee)
       })
     }
-  }, [cartStore.items, mounted])
+  }, [totalPrice, mounted])
 
   if (!mounted || authLoading) {
     return null
