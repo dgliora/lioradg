@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Card, Button, useToast } from '@/components/ui'
 import { useCartStore } from '@/lib/store/cartStore'
 import { useAuth } from '@/lib/contexts/AuthContext'
+import { calculateShippingFee } from '@/lib/utils/shipping'
 
 export default function CartPage() {
   const router = useRouter()
@@ -23,7 +24,7 @@ export default function CartPage() {
   // Store'dan verileri al (mounted olduktan sonra)
   const [cartItems, setCartItems] = useState([])
   const [totalPrice, setTotalPrice] = useState(0)
-  const shippingFee = 89.90
+  const [shippingFee, setShippingFee] = useState(89.90)
 
   useEffect(() => {
     if (mounted) {
@@ -32,6 +33,11 @@ export default function CartPage() {
         return sum + (item.product.price * item.quantity)
       }, 0)
       setTotalPrice(total)
+      
+      // Kargo ücretini hesapla
+      calculateShippingFee(total).then(fee => {
+        setShippingFee(fee)
+      })
     }
   }, [cartStore.items, mounted])
 
@@ -227,8 +233,8 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-neutral-medium">Kargo Bedeli</span>
-                    <span className="font-medium text-neutral">
-                      {shippingFee.toLocaleString('tr-TR', {
+                    <span className={shippingFee === 0 ? 'text-success font-medium' : 'font-medium text-neutral'}>
+                      {shippingFee === 0 ? 'Ücretsiz' : shippingFee.toLocaleString('tr-TR', {
                         style: 'currency',
                         currency: 'TRY',
                       })}

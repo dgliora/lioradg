@@ -6,18 +6,30 @@ import Image from 'next/image'
 import { useCartStore } from '@/lib/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui'
+import { calculateShippingFee } from '@/lib/utils/shipping'
 
 export function MiniCart() {
   const [mounted, setMounted] = useState(false)
+  const [shippingCost, setShippingCost] = useState(89.90)
   const { items, removeItem, getTotalPrice } = useCartStore()
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  useEffect(() => {
+    if (mounted && items.length > 0) {
+      const total = getTotalPrice()
+      calculateShippingFee(total).then(fee => {
+        setShippingCost(fee)
+      })
+    } else if (mounted && items.length === 0) {
+      setShippingCost(89.90)
+    }
+  }, [items, mounted])
+
   if (!mounted) return null
 
-  const shippingCost = getTotalPrice() >= 500 ? 0 : 29.90
   const total = getTotalPrice() + shippingCost
 
   return (
