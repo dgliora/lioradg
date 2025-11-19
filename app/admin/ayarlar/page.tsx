@@ -132,6 +132,10 @@ export default function SettingsPage() {
           return 'Bu tutarın altındaki siparişler kabul edilmeyecek (0 = limit yok)'
         case 'cash_on_delivery':
           return 'Kapıda ödeme seçeneğinin aktif/pasif durumu'
+        case 'site_title':
+          return 'SEO için kullanılacak site başlığı (meta title)'
+        case 'site_description':
+          return 'SEO için kullanılacak site açıklaması (meta description)'
         default:
           return ''
       }
@@ -241,6 +245,15 @@ export default function SettingsPage() {
         <div className="space-y-4">
           {renderSettingField('min_order_amount')}
           {renderSettingField('cash_on_delivery')}
+        </div>
+      </Card>
+
+      {/* Site Bilgileri */}
+      <Card>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Site Bilgileri</h2>
+        <div className="space-y-4">
+          {renderSettingField('site_title')}
+          {renderSettingField('site_description')}
         </div>
       </Card>
     </div>

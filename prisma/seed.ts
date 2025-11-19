@@ -547,6 +547,18 @@ async function main() {
       label: 'Kapıda Ödeme',
       type: 'boolean',
     },
+    {
+      key: 'site_title',
+      value: 'Liora DG - Doğal Güzellik Ürünleri',
+      label: 'Site Başlığı',
+      type: 'text',
+    },
+    {
+      key: 'site_description',
+      value: 'Doğal ve organik güzellik ürünleri ile kendinizi şımartın',
+      label: 'Site Açıklaması',
+      type: 'text',
+    },
   ]
 
   for (const setting of settings) {
