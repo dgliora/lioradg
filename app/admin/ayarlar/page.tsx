@@ -136,6 +136,10 @@ export default function SettingsPage() {
           return 'SEO için kullanılacak site başlığı (meta title)'
         case 'site_description':
           return 'SEO için kullanılacak site açıklaması (meta description)'
+        case 'email_notifications':
+          return 'Yeni sipariş ve stok uyarıları için email bildirimlerinin aktif/pasif durumu'
+        case 'stock_alert_threshold':
+          return 'Bu sayının altındaki stoklarda admin paneline uyarı gösterilecek'
         default:
           return ''
       }
@@ -254,6 +258,15 @@ export default function SettingsPage() {
         <div className="space-y-4">
           {renderSettingField('site_title')}
           {renderSettingField('site_description')}
+        </div>
+      </Card>
+
+      {/* Bildirimler */}
+      <Card>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Bildirimler</h2>
+        <div className="space-y-4">
+          {renderSettingField('email_notifications')}
+          {renderSettingField('stock_alert_threshold')}
         </div>
       </Card>
     </div>

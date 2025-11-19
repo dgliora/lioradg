@@ -559,6 +559,18 @@ async function main() {
       label: 'Site Açıklaması',
       type: 'text',
     },
+    {
+      key: 'email_notifications',
+      value: 'true',
+      label: 'Email Bildirimleri',
+      type: 'boolean',
+    },
+    {
+      key: 'stock_alert_threshold',
+      value: '10',
+      label: 'Stok Uyarı Eşiği',
+      type: 'number',
+    },
   ]
 
   for (const setting of settings) {
