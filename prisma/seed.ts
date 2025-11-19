@@ -571,6 +571,24 @@ async function main() {
       label: 'Stok Uyarı Eşiği',
       type: 'number',
     },
+    {
+      key: 'hero_slider_images',
+      value: '',
+      label: 'Ana Sayfa Slider Fotoğrafları',
+      type: 'text',
+    },
+    {
+      key: 'hero_slider_auto_play',
+      value: 'true',
+      label: 'Slider Otomatik Oynatma',
+      type: 'boolean',
+    },
+    {
+      key: 'hero_slider_interval',
+      value: '5000',
+      label: 'Slider Geçiş Süresi (ms)',
+      type: 'number',
+    },
   ]
 
   for (const setting of settings) {

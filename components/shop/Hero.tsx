@@ -1,11 +1,25 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui'
 import { motion } from 'framer-motion'
 import { Parallax } from 'react-scroll-parallax'
+import { HeroSlider } from './HeroSlider'
 
 export function Hero() {
+  const [sliderData, setSliderData] = useState<{
+    images: string[]
+    autoPlay: boolean
+    interval: number
+  }>({ images: [], autoPlay: true, interval: 5000 })
+
+  useEffect(() => {
+    fetch('/api/settings/hero-slider')
+      .then((res) => res.json())
+      .then((data) => setSliderData(data))
+      .catch(() => {})
+  }, [])
   return (
     <section className="relative min-h-screen flex items-center gradient-hero overflow-hidden">
       {/* Parallax Decorative Elements */}
@@ -99,21 +113,18 @@ export function Hero() {
               </motion.div>
             </motion.div>
 
-            {/* Right: Image/Visual with Parallax */}
+            {/* Right: Slider/Visual with Parallax */}
             <Parallax speed={5} className="relative hidden lg:block">
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
-                className="relative aspect-square rounded-card overflow-hidden"
               >
-                <div className="absolute inset-0 gradient-sage opacity-20" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-white p-16">
-                    <div className="text-6xl mb-6">🌿</div>
-                    <p className="text-2xl font-serif font-semibold">Premium Doğal Bakım</p>
-                  </div>
-                </div>
+                <HeroSlider
+                  images={sliderData.images}
+                  autoPlay={sliderData.autoPlay}
+                  interval={sliderData.interval}
+                />
               </motion.div>
             </Parallax>
           </div>
