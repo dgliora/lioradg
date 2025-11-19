@@ -67,7 +67,9 @@ export default async function CampaignsPage() {
                       <span>
                         {new Date(campaign.startDate).toLocaleDateString('tr-TR')} - {new Date(campaign.endDate).toLocaleDateString('tr-TR')}
                       </span>
-                      <span className="text-sage font-semibold">Devam Ediyor</span>
+                      <Link href="/urunler" className="text-sage font-semibold hover:underline">
+                        Hemen Alışverişe Başla →
+                      </Link>
                     </div>
                   </div>
                 </Card>
@@ -77,7 +79,7 @@ export default async function CampaignsPage() {
         )}
 
         {/* Campaign Banners */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="mb-12">
           <Link href="/urunler/krem-bakim">
             <Card hover padding="none" className="overflow-hidden group cursor-pointer">
               <div className="relative h-64 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
@@ -93,27 +95,6 @@ export default async function CampaignsPage() {
                   </p>
                   <span className="text-primary font-semibold group-hover:underline">
                     Hemen Alışverişe Başla →
-                  </span>
-                </div>
-              </div>
-            </Card>
-          </Link>
-
-          <Link href="/urunler/bitkisel-yaglar">
-            <Card hover padding="none" className="overflow-hidden group cursor-pointer">
-              <div className="relative h-64 bg-gradient-to-br from-accent/10 to-primary/10 flex items-center justify-center">
-                <div className="text-center p-8">
-                  <Badge variant="warning" size="lg" className="mb-4">
-                    Yeni Koleksiyon
-                  </Badge>
-                  <h2 className="text-h2 font-bold text-neutral-900 mb-2">
-                    Bitkisel Yağlar Serisi
-                  </h2>
-                  <p className="text-neutral-600 mb-4">
-                    Difüzör için özel yağlar
-                  </p>
-                  <span className="text-primary font-semibold group-hover:underline">
-                    Keşfet →
                   </span>
                 </div>
               </div>
