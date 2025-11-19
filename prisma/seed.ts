@@ -480,17 +480,41 @@ async function main() {
   }
 
   // Ayarları oluştur
-  const shippingFee = await prisma.setting.upsert({
-    where: { key: 'shipping_fee' },
-    update: {},
-    create: {
+  const settings = [
+    {
       key: 'shipping_fee',
       value: '89.90',
       label: 'Kargo Ücreti (TL)',
       type: 'number',
     },
-  })
-  console.log('✅ Kargo ücreti ayarı oluşturuldu:', shippingFee.value, 'TL')
+    {
+      key: 'contact_phone',
+      value: '+90 530 208 47 47',
+      label: 'Telefon Numarası',
+      type: 'text',
+    },
+    {
+      key: 'contact_email',
+      value: 'info@lioradg.com.tr',
+      label: 'Email Adresi',
+      type: 'email',
+    },
+    {
+      key: 'contact_address',
+      value: 'İstanbul, Türkiye',
+      label: 'Adres',
+      type: 'text',
+    },
+  ]
+
+  for (const setting of settings) {
+    await prisma.setting.upsert({
+      where: { key: setting.key },
+      update: {},
+      create: setting,
+    })
+    console.log(`✅ Ayar oluşturuldu: ${setting.label} = ${setting.value}`)
+  }
 
   console.log('🎉 Seeding tamamlandı!')
 }

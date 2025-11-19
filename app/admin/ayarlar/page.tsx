@@ -97,6 +97,62 @@ export default function SettingsPage() {
     }
   }
 
+  const renderSettingField = (key: string) => {
+    const setting = settings.find(s => s.key === key)
+    if (!setting) return null
+
+    const getInputType = () => {
+      if (setting.type === 'email') return 'email'
+      if (setting.type === 'number') return 'number'
+      return 'text'
+    }
+
+    const getDescription = () => {
+      switch (key) {
+        case 'shipping_fee':
+          return 'Sepet sayfasında ve mini sepette gösterilecek kargo ücreti'
+        case 'contact_phone':
+          return 'Header ve footer\'da gösterilecek telefon numarası'
+        case 'contact_email':
+          return 'Header ve footer\'da gösterilecek email adresi'
+        case 'contact_address':
+          return 'Footer\'da gösterilecek adres bilgisi'
+        default:
+          return ''
+      }
+    }
+
+    return (
+      <div key={setting.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {setting.label || setting.key}
+          </label>
+          <input
+            type={getInputType()}
+            step={setting.type === 'number' ? '0.01' : undefined}
+            value={editedValues[setting.key] || setting.value}
+            onChange={(e) => setEditedValues({ ...editedValues, [setting.key]: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
+            placeholder={setting.value}
+          />
+          {getDescription() && (
+            <p className="text-xs text-gray-500 mt-1">
+              {getDescription()}
+            </p>
+          )}
+        </div>
+        <Button
+          onClick={() => handleSave(setting.key)}
+          disabled={saving === setting.key}
+          className="whitespace-nowrap"
+        >
+          {saving === setting.key ? 'Kaydediliyor...' : 'Kaydet'}
+        </Button>
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -115,49 +171,21 @@ export default function SettingsPage() {
         <p className="text-gray-600">Sitenin genel ayarlarını buradan yönetebilirsiniz</p>
       </div>
 
+      {/* Kargo Ayarları */}
       <Card>
         <h2 className="text-xl font-bold text-gray-900 mb-6">Kargo Ayarları</h2>
         <div className="space-y-4">
-          {settings.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <p className="mb-4">Ayar bulunamadı. Lütfen sayfayı yenileyin.</p>
-              <Button onClick={fetchSettings}>Yeniden Yükle</Button>
-            </div>
-          ) : settings.filter(s => s.key === 'shipping_fee').length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <p className="mb-4">Kargo ücreti ayarı bulunamadı. Otomatik oluşturuluyor...</p>
-            </div>
-          ) : (
-            settings
-            .filter(s => s.key === 'shipping_fee')
-            .map((setting) => (
-              <div key={setting.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {setting.label || setting.key}
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={editedValues[setting.key] || setting.value}
-                    onChange={(e) => setEditedValues({ ...editedValues, [setting.key]: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
-                    placeholder={setting.value}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Sepet sayfasında ve mini sepette gösterilecek kargo ücreti
-                  </p>
-                </div>
-                <Button
-                  onClick={() => handleSave(setting.key)}
-                  disabled={saving === setting.key}
-                  className="whitespace-nowrap"
-                >
-                  {saving === setting.key ? 'Kaydediliyor...' : 'Kaydet'}
-                </Button>
-              </div>
-            ))
-          )}
+          {renderSettingField('shipping_fee')}
+        </div>
+      </Card>
+
+      {/* İletişim Bilgileri */}
+      <Card>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">İletişim Bilgileri</h2>
+        <div className="space-y-4">
+          {renderSettingField('contact_phone')}
+          {renderSettingField('contact_email')}
+          {renderSettingField('contact_address')}
         </div>
       </Card>
     </div>
