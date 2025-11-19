@@ -19,7 +19,11 @@ export async function calculateShippingFee(cartTotal: number): Promise<number> {
     }
 
     const data = await response.json()
-    console.log(`📦 Sepet tutarı: ${cartTotal} TL, Ücretsiz kargo: ${data.freeShipping ? 'EVET' : 'HAYIR'}`)
+    if (data.debug) {
+      console.log(`📦 Sepet: ${data.debug.cartTotal} TL, Min: ${data.debug.minAmount} TL, Scope: ${data.debug.scope}, Ücretsiz: ${data.freeShipping ? 'EVET ✅' : 'HAYIR ❌'}`)
+    } else {
+      console.log(`📦 Sepet tutarı: ${cartTotal} TL, Ücretsiz kargo: ${data.freeShipping ? 'EVET ✅' : 'HAYIR ❌'}`)
+    }
     return data.freeShipping ? 0 : defaultShippingFee
   } catch (error) {
     console.error('Kargo ücreti hesaplanırken hata:', error)

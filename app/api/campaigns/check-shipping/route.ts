@@ -31,22 +31,47 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    console.log(`🔍 Kargo kontrolü: Sepet tutarı = ${cartTotal} TL, Aktif kampanya sayısı = ${campaigns.length}`)
+
     // Kampanyaları kontrol et
     for (const campaign of campaigns) {
+      console.log(`📋 Kampanya: scope=${campaign.scope}, minAmount=${campaign.minAmount}`)
+      
       // Eğer kampanya "Sepet Tutarına Göre" ise
       if (campaign.scope === 'CART') {
-        const minAmount = campaign.minAmount ? parseFloat(campaign.minAmount.toString()) : null
-        if (minAmount !== null && cartTotal >= minAmount) {
+        // minAmount MUTLAKA olmalı
+        if (!campaign.minAmount) {
+          console.log(`⚠️ CART kampanyası ama minAmount yok, atlanıyor`)
+          continue
+        }
+        
+        const minAmount = parseFloat(campaign.minAmount.toString())
+        if (cartTotal >= minAmount) {
           console.log(`✅ Ücretsiz kargo: Sepet ${cartTotal} >= Minimum ${minAmount}`)
-          return NextResponse.json({ freeShipping: true })
+          return NextResponse.json({ 
+            freeShipping: true,
+            debug: { cartTotal, minAmount, scope: campaign.scope }
+          })
         } else {
           console.log(`❌ Ücretsiz kargo yok: Sepet ${cartTotal} < Minimum ${minAmount}`)
         }
       }
-      // Eğer kampanya "Tüm Ürünler" ise
+      // Eğer kampanya "Tüm Ürünler" ise - SADECE minAmount yoksa veya 0 ise
       else if (campaign.scope === 'ALL') {
-        console.log(`✅ Ücretsiz kargo: Tüm ürünler kampanyası aktif`)
-        return NextResponse.json({ freeShipping: true })
+        // ALL scope'unda da minAmount kontrolü yapalım (eğer varsa)
+        if (campaign.minAmount) {
+          const minAmount = parseFloat(campaign.minAmount.toString())
+          if (cartTotal >= minAmount) {
+            console.log(`✅ Ücretsiz kargo (ALL): Sepet ${cartTotal} >= Minimum ${minAmount}`)
+            return NextResponse.json({ freeShipping: true })
+          } else {
+            console.log(`❌ Ücretsiz kargo yok (ALL): Sepet ${cartTotal} < Minimum ${minAmount}`)
+            continue
+          }
+        } else {
+          console.log(`✅ Ücretsiz kargo: Tüm ürünler kampanyası aktif (minAmount yok)`)
+          return NextResponse.json({ freeShipping: true })
+        }
       }
     }
 
