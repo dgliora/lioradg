@@ -133,8 +133,18 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!formData.title || !formData.value || !formData.startDate || !formData.endDate) {
-      alert('Lütfen gerekli alanları doldurun')
+    // Validasyon
+    const missingFields = []
+    if (!formData.title) missingFields.push('Kampanya Adı')
+    if (formData.type !== 'FREE_SHIPPING' && !formData.value) missingFields.push('İndirim Değeri')
+    if (!formData.startDate) missingFields.push('Başlangıç Tarihi')
+    if (!formData.endDate) missingFields.push('Bitiş Tarihi')
+    if (formData.scope === 'CATEGORY' && formData.targetCategories.length === 0) missingFields.push('Kategori Seçimi')
+    if (formData.scope === 'PRODUCT' && formData.targetProducts.length === 0) missingFields.push('Ürün Seçimi')
+    if (formData.scope === 'CART' && !formData.minAmount) missingFields.push('Minimum Sepet Tutarı')
+
+    if (missingFields.length > 0) {
+      alert(`Lütfen aşağıdaki alanları doldurun:\n\n${missingFields.map(field => `- ${field}`).join('\n')}`)
       return
     }
 
