@@ -104,12 +104,8 @@ export function ProductFilters({ categories, currentCategorySlug }: ProductFilte
           {categories.map((category) => {
             const isActive = category.slug === currentCategorySlug
             const icons: { [key: string]: string } = {
-              'parfumler': '🌸',
-              'tonikler': '💧',
-              'sampuan-sac-bakim': '🧴',
-              'krem-bakim': '✨',
               'bitkisel-yaglar': '🌿',
-              'oda-tekstil-kokulari': '🏠',
+              'oda-tekstil-kokulari': '🕯️',
             }
             return (
               <button

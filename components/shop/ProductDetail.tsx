@@ -17,14 +17,14 @@ interface ProductDetailProps {
 
 export function ProductDetail({ product }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1)
-  const [activeTab, setActiveTab] = useState<'description' | 'content' | 'usage' | 'reviews'>('description')
+  const [activeTab, setActiveTab] = useState<'description' | 'content' | 'usage'>('description')
   const [selectedImage, setSelectedImage] = useState(0)
   const addItem = useCartStore((state) => state.addItem)
   const { showToast } = useToast()
 
   const hasDiscount = product.salePrice && product.salePrice < product.price
   const discountPercent = hasDiscount
-    ? Math.round(((product.price - product.salePrice) / product.price) * 100)
+    ? Math.round(((product.price - product.salePrice!) / product.price) * 100)
     : 0
 
   const finalPrice = product.salePrice || product.price
@@ -163,7 +163,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               {hasDiscount ? (
                 <div className="flex items-center gap-3">
                   <span className="text-3xl font-bold text-secondary">
-                    {formatPrice(product.salePrice)}
+                    {formatPrice(product.salePrice!)}
                   </span>
                   <span className="text-xl text-gray-500 line-through">
                     {formatPrice(product.price)}
@@ -263,100 +263,53 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
         {/* Tabs */}
         <div className="border-t border-gray-200 pt-8">
-          <div className="flex gap-6 border-b border-gray-200 mb-8">
+          <div className="flex gap-1 sm:gap-4 border-b border-gray-200 mb-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab('description')}
-              className={`pb-3 font-medium transition-colors ${
+              className={`pb-3 px-2 font-medium transition-colors whitespace-nowrap ${
                 activeTab === 'description'
                   ? 'text-primary border-b-2 border-primary'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Açıklama
+              Özellikleri
             </button>
-            {product.content && (
-              <button
-                onClick={() => setActiveTab('content')}
-                className={`pb-3 font-medium transition-colors ${
-                  activeTab === 'content'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                İçerik
-              </button>
-            )}
-            {product.usage && (
-              <button
-                onClick={() => setActiveTab('usage')}
-                className={`pb-3 font-medium transition-colors ${
-                  activeTab === 'usage'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Kullanım
-              </button>
-            )}
             <button
-              onClick={() => setActiveTab('reviews')}
-              className={`pb-3 font-medium transition-colors ${
-                activeTab === 'reviews'
+              onClick={() => setActiveTab('content')}
+              className={`pb-3 px-2 font-medium transition-colors whitespace-nowrap ${
+                activeTab === 'content'
                   ? 'text-primary border-b-2 border-primary'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Yorumlar ({product.reviews?.length || 0})
+              Bilinen Faydaları
+            </button>
+            <button
+              onClick={() => setActiveTab('usage')}
+              className={`pb-3 px-2 font-medium transition-colors whitespace-nowrap ${
+                activeTab === 'usage'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Kullanım Alanı
             </button>
           </div>
 
           <div className="prose max-w-none">
             {activeTab === 'description' && (
-              <div className="text-gray-700 whitespace-pre-line">
-                {product.description || 'Ürün açıklaması bulunmamaktadır.'}
+              <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                {product.description || 'Bilgi bulunmamaktadır.'}
               </div>
             )}
-            {activeTab === 'content' && product.content && (
-              <div className="text-gray-700 whitespace-pre-line">{product.content}</div>
+            {activeTab === 'content' && (
+              <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                {product.content || 'Bilgi bulunmamaktadır.'}
+              </div>
             )}
-            {activeTab === 'usage' && product.usage && (
-              <div className="text-gray-700 whitespace-pre-line">{product.usage}</div>
-            )}
-            {activeTab === 'reviews' && (
-              <div>
-                {product.reviews && product.reviews.length > 0 ? (
-                  <div className="space-y-6">
-                    {product.reviews.map((review: any) => (
-                      <div key={review.id} className="border-b border-gray-200 pb-6">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <svg
-                                key={star}
-                                className={`w-4 h-4 ${
-                                  star <= review.rating ? 'text-yellow-400' : 'text-gray-300'
-                                }`}
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                              </svg>
-                            ))}
-                          </div>
-                          <span className="font-medium text-gray-900">{review.user.name}</span>
-                          <span className="text-sm text-gray-500">
-                            {new Date(review.createdAt).toLocaleDateString('tr-TR')}
-                          </span>
-                        </div>
-                        {review.comment && (
-                          <p className="text-gray-700">{review.comment}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-600">Henüz yorum yapılmamış.</p>
-                )}
+            {activeTab === 'usage' && (
+              <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                {product.usage || 'Bilgi bulunmamaktadır.'}
               </div>
             )}
           </div>

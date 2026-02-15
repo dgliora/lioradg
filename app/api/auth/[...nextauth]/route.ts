@@ -23,14 +23,14 @@ const { handlers } = NextAuth({
           }
 
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
+            where: { email: credentials.email as string },
           })
 
           if (!user) {
             return null
           }
 
-          const isValid = await verifyPassword(credentials.password, user.password)
+          const isValid = await verifyPassword(credentials.password as string, user.password)
           if (!isValid) {
             return null
           }
@@ -71,9 +71,9 @@ const { handlers } = NextAuth({
     },
     async jwt({ token, user }) {
       try {
-        if (user) {
+        if (user && user.id) {
           token.id = user.id
-          token.role = user.role
+          token.role = user.role as any
           token.email = user.email
           token.name = user.name
           return token

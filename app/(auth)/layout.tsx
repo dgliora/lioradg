@@ -1,5 +1,6 @@
 'use client'
 
+import { SessionProvider } from 'next-auth/react'
 import { AuthProvider } from '@/lib/contexts/AuthContext'
 import { ToastProvider } from '@/components/ui'
 
@@ -9,9 +10,10 @@ export default function AuthLayout({
   children: React.ReactNode
 }) {
   return (
-    <AuthProvider>
-      <ToastProvider>{children}</ToastProvider>
-    </AuthProvider>
+    <SessionProvider>
+      <AuthProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </AuthProvider>
+    </SessionProvider>
   )
 }
-

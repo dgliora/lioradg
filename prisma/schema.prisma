@@ -3,13 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./prisma/dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
   USER
   ADMIN
+  STAFF
 }
 
 enum OrderStatus {
@@ -20,6 +22,12 @@ enum OrderStatus {
   DELIVERED
   CANCELLED
   REFUNDED
+}
+
+enum CartStatus {
+  ACTIVE
+  ORDERED
+  ABANDONED
 }
 
 enum CampaignType {
@@ -80,6 +88,7 @@ model Product {
   usage       String?
   price       Float
   salePrice   Float?
+  costPrice   Float?
   sku         String?  @unique
   stock       Int      @default(0)
   images      String
@@ -132,10 +141,14 @@ model Cart {
   id        String     @id @default(cuid())
   userId    String     @unique
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email     String?
+  status    CartStatus @default(ACTIVE)
+  total     Float      @default(0)
   items     CartItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
+  @@index([status])
   @@map("carts")
 }
 
@@ -244,4 +257,15 @@ model Setting {
   updatedAt DateTime @updatedAt
 
   @@map("settings")
+}
+
+model MailLog {
+  id     String   @id @default(cuid())
+  userId String?
+  email  String
+  type   String
+  sentAt DateTime @default(now())
+
+  @@index([email, type, sentAt])
+  @@map("mail_logs")
 }

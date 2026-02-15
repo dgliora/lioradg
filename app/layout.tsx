@@ -17,8 +17,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-XRSGB1BXFF"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-XRSGB1BXFF');
+            `,
+          }}
+        />
+      </head>
+      <body className={inter.className}>
+        {children}
+      </body>
     </html>
   )
 }
-

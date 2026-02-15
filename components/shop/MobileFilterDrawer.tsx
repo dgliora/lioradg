@@ -51,12 +51,8 @@ export function MobileFilterDrawer({
   }
 
   const icons: { [key: string]: string } = {
-    'parfumler': '🌸',
-    'tonikler': '💧',
-    'sampuan-sac-bakim': '🧴',
-    'krem-bakim': '✨',
     'bitkisel-yaglar': '🌿',
-    'oda-tekstil-kokulari': '🏠',
+    'oda-tekstil-kokulari': '🕯️',
   }
 
   const sortOptions = [

@@ -29,7 +29,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const isFav = isMounted ? isFavorite(product.id) : false
   const hasDiscount = product.salePrice && product.salePrice < product.price
   const discountPercent = hasDiscount
-    ? Math.round(((product.price - product.salePrice) / product.price) * 100)
+    ? Math.round(((product.price - product.salePrice!) / product.price) * 100)
     : 0
 
   const mainImage = product.images?.split(',')[0] || '/placeholder.jpg'

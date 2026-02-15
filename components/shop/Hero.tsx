@@ -80,7 +80,7 @@ export function Hero() {
                 transition={{ delay: 0.5, duration: 0.8 }}
                 className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
               >
-                <Link href="/urunler/krem-bakim">
+                <Link href="/urunler/bitkisel-yaglar">
                   <Button size="lg" className="min-w-[200px]">
                     Ürünleri Keşfet
                     <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -60,7 +60,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           </motion.div>
 
           <div className="text-center">
-            <Link href="/urunler/krem-bakim">
+            <Link href="/urunler/bitkisel-yaglar">
               <Button size="lg" variant="outline">
                 Tüm Ürünleri Görüntüle
                 <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

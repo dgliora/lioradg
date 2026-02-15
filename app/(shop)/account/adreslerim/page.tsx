@@ -125,24 +125,22 @@ export default function AddressesPage() {
   const handleDelete = (id: string) => {
     if (confirm('Bu adresi silmek istediğinizden emin misiniz?')) {
       const addressToDelete = addresses.find(addr => addr.id === id)
-      if (addressToDelete?.isDefault) {
-        // Varsayılan adres siliniyorsa başka birini varsayılan yap
-        const remainingAddresses = addresses.filter(addr => addr.id !== id)
-        if (remainingAddresses.length > 0) {
-          const updatedAddresses = remainingAddresses.map((addr, index) => ({
-            ...addr,
-            isDefault: index === 0
-          }))
-          localStorage.setItem('user-addresses', JSON.stringify(updatedAddresses))
-          setAddresses(updatedAddresses)
-          showToast('Varsayılan adres güncellendi', 'info')
-        }
-      } else {
-        const updatedAddresses = addresses.filter((addr) => addr.id !== id)
+      const remainingAddresses = addresses.filter(addr => addr.id !== id)
+      
+      if (addressToDelete?.isDefault && remainingAddresses.length > 0) {
+        // Varsayılan adres siliniyorsa ilk kalan adresi varsayılan yap
+        const updatedAddresses = remainingAddresses.map((addr, index) => ({
+          ...addr,
+          isDefault: index === 0
+        }))
         localStorage.setItem('user-addresses', JSON.stringify(updatedAddresses))
         setAddresses(updatedAddresses)
-        showToast('Adres silindi', 'info')
+      } else {
+        localStorage.setItem('user-addresses', JSON.stringify(remainingAddresses))
+        setAddresses(remainingAddresses)
       }
+      
+      showToast('Adres silindi', 'success')
     }
   }
 

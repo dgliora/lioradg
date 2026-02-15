@@ -136,7 +136,7 @@ export default function CampaignTemplatesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Kampanya Şablonları</h1>
-          <p className="text-gray-600">Türkiye'nin resmi ve özel gün kampanyaları - Bir tıkla aktive et!</p>
+          <p className="text-gray-600">Türkiye&apos;nin resmi ve özel gün kampanyaları - Bir tıkla aktive et!</p>
         </div>
         <Link href="/admin/kampanyalar">
           <Button variant="ghost">

@@ -24,7 +24,8 @@ export function ProductGrid({
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('sayfa', page.toString())
-    router.push(`/urunler/${categorySlug}?${params.toString()}`)
+    const baseUrl = categorySlug === 'all' ? '/urunler' : `/urunler/${categorySlug}`
+    router.push(`${baseUrl}?${params.toString()}`)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 

@@ -3,13 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import { Card, Input, Button, useToast } from '@/components/ui'
-import { useAuth } from '@/lib/contexts/AuthContext'
 import { LogoLioraDG } from '@/components/LogoLioraDG'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { login } = useAuth()
   const { showToast } = useToast()
   const [formData, setFormData] = useState({
     name: '',
@@ -21,23 +20,30 @@ export default function RegisterPage() {
     termsConsent: false,
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (formData.password !== formData.passwordConfirm) {
-      alert('Şifreler eşleşmiyor!')
+      showToast('Şifreler eşleşmiyor!', 'error')
+      return
+    }
+
+    if (formData.password.length < 6) {
+      showToast('Şifre en az 6 karakter olmalı', 'error')
       return
     }
 
     if (!formData.termsConsent) {
-      alert('Üyelik koşulları ve KVKK metnini onaylamanız gerekmektedir.')
+      showToast('Üyelik koşulları ve KVKK metnini onaylamanız gerekmektedir.', 'error')
       return
     }
 
     setIsSubmitting(true)
     
     try {
+      // 1) Kullanıcıyı oluştur
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,11 +63,22 @@ export default function RegisterPage() {
         return
       }
 
-      // Auto-login after registration
-      login(data.user)
-      
-      showToast(`Hoş geldiniz ${data.user.name}! Hesabınıza e-posta gönderildi.`, 'success')
-      router.push('/account')
+      // 2) NextAuth ile otomatik giriş yap (session oluştursun)
+      const signInResult = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (signInResult?.ok) {
+        showToast(`Hoş geldiniz ${data.user.name}! Hesabınız oluşturuldu.`, 'success')
+        router.push('/account')
+        router.refresh()
+      } else {
+        // Kayıt başarılı ama giriş olmadı, giriş sayfasına yönlendir
+        showToast('Hesabınız oluşturuldu. Lütfen giriş yapın.', 'success')
+        router.push('/giris')
+      }
     } catch (error) {
       showToast('Bir hata oluştu', 'error')
     } finally {
@@ -69,11 +86,21 @@ export default function RegisterPage() {
     }
   }
 
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true)
+    try {
+      await signIn('google', { callbackUrl: '/account' })
+    } catch {
+      showToast('Google ile kayıt sırasında hata oluştu', 'error')
+      setIsGoogleLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center py-12 px-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-32">
-          <Link href="/" className="inline-block mb-24">
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-block mb-4">
             <LogoLioraDG 
               variant="full"
               width={200}
@@ -82,7 +109,7 @@ export default function RegisterPage() {
               showImage={true}
             />
           </Link>
-          <h1 className="text-h2 font-bold text-neutral-900 mb-8">
+          <h1 className="text-2xl font-bold text-neutral-900 mb-2">
             Hesap Oluşturun
           </h1>
           <p className="text-neutral-600">
@@ -91,7 +118,41 @@ export default function RegisterPage() {
         </div>
 
         <Card>
-          <form onSubmit={handleSubmit} className="space-y-16">
+          {/* Google ile Kayıt */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={isGoogleLoading}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isGoogleLoading ? (
+              <svg className="w-5 h-5 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+            )}
+            Google ile Kayıt Ol
+          </button>
+
+          {/* Ayırıcı */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-white px-4 text-gray-400">veya</span>
+            </div>
+          </div>
+
+          {/* Email/Şifre Formu */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               label="Ad Soyad"
               type="text"
@@ -115,7 +176,7 @@ export default function RegisterPage() {
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="En az 8 karakter"
+              placeholder="En az 6 karakter"
               required
             />
             
@@ -128,16 +189,16 @@ export default function RegisterPage() {
               required
             />
 
-            <div className="space-y-3">
-              <label className="flex items-start cursor-pointer p-3 rounded-lg hover:bg-warm-50 transition-colors">
+            <div className="space-y-3 pt-2">
+              <label className="flex items-start cursor-pointer p-3 rounded-lg hover:bg-gray-50 transition-colors">
                 <input
                   type="checkbox"
                   checked={formData.termsConsent}
                   onChange={(e) => setFormData({ ...formData, termsConsent: e.target.checked })}
                   required
-                  className="mt-1 mr-3 text-sage focus:ring-sage"
+                  className="mt-1 mr-3 text-sage focus:ring-sage rounded"
                 />
-                <span className="text-sm text-neutral-medium">
+                <span className="text-sm text-neutral-600">
                   <Link href="/kullanim-sartlari" target="_blank" className="text-sage hover:underline font-medium">
                     Üyelik Koşulları
                   </Link>
@@ -149,27 +210,27 @@ export default function RegisterPage() {
                 </span>
               </label>
 
-              <label className="flex items-start cursor-pointer p-3 rounded-lg hover:bg-warm-50 transition-colors">
+              <label className="flex items-start cursor-pointer p-3 rounded-lg hover:bg-gray-50 transition-colors">
                 <input
                   type="checkbox"
                   checked={formData.emailConsent}
                   onChange={(e) => setFormData({ ...formData, emailConsent: e.target.checked })}
-                  className="mt-1 mr-3 text-sage focus:ring-sage"
+                  className="mt-1 mr-3 text-sage focus:ring-sage rounded"
                 />
-                <span className="text-sm text-neutral-medium">
-                  Kampanyalar ve yeni ürünler hakkında e-posta ile bilgilendirme almak istiyorum
+                <span className="text-sm text-neutral-600">
+                  Kampanyalar ve yeni ürünler hakkında e-posta almak istiyorum
                 </span>
               </label>
 
-              <label className="flex items-start cursor-pointer p-3 rounded-lg hover:bg-warm-50 transition-colors">
+              <label className="flex items-start cursor-pointer p-3 rounded-lg hover:bg-gray-50 transition-colors">
                 <input
                   type="checkbox"
                   checked={formData.smsConsent}
                   onChange={(e) => setFormData({ ...formData, smsConsent: e.target.checked })}
-                  className="mt-1 mr-3 text-sage focus:ring-sage"
+                  className="mt-1 mr-3 text-sage focus:ring-sage rounded"
                 />
-                <span className="text-sm text-neutral-medium">
-                  Özel fırsatlar ve sipariş durumu hakkında SMS ile bilgilendirme almak istiyorum
+                <span className="text-sm text-neutral-600">
+                  Özel fırsatlar ve sipariş durumu hakkında SMS almak istiyorum
                 </span>
               </label>
             </div>
@@ -179,34 +240,8 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-neutral-500">veya</span>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            fullWidth
-            onClick={() => window.location.href = '/api/auth/signin/google'}
-            className="flex items-center justify-center gap-3"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Google ile Kayıt Ol
-          </Button>
-
-          <div className="mt-24 text-center">
-            <p className="text-small text-neutral-600">
+          <div className="mt-6 text-center">
+            <p className="text-sm text-neutral-600">
               Zaten hesabınız var mı?{' '}
               <Link href="/giris" className="text-primary hover:text-primary-hover font-medium">
                 Giriş Yapın
@@ -218,4 +253,3 @@ export default function RegisterPage() {
     </div>
   )
 }
-

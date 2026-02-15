@@ -27,7 +27,7 @@ export function Header() {
   const [contactInfo, setContactInfo] = useState({
     phone: '+90 530 208 47 47',
     email: 'info@lioradg.com.tr',
-    instagram: 'https://instagram.com/lioradg',
+    instagram: 'https://instagram.com/dgliora',
   })
   const cartItems = useCartStore((state) => state.items)
   const favoriteItems = useFavoritesStore((state) => state.items)

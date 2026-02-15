@@ -210,7 +210,7 @@ export default function EditCategoryPage({ params }: { params: { id: string } })
                 placeholder="Boş bırakılırsa otomatik oluşturulur"
               />
               <p className="text-sm text-gray-500 mt-1">
-                URL'de görünecek şekilde. Örn: oda-kokuları
+                URL&apos;de görünecek şekilde. Örn: oda-kokuları
               </p>
             </div>
 

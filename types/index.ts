@@ -18,6 +18,7 @@ export interface Category {
   slug: string
   description?: string | null
   image?: string | null
+  icon?: string | null
   order: number
   createdAt: Date
   updatedAt: Date

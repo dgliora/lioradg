@@ -7,6 +7,7 @@ import { Card, Button, useToast } from '@/components/ui'
 import { useCartStore } from '@/lib/store/cartStore'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { calculateShippingFee } from '@/lib/utils/shipping'
+import type { CartItem } from '@/lib/store/cartStore'
 
 export default function CartPage() {
   const router = useRouter()
@@ -22,7 +23,7 @@ export default function CartPage() {
   }, [])
 
   // Store'dan verileri al (mounted olduktan sonra)
-  const [cartItems, setCartItems] = useState([])
+  const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [totalPrice, setTotalPrice] = useState(0)
   const [shippingFee, setShippingFee] = useState(89.90)
 
@@ -150,7 +151,7 @@ export default function CartPage() {
               {cartItems.map((item) => {
                 const itemTotal = item.product.price * item.quantity
                 return (
-                  <Card key={item.id} className="p-6">
+                  <Card key={item.product.id} className="p-6">
                     <div className="flex items-center gap-4">
                       {/* Ürün Resmi */}
                       <div className="w-20 h-20 bg-warm-50 rounded-lg flex-shrink-0 overflow-hidden relative">
@@ -185,9 +186,9 @@ export default function CartPage() {
                               currency: 'TRY',
                             })}
                           </span>
-                          {item.product.originalPrice && item.product.originalPrice > item.product.price && (
+                          {item.product.salePrice && item.product.salePrice < item.product.price && (
                             <span className="text-sm text-neutral-medium line-through">
-                              {item.product.originalPrice.toLocaleString('tr-TR', {
+                              {item.product.price.toLocaleString('tr-TR', {
                                 style: 'currency',
                                 currency: 'TRY',
                               })}

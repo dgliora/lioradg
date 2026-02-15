@@ -9,11 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Premium Sage Green Palette
+        // Premium Soft Blue Palette
         sage: {
-          DEFAULT: '#8B9D83',
-          light: '#A8B99C',
-          dark: '#6B7C65',
+          DEFAULT: '#839DAB',
+          light: '#9CB8C8',
+          dark: '#657C8B',
         },
         rose: {
           DEFAULT: '#D4A5A5',
@@ -62,7 +62,7 @@ const config: Config = {
       boxShadow: {
         'soft': '0 2px 16px rgba(0, 0, 0, 0.04)',
         'hover': '0 12px 32px rgba(0, 0, 0, 0.12)',
-        'button': '0 4px 20px rgba(139, 157, 131, 0.25)',
+        'button': '0 4px 20px rgba(131, 157, 171, 0.25)',
       },
       maxWidth: {
         container: '1400px',

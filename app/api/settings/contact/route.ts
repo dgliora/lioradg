@@ -16,7 +16,7 @@ export async function GET() {
       phone: phone?.value || '+90 530 208 47 47',
       email: email?.value || 'info@lioradg.com.tr',
       address: address?.value || 'İstanbul, Türkiye',
-      instagram: instagram?.value || 'https://instagram.com/lioradg',
+      instagram: instagram?.value || 'https://instagram.com/dgliora',
       facebook: facebook?.value || 'https://facebook.com/lioradg',
       whatsapp: whatsapp?.value || '905302084747',
     })
@@ -27,7 +27,7 @@ export async function GET() {
         phone: '+90 530 208 47 47',
         email: 'info@lioradg.com.tr',
         address: 'İstanbul, Türkiye',
-        instagram: 'https://instagram.com/lioradg',
+        instagram: 'https://instagram.com/dgliora',
         facebook: 'https://facebook.com/lioradg',
         whatsapp: '905302084747',
       },

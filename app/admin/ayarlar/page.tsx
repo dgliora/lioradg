@@ -197,8 +197,6 @@ export default function SettingsPage() {
           return 'Footer\'da gösterilecek adres bilgisi'
         case 'social_instagram':
           return 'Footer\'da gösterilecek Instagram profil linki'
-        case 'social_facebook':
-          return 'Footer\'da gösterilecek Facebook sayfa linki'
         case 'social_whatsapp':
           return 'WhatsApp iletişim için telefon numarası (ülke kodu ile, örn: 905302084747)'
         case 'min_order_amount':
@@ -311,7 +309,6 @@ export default function SettingsPage() {
         <h2 className="text-xl font-bold text-gray-900 mb-6">Sosyal Medya</h2>
         <div className="space-y-4">
           {renderSettingField('social_instagram')}
-          {renderSettingField('social_facebook')}
           {renderSettingField('social_whatsapp')}
         </div>
       </Card>
@@ -359,7 +356,7 @@ export default function SettingsPage() {
               Slider Fotoğrafları
             </label>
             <p className="text-xs text-gray-500 mb-4">
-              Ana sayfada "Premium Doğal Bakım" bölümünde gösterilecek fotoğraflar
+              Ana sayfada &quot;Premium Doğal Bakım&quot; bölümünde gösterilecek fotoğraflar
             </p>
             
             <div className="mb-4">

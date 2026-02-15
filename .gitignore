@@ -36,3 +36,35 @@ next-env.d.ts
 # prisma
 /prisma/dev.db
 /prisma/dev.db-journal
+
+# zip files
+*.zip
+
+# temp/test files
+quick-test.js
+test-bulk-upload.js
+test-bulk-upload.md
+test-urunler.json
+il.json
+ilce.json
+koy.json
+
+# excel temp
+~$*.xlsx
+
+# node_modules.zip etc
+node_modules.zip
+
+# markdown docs (deployment/test)
+DEPLOYMENT_GUIDE.md
+HIZLI-BASLANGIC.md
+MANUEL-TEST-REHBERI.md
+TEST-OZET.md
+TEST-README.md
+TEST-SONUCLARI.md
+
+# cpanel
+.cpanel.yml
+
+# server
+server.js
