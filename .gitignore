@@ -45,9 +45,9 @@ quick-test.js
 test-bulk-upload.js
 test-bulk-upload.md
 test-urunler.json
-il.json
-ilce.json
-koy.json
+/il.json
+/ilce.json
+/koy.json
 
 # excel temp
 ~$*.xlsx

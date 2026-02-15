@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Card, Button } from '@/components/ui'
@@ -30,6 +30,14 @@ type CampaignTemplate = {
 }
 
 export default function NewCampaignPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-2 border-sage border-t-transparent rounded-full" /></div>}>
+      <NewCampaignContent />
+    </Suspense>
+  )
+}
+
+function NewCampaignContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const templateId = searchParams.get('template')

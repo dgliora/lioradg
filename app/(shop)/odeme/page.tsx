@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -13,6 +13,7 @@ export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart } = useCartStore()
   const { showToast } = useToast()
   const [step, setStep] = useState(1)
+  const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     // Step 1: Shipping Address
     fullName: '',
@@ -28,12 +29,21 @@ export default function CheckoutPage() {
     kvkk: false,
   })
 
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (mounted && items.length === 0) {
+      router.push('/sepet')
+    }
+  }, [mounted, items.length, router])
+
   const shippingCost = getTotalPrice() >= 500 ? 0 : 29.90
   const total = getTotalPrice() + shippingCost
 
-  if (items.length === 0) {
-    router.push('/sepet')
-    return null
+  if (!mounted || items.length === 0) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-2 border-sage border-t-transparent rounded-full" /></div>
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

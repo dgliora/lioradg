@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
+export const dynamic = 'force-dynamic'
+
 interface RawDistrict {
   id: string
   il_id: string
