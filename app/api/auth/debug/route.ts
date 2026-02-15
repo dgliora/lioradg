@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
 export async function GET(req: NextRequest) {
-  const isSecure = req.url.startsWith('https')
-  const cookieName = isSecure ? '__Secure-authjs.session-token' : 'authjs.session-token'
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, salt: cookieName })
+  const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET
+  const token = await getToken({ req, secret })
   
   return NextResponse.json({
     hasToken: !!token,
-    hasSecret: !!process.env.NEXTAUTH_SECRET,
-    secretLength: process.env.NEXTAUTH_SECRET?.length || 0,
+    hasNextAuthSecret: !!process.env.NEXTAUTH_SECRET,
+    hasAuthSecret: !!process.env.AUTH_SECRET,
+    hasAuthUrl: !!process.env.NEXTAUTH_URL,
     tokenRole: token?.role || null,
     tokenEmail: token?.email || null,
     cookies: req.cookies.getAll().map(c => c.name),
+    url: req.url.substring(0, 30),
   })
 }
