@@ -65,13 +65,14 @@ export async function getProfitabilityData(): Promise<ProfitabilityData> {
     })
 
     // costPrice alanını ayrıca çekmeye çalış (migration yapılmamışsa hata vermez)
-    let costPriceMap = new Map<string, number>()
+    const costPriceMap = new Map<string, number>()
     try {
-      const productsWithCost = await prisma.product.findMany({
-        select: { id: true, costPrice: true } as any,
-      })
+      const productsWithCost: Array<{ id: string; costPrice: number | null }> = 
+        await (prisma.product.findMany as any)({
+          select: { id: true, costPrice: true },
+        })
       for (const p of productsWithCost) {
-        costPriceMap.set(p.id, (p as any).costPrice ?? 0)
+        costPriceMap.set(p.id, p.costPrice ?? 0)
       }
     } catch {
       // costPrice alanı henüz DB'de yok — tüm maliyetler 0 olacak
