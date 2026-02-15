@@ -20,23 +20,26 @@ export default function AdminLoginPage() {
     setError('')
     
     try {
-      // redirect: false ile şifre doğrula
-      const result = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
+      // 1) Şifreyi kendi API'mizle doğrula
+      const verifyRes = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, password: formData.password }),
       })
+      const { valid } = await verifyRes.json()
 
-      if (result?.error) {
+      if (!valid) {
         setError('E-posta veya şifre hatalı')
         setIsSubmitting(false)
         return
       }
 
-      // Başarılı — kısa bekleme sonrası full redirect
-      setTimeout(() => {
-        window.location.replace('/admin')
-      }, 500)
+      // 2) Şifre doğru — NextAuth ile giriş yap (full redirect)
+      await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        callbackUrl: '/admin',
+      })
     } catch (error: any) {
       setError('Giriş sırasında bir hata oluştu')
       setIsSubmitting(false)
