@@ -1,7 +1,11 @@
 import { Resend } from 'resend'
 import { prisma } from '@/lib/prisma'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  const key = process.env.RESEND_API_KEY
+  if (!key) throw new Error('RESEND_API_KEY tanımlı değil')
+  return new Resend(key)
+}
 const FROM_EMAIL = process.env.MAIL_FROM || 'Liora DG <noreply@lioradg.com.tr>'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr'
 const COOLDOWN_HOURS = 24
@@ -115,7 +119,7 @@ export async function sendCartReminderEmail(payload: CartReminderPayload): Promi
   `
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: 'Sepetinizde ürünler var! 🛒',
