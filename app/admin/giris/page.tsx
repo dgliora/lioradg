@@ -20,6 +20,7 @@ export default function AdminLoginPage() {
     setError('')
     
     try {
+      // redirect: false ile şifre doğrula
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
@@ -32,15 +33,10 @@ export default function AdminLoginPage() {
         return
       }
 
-      if (result?.ok) {
-        // Başarılı giriş - full reload ile admin paneline yönlendir
-        window.location.href = '/admin'
-        return
-      }
-
-      // Beklenmeyen durum
-      setError('Giriş yapılamadı, lütfen tekrar deneyin')
-      setIsSubmitting(false)
+      // Başarılı — kısa bekleme sonrası full redirect
+      setTimeout(() => {
+        window.location.replace('/admin')
+      }, 500)
     } catch (error: any) {
       setError('Giriş sırasında bir hata oluştu')
       setIsSubmitting(false)
