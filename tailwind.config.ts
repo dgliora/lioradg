@@ -10,6 +10,12 @@ const config: Config = {
     extend: {
       colors: {
         // Premium Soft Blue Palette
+        primary: {
+          DEFAULT: '#839DAB',
+          hover: '#657C8B',
+          light: '#9CB8C8',
+          dark: '#657C8B',
+        },
         sage: {
           DEFAULT: '#839DAB',
           light: '#9CB8C8',
@@ -30,6 +36,7 @@ const config: Config = {
           medium: '#5A5A5A',
           light: '#8E8E8E',
         },
+        focus: '#839DAB',
         success: '#7FCDCD',
         warning: '#E8B86D',
         danger: '#D9A5A0',
