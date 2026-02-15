@@ -18,10 +18,7 @@ const STAFF_RESTRICTED_API = [
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
-  // NextAuth v5 cookie adı: authjs.session-token (HTTPS'de __Secure- prefix'li)
-  const isSecure = request.url.startsWith('https')
-  const cookieName = isSecure ? '__Secure-authjs.session-token' : 'authjs.session-token'
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET, salt: cookieName })
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET })
   const isAdminPath = pathname.startsWith('/admin')
   const isAdminLoginPath = pathname === '/admin/giris'
   const isAdminApi = pathname.startsWith('/api/admin')

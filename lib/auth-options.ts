@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { verifyPassword } from '@/lib/auth'
 
 export const { handlers, auth } = NextAuth({
+  trustHost: true,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -121,5 +122,5 @@ export const { handlers, auth } = NextAuth({
   session: {
     strategy: 'jwt',
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
 })

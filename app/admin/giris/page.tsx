@@ -1,12 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { LogoLioraDG } from '@/components/LogoLioraDG'
 
 export default function AdminLoginPage() {
-  const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -20,26 +18,19 @@ export default function AdminLoginPage() {
     setError('')
     
     try {
-      // 1) Şifreyi kendi API'mizle doğrula
-      const verifyRes = await fetch('/api/auth/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, password: formData.password }),
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
       })
-      const { valid } = await verifyRes.json()
 
-      if (!valid) {
+      if (result?.error) {
         setError('E-posta veya şifre hatalı')
         setIsSubmitting(false)
         return
       }
 
-      // 2) Şifre doğru — NextAuth ile giriş yap (full redirect)
-      await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        callbackUrl: '/admin',
-      })
+      window.location.href = '/admin'
     } catch (error: any) {
       setError('Giriş sırasında bir hata oluştu')
       setIsSubmitting(false)
