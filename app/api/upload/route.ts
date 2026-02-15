@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
+import { checkAdminAuth } from '@/lib/auth-server'
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await checkAdminAuth()
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 })
+    }
+
     const formData = await request.formData()
     const file = formData.get('file') as File
     

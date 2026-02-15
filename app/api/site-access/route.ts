@@ -4,13 +4,16 @@ export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json()
     
-    const correctPassword = process.env.SITE_PASSWORD || 'lioradg2025'
+    const correctPassword = process.env.SITE_PASSWORD
+    if (!correctPassword) {
+      return NextResponse.json({ error: 'Site şifresi yapılandırılmamış' }, { status: 500 })
+    }
     
     if (password === correctPassword) {
       const response = NextResponse.json({ success: true })
       
-      // 30 gün geçerli cookie
-      response.cookies.set('site_access', correctPassword, {
+      // 30 gün geçerli cookie — şifreyi değil sabit token değeri koy
+      response.cookies.set('site_access', 'granted', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

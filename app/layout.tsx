@@ -5,9 +5,30 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Lioradg - Kişisel Bakım ve Temizlik Ürünleri',
+  title: {
+    default: 'Liora DG - Kişisel Bakım ve Temizlik Ürünleri',
+    template: '%s | Liora DG',
+  },
   description: 'Güvenilir, şeffaf ve erişilebilir kişisel bakım ürünleri. Parfüm, tonik, şampuan, krem, bitkisel yağlar ve oda kokuları.',
-  keywords: 'kozmetik, bitkisel ürünler, doğal kozmetik, krem, parfüm, tonik, bakım ürünleri',
+  keywords: 'kozmetik, bitkisel ürünler, doğal kozmetik, krem, parfüm, tonik, bakım ürünleri, liora dg',
+  metadataBase: new URL('https://lioradg.com.tr'),
+  openGraph: {
+    type: 'website',
+    locale: 'tr_TR',
+    url: 'https://lioradg.com.tr',
+    siteName: 'Liora DG',
+    title: 'Liora DG - Kişisel Bakım ve Temizlik Ürünleri',
+    description: 'Güvenilir, şeffaf ve erişilebilir kişisel bakım ürünleri. Parfüm, tonik, şampuan, krem, bitkisel yağlar ve oda kokuları.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Liora DG - Kişisel Bakım ve Temizlik Ürünleri',
+    description: 'Güvenilir, şeffaf ve erişilebilir kişisel bakım ürünleri.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 }
 
 export default function RootLayout({

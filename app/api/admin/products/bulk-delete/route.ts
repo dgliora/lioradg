@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { checkAdminAuth } from '@/lib/auth-server'
 
 export async function POST(request: Request) {
   try {
+    const auth = await checkAdminAuth()
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 })
+    }
+
     const { productIds } = await request.json()
 
     if (!Array.isArray(productIds) || productIds.length === 0) {

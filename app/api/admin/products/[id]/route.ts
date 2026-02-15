@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { checkAdminAuth } from '@/lib/auth-server'
 
 // GET - Tek ürün getir
 export async function GET(
@@ -37,6 +38,11 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const auth = await checkAdminAuth()
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 })
+    }
+
     const body = await request.json()
     
     const {
@@ -121,6 +127,11 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const auth = await checkAdminAuth()
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 })
+    }
+
     // Önce ürünün sipariş ilişkisi var mı kontrol et
     const orderItems = await prisma.orderItem.count({
       where: { productId: params.id },
