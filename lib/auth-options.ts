@@ -4,7 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/prisma'
 import { verifyPassword } from '@/lib/auth'
 
-export const { handlers, auth } = NextAuth({
+export const { handlers, auth, signIn } = NextAuth({
   trustHost: true,
   providers: [
     GoogleProvider({

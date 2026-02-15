@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
 import { LogoLioraDG } from '@/components/LogoLioraDG'
+import { adminLogin } from './actions'
 
 export default function AdminLoginPage() {
   const [formData, setFormData] = useState({
@@ -18,20 +18,13 @@ export default function AdminLoginPage() {
     setError('')
     
     try {
-      const result = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      })
-
+      const result = await adminLogin(formData.email, formData.password)
+      
       if (result?.error) {
-        setError('E-posta veya şifre hatalı')
+        setError(result.error)
         setIsSubmitting(false)
-        return
       }
-
-      window.location.href = '/admin'
-    } catch (error: any) {
+    } catch {
       setError('Giriş sırasında bir hata oluştu')
       setIsSubmitting(false)
     }
