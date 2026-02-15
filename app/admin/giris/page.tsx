@@ -33,10 +33,14 @@ export default function AdminLoginPage() {
       }
 
       if (result?.ok) {
-        // Başarılı giriş - admin paneline yönlendir
-        router.push('/admin')
-        router.refresh()
+        // Başarılı giriş - full reload ile admin paneline yönlendir
+        window.location.href = '/admin'
+        return
       }
+
+      // Beklenmeyen durum
+      setError('Giriş yapılamadı, lütfen tekrar deneyin')
+      setIsSubmitting(false)
     } catch (error: any) {
       setError('Giriş sırasında bir hata oluştu')
       setIsSubmitting(false)
