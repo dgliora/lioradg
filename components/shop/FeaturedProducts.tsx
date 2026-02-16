@@ -50,7 +50,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-16"
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-8 mb-16"
           >
             {products.map((product) => (
               <motion.div key={product.id} variants={item}>

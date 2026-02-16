@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { v4 as uuidv4 } from 'uuid';
 import { sendResetEmail } from '@/lib/email';
+import { checkRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 
 export async function POST(req: NextRequest) {
+  const id = getClientIdentifier(req);
+  const { ok, retryAfter } = checkRateLimit(id, 'forgot-password');
+  if (!ok) {
+    return NextResponse.json(
+      { error: 'Çok fazla deneme. Lütfen bir süre sonra tekrar deneyin.' },
+      { status: 429, headers: retryAfter ? { 'Retry-After': String(retryAfter) } : {} }
+    );
+  }
   try {
     const { email } = await req.json();
     

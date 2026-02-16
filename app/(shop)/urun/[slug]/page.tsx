@@ -2,11 +2,13 @@ import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { getProductBySlug, getRelatedProducts } from '@/lib/api/products'
 import { ProductDetail } from '@/components/shop/ProductDetail'
-import { FeaturedProducts } from '@/components/shop/FeaturedProducts'
+import { formatPrice } from '@/lib/utils'
 
 interface ProductPageProps {
   params: { slug: string }
 }
+
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.vercel.app'
 
 export async function generateMetadata({
   params,
@@ -14,14 +16,33 @@ export async function generateMetadata({
   const product = await getProductBySlug(params.slug)
 
   if (!product) {
-    return {
-      title: 'Ürün Bulunamadı',
-    }
+    return { title: 'Ürün Bulunamadı' }
   }
 
+  const title = `${product.name} - Lioradg`
+  const price = product.salePrice || product.price
+  const description =
+    (product.description?.slice(0, 155) || product.name) +
+    (product.description && product.description.length > 155 ? '...' : '') +
+    ` | ${formatPrice(price)}`
+  const image = product.images?.split(',')[0]?.trim()
+  const imageUrl = image ? (image.startsWith('http') ? image : `${baseUrl}${image.startsWith('/') ? '' : '/'}${image}`) : undefined
+
   return {
-    title: `${product.name} - Lioradg`,
-    description: product.description || product.name,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      ...(imageUrl && { images: [{ url: imageUrl, width: 600, height: 600, alt: product.name }] }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(imageUrl && { images: [imageUrl] }),
+    },
   }
 }
 

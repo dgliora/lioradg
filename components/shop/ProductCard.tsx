@@ -138,19 +138,17 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
 
-          {/* Content */}
-          <div className="p-6 flex flex-col flex-1">
-            {/* Product Name */}
-            <h3 className="text-base font-medium text-neutral mb-3 line-clamp-2 min-h-[48px] group-hover:text-sage transition-colors">
+          {/* Content - mobil padding küçük, fiyat taşmasın */}
+          <div className="p-3 sm:p-4 md:p-6 flex flex-col flex-1 min-w-0">
+            <h3 className="text-sm sm:text-base font-medium text-neutral mb-2 line-clamp-2 min-h-[40px] sm:min-h-[48px] group-hover:text-sage transition-colors">
               {product.name}
             </h3>
 
-            {/* Rating */}
-            <div className="flex items-center gap-1 mb-4">
+            <div className="flex items-center gap-0.5 sm:gap-1 mb-2 sm:mb-4 shrink-0">
               {[1, 2, 3, 4, 5].map((star) => (
                 <svg
                   key={star}
-                  className="w-4 h-4 text-warning"
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-warning shrink-0"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -159,19 +157,19 @@ export function ProductCard({ product }: ProductCardProps) {
               ))}
             </div>
 
-            {/* Price */}
-            <div className="mt-auto mb-4">
+            {/* Fiyat - mobilde küçük, taşma yok */}
+            <div className="mt-auto mb-2 sm:mb-4 min-w-0">
               {hasDiscount ? (
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold text-danger">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0">
+                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-danger tabular-nums">
                     {formatPrice(finalPrice)}
                   </span>
-                  <span className="text-sm text-neutral-light line-through">
+                  <span className="text-xs sm:text-sm text-neutral-light line-through tabular-nums">
                     {formatPrice(product.price)}
                   </span>
                 </div>
               ) : (
-                <span className="text-2xl font-bold text-neutral">
+                <span className="text-lg sm:text-xl md:text-2xl font-bold text-neutral tabular-nums block truncate">
                   {formatPrice(product.price)}
                 </span>
               )}

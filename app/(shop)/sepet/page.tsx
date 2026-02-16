@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Card, Button, useToast } from '@/components/ui'
+import { Card, Button, useToast, Skeleton } from '@/components/ui'
 import { useCartStore } from '@/lib/store/cartStore'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { calculateShippingFee } from '@/lib/utils/shipping'
@@ -62,7 +62,45 @@ export default function CartPage() {
   }, [totalPrice, mounted])
 
   if (!mounted || authLoading) {
-    return null
+    return (
+      <div className="min-h-screen bg-warm-50 py-6 sm:py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="mb-6 sm:mb-8">
+              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+              <div className="lg:col-span-2 space-y-4">
+                {[1, 2].map((i) => (
+                  <Card key={i} className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                      <Skeleton className="w-full sm:w-20 h-32 sm:h-20 rounded-lg shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-6 w-24" />
+                        <Skeleton className="h-9 w-32" />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+              <div className="lg:col-span-1">
+                <Card className="p-4 sm:p-6">
+                  <Skeleton className="h-6 w-28 mb-6" />
+                  <div className="space-y-4 mb-6">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-10 w-full mt-4" />
+                  </div>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   const handleRemoveItem = (productId: string) => {
@@ -131,12 +169,11 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-warm-50 py-12">
+    <div className="min-h-screen bg-warm-50 py-6 sm:py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          {/* Sayfa Başlığı */}
-          <div className="mb-8">
-            <h1 className="text-h1 font-serif font-bold text-neutral mb-2">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-xl sm:text-h1 font-serif font-bold text-neutral mb-2">
               Sepetim ({cartItems.length} ürün)
             </h1>
             <p className="text-neutral-medium">
@@ -144,17 +181,14 @@ export default function CartPage() {
             </p>
           </div>
 
-          {/* Sepet İçeriği */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Sol: Ürün Listesi */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4">
               {cartItems.map((item) => {
-                const itemTotal = item.product.price * item.quantity
+                const itemTotal = (item.product.salePrice || item.product.price) * item.quantity
                 return (
-                  <Card key={item.product.id} className="p-6">
-                    <div className="flex items-center gap-4">
-                      {/* Ürün Resmi */}
-                      <div className="w-20 h-20 bg-warm-50 rounded-lg flex-shrink-0 overflow-hidden relative">
+                  <Card key={item.product.id} className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                      <div className="w-full sm:w-20 h-32 sm:h-20 bg-warm-50 rounded-lg flex-shrink-0 overflow-hidden relative">
                         {mounted && item.product.images && (
                           <Image
                             src={item.product.images}
@@ -196,36 +230,34 @@ export default function CartPage() {
                           )}
                         </div>
 
-                        {/* Miktar Seçici */}
-                        <div className="flex items-center gap-4">
-                          <label className="text-xs text-neutral-medium whitespace-nowrap">Miktar:</label>
-                          <div className="flex items-center gap-2 bg-warm-50 rounded-lg p-1">
-                            <button
-                              onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
-                              className="w-8 h-8 rounded-md bg-white flex items-center justify-center text-neutral hover:bg-neutral hover:text-neutral-dark transition-colors"
-                              disabled={item.quantity <= 1}
-                            >
-                              <span className="text-lg font-medium">-</span>
-                            </button>
-                            <span className="w-8 text-center text-sm font-semibold text-neutral">
-                              {item.quantity}
-                            </span>
-                            <button
-                              onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1)}
-                              className="w-8 h-8 rounded-md bg-white flex items-center justify-center text-neutral hover:bg-neutral hover:text-neutral-dark transition-colors"
-                            >
-                              <span className="text-lg font-medium">+</span>
-                            </button>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            <label className="text-xs text-neutral-medium whitespace-nowrap">Miktar:</label>
+                            <div className="flex items-center gap-1 bg-warm-50 rounded-lg p-1">
+                              <button
+                                onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
+                                className="w-8 h-8 rounded-md bg-white flex items-center justify-center text-neutral hover:bg-neutral hover:text-white transition-colors disabled:opacity-50"
+                                disabled={item.quantity <= 1}
+                              >
+                                <span className="text-lg font-medium">-</span>
+                              </button>
+                              <span className="w-8 text-center text-sm font-semibold text-neutral">
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1)}
+                                className="w-8 h-8 rounded-md bg-white flex items-center justify-center text-neutral hover:bg-neutral hover:text-white transition-colors"
+                              >
+                                <span className="text-lg font-medium">+</span>
+                              </button>
+                            </div>
                           </div>
-                          
-                          <div className="ml-auto">
-                            <button
-                              onClick={() => handleRemoveItem(item.product.id)}
-                              className="text-danger hover:text-danger-dark transition-colors text-sm font-medium"
-                            >
-                              Sepetten Kaldır
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => handleRemoveItem(item.product.id)}
+                            className="text-danger hover:underline text-sm font-medium py-2 px-3 -mx-3 rounded-lg active:bg-warm-100 min-h-[44px] flex items-center"
+                          >
+                            Sepetten Kaldır
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -234,9 +266,8 @@ export default function CartPage() {
               })}
             </div>
 
-            {/* Sağ: Sepet Özeti */}
             <div className="lg:col-span-1 space-y-6">
-              <Card className="p-6 sticky top-24">
+              <Card className="p-4 sm:p-6 lg:sticky lg:top-24">
                 <h3 className="font-serif font-semibold text-neutral mb-6 text-lg">
                   Sepet Özeti
                 </h3>

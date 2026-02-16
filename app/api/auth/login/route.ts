@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserByEmail, verifyPassword } from '@/lib/auth'
+import { checkRateLimit, getClientIdentifier } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
+  const id = getClientIdentifier(request)
+  const { ok, retryAfter } = checkRateLimit(id, 'login')
+  if (!ok) {
+    return NextResponse.json(
+      { error: 'Çok fazla giriş denemesi. Lütfen bir süre sonra tekrar deneyin.' },
+      { status: 429, headers: retryAfter ? { 'Retry-After': String(retryAfter) } : {} }
+    )
+  }
   try {
     const { email, password } = await request.json()
 

@@ -83,13 +83,11 @@ export function Header() {
       {/* Kampanyalar Banner */}
       <ActiveCampaignsBanner />
 
-      {/* Top Bar */}
       <div className="bg-sage text-white border-b border-sage-dark/20">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-9 text-xs">
-            {/* Left: Contact Info */}
-            <div className="flex items-center gap-4">
-              <a href={`tel:${contactInfo.phone.replace(/\s/g, '')}`} className="flex items-center gap-1.5 hover:text-warm-100 transition-colors">
+        <div className="container mx-auto px-4 overflow-hidden">
+          <div className="flex items-center justify-between h-9 text-xs min-w-0">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 shrink">
+              <a href={`tel:${contactInfo.phone.replace(/\s/g, '')}`} className="flex items-center gap-1.5 hover:text-warm-100 transition-colors shrink-0">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
@@ -104,12 +102,11 @@ export function Header() {
               </a>
             </div>
             
-            {/* Right: Links & Social */}
-            <div className="flex items-center gap-4">
-              <Link href="/siparis-takip" className="hover:text-warm-100 transition-colors">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+              <Link href="/siparis-takip" className="hover:text-warm-100 transition-colors whitespace-nowrap hidden sm:inline">
                 Sipariş Takip
               </Link>
-              <Link href="/iletisim" className="hover:text-warm-100 transition-colors">
+              <Link href="/iletisim" className="hover:text-warm-100 transition-colors whitespace-nowrap hidden md:inline">
                 İletişim
               </Link>
               <a href={contactInfo.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-warm-100 transition-colors">
@@ -358,26 +355,27 @@ export function Header() {
             </div>
 
             <div className="flex flex-col gap-1">
-              <Link href="/" className="px-4 py-4 text-base font-medium text-neutral hover:bg-warm-50 rounded-lg">
+              <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-4 text-base font-medium text-neutral hover:bg-warm-50 rounded-lg">
                 Ana Sayfa
               </Link>
               {categories.map((category) => (
                 <Link
                   key={category.slug}
                   href={`/urunler/${category.slug}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-4 hover:bg-warm-50 rounded-lg"
                 >
                   <span className="text-xl">{category.icon || '🏷️'}</span>
                   <span className="text-base text-neutral-medium">{category.name}</span>
                 </Link>
               ))}
-              <Link href="/kampanyalar" className="px-4 py-4 text-base font-medium text-neutral hover:bg-warm-50 rounded-lg">
+              <Link href="/kampanyalar" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-4 text-base font-medium text-neutral hover:bg-warm-50 rounded-lg">
                 Kampanyalar
               </Link>
-              <Link href="/musteri-hizmetleri" className="px-4 py-4 text-base font-medium text-neutral hover:bg-warm-50 rounded-lg">
+              <Link href="/musteri-hizmetleri" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-4 text-base font-medium text-neutral hover:bg-warm-50 rounded-lg">
                 Müşteri Hizmetleri
               </Link>
-              <Link href="/giris" className="px-4 py-4 text-base font-medium text-neutral hover:bg-warm-50 rounded-lg">
+              <Link href="/giris" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-4 text-base font-medium text-neutral hover:bg-warm-50 rounded-lg">
                 Giriş Yap
               </Link>
             </div>

@@ -77,39 +77,41 @@ export function MobileBottomNav() {
     },
   ]
 
+  const showBadge = (val: number | undefined) => typeof val === 'number' && val > 0
+
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-warm-100 shadow-lg safe-area-bottom">
-      <div className="flex items-center justify-around px-2 py-2">
+      <div className="flex items-stretch justify-around px-1 py-2 gap-0">
         {navItems.map((item) => {
           const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
-          
+          const badgeVal = 'badge' in item ? item.badge : undefined
+          const show = showBadge(badgeVal)
+
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all relative min-w-[60px]",
-                isActive 
-                  ? "text-sage" 
-                  : "text-neutral-medium active:scale-95"
+                "flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-lg transition-all relative min-w-0 flex-1 max-w-[80px]",
+                isActive ? "text-sage" : "text-neutral-medium active:scale-95"
               )}
             >
-              <div className="relative">
+              <div className="relative flex shrink-0 w-8 h-8 items-center justify-center">
                 {item.icon(isActive)}
-                {item.badge && item.badge > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                    {item.badge > 9 ? '9+' : item.badge}
+                {show && (
+                  <span className="absolute top-0 right-0 min-w-[16px] h-4 px-1 bg-rose text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+                    {badgeVal! > 9 ? '9+' : badgeVal}
                   </span>
                 )}
               </div>
               <span className={cn(
-                "text-[10px] font-medium transition-all",
-                isActive ? "text-sage scale-105" : "text-neutral-medium"
+                "text-[10px] font-medium leading-tight text-center truncate w-full block",
+                isActive ? "text-sage" : "text-neutral-medium"
               )}>
                 {item.name}
               </span>
               {isActive && (
-                <div className="absolute -top-[2px] left-1/2 -translate-x-1/2 w-12 h-1 bg-sage rounded-b-full" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.5 bg-sage rounded-b-full" />
               )}
             </Link>
           )
