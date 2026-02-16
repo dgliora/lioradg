@@ -47,8 +47,7 @@ function LoginContent() {
 
       if (result?.ok) {
         showToast('Giriş başarılı! Yönlendiriliyorsunuz...', 'success')
-        router.push(callbackUrl)
-        router.refresh()
+        window.location.href = callbackUrl
       }
     } catch (error: any) {
       showToast('Giriş sırasında bir hata oluştu', 'error')

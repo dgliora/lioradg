@@ -72,12 +72,10 @@ export default function RegisterPage() {
 
       if (signInResult?.ok) {
         showToast(`Hoş geldiniz ${data.user.name}! Hesabınız oluşturuldu.`, 'success')
-        router.push('/account')
-        router.refresh()
+        window.location.href = '/account'
       } else {
-        // Kayıt başarılı ama giriş olmadı, giriş sayfasına yönlendir
         showToast('Hesabınız oluşturuldu. Lütfen giriş yapın.', 'success')
-        router.push('/giris')
+        window.location.href = '/giris'
       }
     } catch (error) {
       showToast('Bir hata oluştu', 'error')

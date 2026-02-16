@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, ReactNode } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 
 interface User {
   id: string
@@ -19,30 +20,20 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    // Check localStorage for user
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser))
-      } catch (error) {
-        localStorage.removeItem('user')
+  const { data: session, status } = useSession()
+  const isLoading = status === 'loading'
+  const user: User | null = session?.user
+    ? {
+        id: (session.user as any).id ?? '',
+        name: session.user.name ?? '',
+        email: session.user.email ?? '',
+        role: (session.user as any).role ?? 'USER',
       }
-    }
-    setIsLoading(false)
-  }, [])
+    : null
 
-  const login = (userData: User) => {
-    setUser(userData)
-    localStorage.setItem('user', JSON.stringify(userData))
-  }
-
+  const login = () => {}
   const logout = () => {
-    setUser(null)
-    localStorage.removeItem('user')
+    signOut({ callbackUrl: '/' })
   }
 
   return (
