@@ -11,11 +11,11 @@ export const metadata: Metadata = {
   },
   description: 'Güvenilir, şeffaf ve erişilebilir kişisel bakım ürünleri. Parfüm, tonik, şampuan, krem, bitkisel yağlar ve oda kokuları.',
   keywords: 'kozmetik, bitkisel ürünler, doğal kozmetik, krem, parfüm, tonik, bakım ürünleri, liora dg',
-  metadataBase: new URL('https://lioradg.com.tr'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.vercel.app'),
   openGraph: {
     type: 'website',
     locale: 'tr_TR',
-    url: 'https://lioradg.com.tr',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.vercel.app',
     siteName: 'Liora DG',
     title: 'Liora DG - Kişisel Bakım ve Temizlik Ürünleri',
     description: 'Güvenilir, şeffaf ve erişilebilir kişisel bakım ürünleri. Parfüm, tonik, şampuan, krem, bitkisel yağlar ve oda kokuları.',

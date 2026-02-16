@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/', '/api/', '/sepet', '/odeme'],
       },
     ],
-    sitemap: 'https://lioradg.com.tr/sitemap.xml',
+    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.vercel.app'}/sitemap.xml`,
   }
 }

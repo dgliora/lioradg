@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://lioradg.com.tr'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.vercel.app'
 
   // Statik sayfalar
   const staticPages: MetadataRoute.Sitemap = [
