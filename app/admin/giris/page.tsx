@@ -28,7 +28,8 @@ export default function AdminLoginPage() {
       setIsSubmitting(false)
       return
     }
-    if (result?.ok) {
+    // Basarili giris: error yok (v5 bazen ok: true donmeden doner)
+    if (!result?.error) {
       window.location.href = '/admin'
       return
     }

@@ -3,9 +3,10 @@ import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/prisma'
 import { verifyPassword } from '@/lib/auth'
+import { authConfig } from '@/lib/auth.config'
 
 export const { handlers, auth, signIn } = NextAuth({
-  trustHost: true,
+  ...authConfig,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -123,5 +124,4 @@ export const { handlers, auth, signIn } = NextAuth({
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60,
   },
-  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
 })
