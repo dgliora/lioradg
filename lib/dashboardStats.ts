@@ -271,45 +271,80 @@ async function getActiveCampaigns() {
   }))
 }
 
+const EMPTY_ANALYTICS: DashboardData['analytics'] = {
+  totalVisitors: 0,
+  last7DaysVisitors: 0,
+  totalSessions: 0,
+}
+
+const FALLBACK_DASHBOARD: DashboardData = {
+  daily: { todayRevenue: 0, todayOrderCount: 0, paidOrderCount: 0, failedOrderCount: 0 },
+  revenueChart: [],
+  topProducts: [],
+  stockAlert: { outOfStock: 0, lowStock: 0, lowStockProducts: [] },
+  averageCartValue: 0,
+  recentOrders: [],
+  totalProducts: 0,
+  totalOrders: 0,
+  totalUsers: 0,
+  pendingOrders: 0,
+  totalRevenue: 0,
+  ordersByStatus: [],
+  activeCampaigns: [],
+  profitability: { summary: { totalNetProfit: 0, averageProfitMargin: 0, iyzicoTotalCommission: 0 }, topProfitable: [] },
+  analytics: EMPTY_ANALYTICS,
+  abandonedCarts: { abandonedLast24h: 0, abandonedPotentialRevenue: 0, abandonedCarts: [] },
+}
+
 // Ana fonksiyon - tüm dashboard verisini toplar
 export async function getDashboardData(): Promise<DashboardData> {
-  const [
-    daily,
-    revenueChart,
-    topProducts,
-    stockAlert,
-    averageCartValue,
-    recentOrders,
-    general,
-    activeCampaigns,
-    profitability,
-    analytics,
-    abandonedCarts,
-  ] = await Promise.all([
-    getDailySummary(),
-    getRevenueChart(),
-    getTopProducts(),
-    getStockAlerts(),
-    getAverageCartValue(),
-    getRecentOrders(),
-    getGeneralStats(),
-    getActiveCampaigns(),
-    getProfitabilityData(),
-    getAnalyticsData(),
-    getAbandonedCartStats(),
-  ])
+  let analytics = EMPTY_ANALYTICS
+  try {
+    analytics = await getAnalyticsData()
+  } catch {
+    // Analytics hatası dashboard'u kırmasın
+  }
 
-  return {
-    daily,
-    revenueChart,
-    topProducts,
-    stockAlert,
-    averageCartValue,
-    recentOrders,
-    ...general,
-    activeCampaigns,
-    profitability,
-    analytics,
-    abandonedCarts,
+  try {
+    const [
+      daily,
+      revenueChart,
+      topProducts,
+      stockAlert,
+      averageCartValue,
+      recentOrders,
+      general,
+      activeCampaigns,
+      profitability,
+      abandonedCarts,
+    ] = await Promise.all([
+      getDailySummary(),
+      getRevenueChart(),
+      getTopProducts(),
+      getStockAlerts(),
+      getAverageCartValue(),
+      getRecentOrders(),
+      getGeneralStats(),
+      getActiveCampaigns(),
+      getProfitabilityData(),
+      getAbandonedCartStats(),
+    ])
+
+    return {
+      daily,
+      revenueChart,
+      topProducts,
+      stockAlert,
+      averageCartValue,
+      recentOrders,
+      ...general,
+      activeCampaigns,
+      profitability,
+      analytics,
+      abandonedCarts,
+    }
+  } catch (err) {
+    console.error('[Dashboard] getDashboardData hatası:', err)
+    return FALLBACK_DASHBOARD
   }
 }
