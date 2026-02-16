@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { requireAdmin } from '@/lib/services/roleGuard'
+import { checkAdminAuth } from '@/lib/auth-server'
 
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const auth = await requireAdmin(_request)
-  if (!auth.authorized) return auth.response
-
+  const auth = await checkAdminAuth()
+  if (!auth.isAdmin) {
+    return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 })
+  }
   if (auth.role !== 'ADMIN') {
     return NextResponse.json(
       { error: 'Sadece admin müşteri silebilir' },
