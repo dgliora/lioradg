@@ -1,11 +1,20 @@
 'use client'
 
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { cn } from '@/lib/utils'
 import { LogoLioraDG } from '@/components/LogoLioraDG'
 import { AdminSessionProvider } from '@/components/providers/AdminSessionProvider'
+
+function AdminContentFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+}
 
 function AdminLayoutContent({
   children,
@@ -95,8 +104,10 @@ function AdminLayoutContent({
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
-          {children}
+        <main className="flex-1 p-8 min-h-[calc(100vh-73px)]">
+          <Suspense fallback={<AdminContentFallback />}>
+            {children}
+          </Suspense>
         </main>
       </div>
     </div>
