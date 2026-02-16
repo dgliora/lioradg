@@ -17,8 +17,13 @@ const STAFF_RESTRICTED_API = [
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
-
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET })
+  const isSecure = request.url.startsWith('https')
+  const sessionCookieName = isSecure ? '__Secure-authjs.session-token' : 'authjs.session-token'
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
+    salt: sessionCookieName,
+  })
   const isAdminPath = pathname.startsWith('/admin')
   const isAdminLoginPath = pathname === '/admin/giris'
   const isAdminApi = pathname.startsWith('/api/admin')
