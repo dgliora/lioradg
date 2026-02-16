@@ -23,7 +23,9 @@ export default function AdminLoginPage() {
       if (result?.error) {
         setError(result.error)
         setIsSubmitting(false)
+        return
       }
+      window.location.href = '/admin'
     } catch {
       setError('Giriş sırasında bir hata oluştu')
       setIsSubmitting(false)

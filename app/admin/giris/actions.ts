@@ -1,22 +1,23 @@
 'use server'
 
 import { signIn } from '@/lib/auth-options'
-import { redirect } from 'next/navigation'
+import { AuthError } from 'next-auth'
 
 export async function adminLogin(email: string, password: string) {
   try {
     await signIn('credentials', {
       email,
       password,
-      redirect: false,
+      redirectTo: '/admin',
     })
   } catch (error: any) {
-    // NEXT_REDIRECT hatasini tekrar firlat (Next.js yonlendirmesi)
     if (error?.digest?.startsWith('NEXT_REDIRECT')) {
       throw error
     }
+    if (error instanceof AuthError) {
+      return { error: 'E-posta veya şifre hatalı' }
+    }
     return { error: 'E-posta veya şifre hatalı' }
   }
-
-  redirect('/admin')
+  return null
 }
