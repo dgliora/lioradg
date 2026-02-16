@@ -31,6 +31,7 @@ function AdminLayoutContent({
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: '📊' },
+    { name: 'Analitik', href: '/admin/analitik', icon: '📈' },
     { name: 'Ürünler', href: '/admin/urunler', icon: '📦' },
     { name: 'Kategoriler', href: '/admin/kategoriler', icon: '🏷️' },
     { name: 'Siparişler', href: '/admin/siparisler', icon: '🛒' },

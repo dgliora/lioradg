@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, Badge } from '@/components/ui'
 import { formatPrice } from '@/lib/utils'
 import type { User, Order } from '@prisma/client'
@@ -16,9 +17,38 @@ interface CustomersTableProps {
   customers: CustomerWithOrders[]
 }
 
-export function CustomersTable({ customers }: CustomersTableProps) {
+export function CustomersTable({ customers: initialCustomers }: CustomersTableProps) {
+  const router = useRouter()
+  const [customers, setCustomers] = useState(initialCustomers)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'orders' | 'date'>('date')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [error, setError] = useState('')
+
+  const handleDelete = async (customer: CustomerWithOrders) => {
+    if (customer.role === 'ADMIN') return
+    if (customer._count.orders > 0) {
+      setError('Siparişi olan müşteri silinemez.')
+      return
+    }
+    if (!confirm(`${customer.name} (${customer.email}) müşterisini silmek istediğinize emin misiniz?`)) return
+    setDeletingId(customer.id)
+    setError('')
+    try {
+      const res = await fetch(`/api/admin/users/${customer.id}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Silinemedi')
+        return
+      }
+      setCustomers((prev) => prev.filter((c) => c.id !== customer.id))
+      router.refresh()
+    } catch {
+      setError('Bağlantı hatası')
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   // Filtrelenmiş ve sıralanmış müşteriler
   const filteredCustomers = customers
@@ -131,12 +161,20 @@ export function CustomersTable({ customers }: CustomersTableProps) {
                 <th className="px-6 py-4 font-medium">Toplam Harcama</th>
                 <th className="px-6 py-4 font-medium">Kayıt Tarihi</th>
                 <th className="px-6 py-4 font-medium">E-posta Onayı</th>
+                <th className="px-6 py-4 font-medium w-24">İşlem</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
+              {error && (
+                <tr>
+                  <td colSpan={7} className="px-6 py-2 bg-red-50 text-red-600 text-sm">
+                    {error}
+                  </td>
+                </tr>
+              )}
               {filteredCustomers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                     {searchQuery
                       ? 'Filtrelere uygun müşteri bulunamadı'
                       : 'Henüz müşteri kaydı bulunmuyor'}
@@ -192,6 +230,21 @@ export function CustomersTable({ customers }: CustomersTableProps) {
                         <Badge variant={customer.emailVerified ? 'success' : 'warning'}>
                           {customer.emailVerified ? 'Onaylı' : 'Bekliyor'}
                         </Badge>
+                      </td>
+                      <td className="px-6 py-4">
+                        {customer.role === 'ADMIN' ? (
+                          <span className="text-xs text-gray-400">—</span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(customer)}
+                            disabled={deletingId === customer.id || customer._count.orders > 0}
+                            className="text-red-600 hover:text-red-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={customer._count.orders > 0 ? 'Siparişi olan müşteri silinemez' : 'Müşteriyi sil'}
+                          >
+                            {deletingId === customer.id ? '...' : 'Sil'}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   )

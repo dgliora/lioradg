@@ -8,7 +8,7 @@ const STAFF_RESTRICTED_PAGES = [
   '/admin/kampanyalar/sablonlar',
   '/admin/musteriler',
 ]
-const STAFF_RESTRICTED_API = ['/api/admin/campaigns/create', '/api/admin/campaign-templates']
+const STAFF_RESTRICTED_API = ['/api/admin/campaigns/create', '/api/admin/campaign-templates', '/api/admin/users/']
 
 const { auth } = NextAuth(authConfig)
 

@@ -1,9 +1,8 @@
 import nodemailer from 'nodemailer'
 
-// SMTP transporter oluştur (Gmail örneği)
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: Number(process.env.SMTP_PORT) || 587,
   secure: false,
   auth: {
     user: process.env.SMTP_USER || 'rboguz06@gmail.com',
@@ -11,10 +10,10 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-// Production modda gerçek email gönder (development check kaldırıldı)
 const isDevelopment = false
 
 export async function sendWelcomeEmail(to: string, name: string) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'
   const mailOptions = {
     from: '"Lioradg" <info@lioradg.com.tr>',
     to,
@@ -44,7 +43,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
               <p>Lioradg ailesine katıldığınız için teşekkür ederiz. 🌿</p>
               <p>Hesabınız başarıyla oluşturuldu. Artık %100 doğal ve organik ürünlerimizi keşfedebilir, özel kampanyalardan yararlanabilirsiniz.</p>
               
-              <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/urunler" class="button">Ürünleri Keşfet</a>
+              <a href="${siteUrl}/urunler" class="button">Ürünleri Keşfet</a>
               
               <div style="background: #F5F1ED; padding: 20px; border-radius: 12px; margin: 20px 0;">
                 <h3 style="margin-top: 0; color: #2C2C2C;">İlk Siparişinize Özel</h3>
@@ -60,7 +59,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
             <div class="footer">
               <p>© 2025 LIORADG. Tüm hakları saklıdır.</p>
               <p>
-                <a href="https://lioradg.com.tr/gizlilik-politikasi" style="color: #8B9D83; text-decoration: none;">Gizlilik Politikası</a> | 
+                <a href="https://lioradg.com.tr/gizlilik-politikasi" style="color: #8B9D83; text-decoration: none;">Gizlilik Politikası</a> |
                 <a href="https://lioradg.com.tr/kvkk" style="color: #8B9D83; text-decoration: none;">KVKK</a>
               </p>
             </div>
@@ -71,12 +70,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
   }
 
   if (isDevelopment) {
-    // Development modda mail gönderme, sadece console log
-    console.log('📧 [DEV MODE] Hoş geldiniz e-postası gönderildi:', {
-      to,
-      name,
-      subject: mailOptions.subject,
-    })
+    console.log('📧 [DEV MODE] Hoş geldiniz e-postası gönderildi:', { to, name, subject: mailOptions.subject })
     return { success: true, dev: true }
   }
 
@@ -143,11 +137,7 @@ export async function sendOrderConfirmationEmail(
   }
 
   if (isDevelopment) {
-    console.log('📧 [DEV MODE] Sipariş onay e-postası gönderildi:', {
-      to,
-      orderNumber,
-      total,
-    })
+    console.log('📧 [DEV MODE] Sipariş onay e-postası gönderildi:', { to, orderNumber, total })
     return { success: true, dev: true }
   }
 
@@ -161,9 +151,8 @@ export async function sendOrderConfirmationEmail(
 }
 
 export async function sendResetEmail(to: string, token: string, name?: string) {
-  // Production'da domain değişecek (deployment sırasında)
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-  const resetUrl = `${baseUrl}/sifre-sifirla?token=${token}`;
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+  const resetUrl = `${baseUrl}/sifre-sifirla?token=${token}`
   const mailOptions = {
     from: '"Lioradg" <info@lioradg.com.tr>',
     to,
@@ -207,24 +196,18 @@ export async function sendResetEmail(to: string, token: string, name?: string) {
         </body>
       </html>
     `,
-  };
+  }
 
   if (isDevelopment) {
-    console.log('📧 [DEV MODE] Şifre sıfırlama e-postası gönderildi:', {
-      to,
-      token,
-      resetUrl,
-      subject: mailOptions.subject,
-    });
-    return { success: true, dev: true };
+    console.log('📧 [DEV MODE] Şifre sıfırlama e-postası gönderildi:', { to, token, resetUrl, subject: mailOptions.subject })
+    return { success: true, dev: true }
   }
 
   try {
-    await transporter.sendMail(mailOptions);
-    return { success: true };
+    await transporter.sendMail(mailOptions)
+    return { success: true }
   } catch (error) {
-    console.error('Reset email send error:', error);
-    return { success: false, error };
+    console.error('Reset email send error:', error)
+    return { success: false, error }
   }
 }
-
