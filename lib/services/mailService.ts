@@ -7,7 +7,7 @@ function getResend() {
   return new Resend(key)
 }
 const FROM_EMAIL = process.env.MAIL_FROM || 'Liora DG <noreply@lioradg.com.tr>'
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.vercel.app'
 const COOLDOWN_HOURS = 24
 
 interface CartReminderPayload {
