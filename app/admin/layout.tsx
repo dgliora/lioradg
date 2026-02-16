@@ -23,6 +23,11 @@ function AdminLayoutContent({
 }) {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const isLoginPage = pathname === '/admin/giris'
+
+  if (isLoginPage) {
+    return <>{children}</>
+  }
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: '📊' },
