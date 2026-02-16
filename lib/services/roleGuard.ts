@@ -58,7 +58,8 @@ export function isStaffRestrictedApi(pathname: string): boolean {
 export async function requireAdmin(req: NextRequest): Promise<{ authorized: true; userId: string; role: Role } | { authorized: false; response: NextResponse }> {
   const isSecure = req.url.startsWith('https')
   const cookieName = isSecure ? '__Secure-authjs.session-token' : 'authjs.session-token'
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, salt: cookieName })
+  const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET
+  const token = await getToken({ req, secret, salt: cookieName })
 
   if (!token || !isAdminOrStaff(token.role as string)) {
     return {
