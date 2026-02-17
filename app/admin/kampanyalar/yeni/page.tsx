@@ -154,6 +154,9 @@ function NewCampaignContent() {
     try {
       const payload = {
         ...formData,
+        // datetime-local değerini UTC ISO'ya çevir (tarayıcı yerel saatini kullanır)
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
         targetCategories: formData.targetCategories.length > 0 
           ? JSON.stringify(formData.targetCategories) 
           : null,

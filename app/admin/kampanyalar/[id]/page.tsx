@@ -153,6 +153,8 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
     try {
       const payload = {
         ...formData,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
         targetCategories: formData.targetCategories.length > 0 
           ? JSON.stringify(formData.targetCategories) 
           : null,
