@@ -43,6 +43,7 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
   const [products, setProducts] = useState<Product[]>([])
   const [productSearch, setProductSearch] = useState('')
   const [campaign, setCampaign] = useState<Campaign | null>(null)
+  const [uploading, setUploading] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -57,8 +58,28 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
     usageLimit: '',
     startDate: '',
     endDate: '',
-    active: true
+    active: true,
+    bannerImage: '',
   })
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      setFormData(prev => ({ ...prev, bannerImage: data.url }))
+    } catch {
+      alert('Fotoğraf yüklenirken hata oluştu')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
 
   useEffect(() => {
     Promise.all([
@@ -90,7 +111,8 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
           usageLimit: data.usageLimit?.toString() || '',
           startDate: new Date(data.startDate).toISOString().slice(0, 16),
           endDate: new Date(data.endDate).toISOString().slice(0, 16),
-          active: data.active
+          active: data.active,
+          bannerImage: data.bannerImage || '',
         })
       } else if (response.status === 404) {
         router.push('/admin/kampanyalar')
@@ -299,6 +321,25 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
                   rows={3}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
                 />
+              </div>
+
+              {/* Banner Fotoğrafı */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Banner Fotoğrafı (Opsiyonel)</label>
+                <div className="flex items-center gap-4">
+                  {formData.bannerImage && (
+                    <div className="relative w-32 h-20 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                      <img src={formData.bannerImage} alt="Banner" className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => setFormData(prev => ({ ...prev, bannerImage: '' }))} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">✕</button>
+                    </div>
+                  )}
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    {uploading ? 'Yükleniyor...' : 'Fotoğraf Seç'}
+                    <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="hidden" />
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Ana sayfada açılan kampanya penceresinde gösterilir</p>
               </div>
 
               <div>

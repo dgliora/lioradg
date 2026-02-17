@@ -22,6 +22,7 @@ export async function GET() {
         type: true,
         endDate: true,
         code: true,
+        bannerImage: true,
       },
       orderBy: {
         startDate: 'desc',

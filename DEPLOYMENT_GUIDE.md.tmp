@@ -1,0 +1,382 @@
+# 🚀 Vercel + Supabase Deployment Rehberi
+
+## Neden Vercel + Supabase?
+
+✅ **Ücretsiz** (başlangıç için yeterli)  
+✅ **Hızlı deploy** (GitHub'dan otomatik)  
+✅ **Next.js için optimize**  
+✅ **Production-ready PostgreSQL**  
+✅ **SSL/HTTPS otomatik**  
+
+---
+
+## ADIM 1: Supabase Kurulumu
+
+### 1.1. Proje Oluştur
+
+1. [supabase.com](https://supabase.com) → Kaydol/Giriş yap
+2. **"New Project"** tıkla
+3. Bilgileri gir:
+   - **Name:** lioradg
+   - **Database Password:** Güçlü şifre oluştur **→ KAYDET!**
+   - **Region:** Europe (Frankfurt) - Türkiye'ye en yakın
+4. **"Create new project"** → 2-3 dakika bekle
+
+### 1.2. Connection String'leri Al
+
+1. Supabase Dashboard → **Settings** → **Database**
+2. **Connection string** bölümünde:
+
+**Session mode (DIRECT_URL için):**
+```
+postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres
+```
+
+**Transaction mode (DATABASE_URL için):**
+```
+postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+```
+
+**ÖNEMLİ:** `[YOUR-PASSWORD]` kısmını proje oluştururken girdiğin şifre ile değiştir!
+
+---
+
+## ADIM 2: .env.local Dosyasını Güncelle
+
+`.env.local` dosyasındaki connection string'leri Supabase'den aldıklarınla değiştir:
+
+```env
+# Supabase Database URLs
+DATABASE_URL="postgresql://postgres.xxxxxxxxxxxxx:[ŞİFREN]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.xxxxxxxxxxxxx:[ŞİFREN]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
+
+# Email (Zaten var)
+SMTP_USER=rboguz06@gmail.com
+SMTP_PASSWORD=awbmowfyuwwvmfbv
+
+# NextAuth (Production için güncelle)
+NEXTAUTH_SECRET=super-secret-random-key-change-in-production-327208468
+NEXTAUTH_URL=https://lioradg.com.tr
+
+# Google OAuth (İsteğe bağlı)
+GOOGLE_CLIENT_ID=your-google-client-id-here
+GOOGLE_CLIENT_SECRET=your-google-client-secret-here
+
+NODE_ENV=production
+```
+
+---
+
+## ADIM 3: Database Migration
+
+### 3.1. Prisma Client'ı Oluştur
+```bash
+npx prisma generate
+```
+
+### 3.2. Migration'ları Çalıştır
+```bash
+npx prisma migrate dev --name init
+```
+
+### 3.3. Seed Data Yükle
+```bash
+npm run db:seed
+```
+
+### 3.4. Kontrol Et
+Supabase Dashboard → **Table Editor** → Tabloları gör
+
+---
+
+## ADIM 4: GitHub'a Push
+
+### 4.1. .gitignore Kontrol
+`.gitignore` dosyasında bunlar olmalı:
+```
+.env
+.env.local
+.env*.local
+node_modules/
+.next/
+```
+
+### 4.2. Git Push
+```bash
+git add .
+git commit -m "Production hazırlığı: PostgreSQL migration"
+git push origin main
+```
+
+**Eğer GitHub repo'n yoksa:**
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/[KULLANICI-ADI]/[REPO-ADI].git
+git push -u origin main
+```
+
+---
+
+## ADIM 5: Vercel Deployment
+
+### 5.1. Vercel'e Kaydol
+1. [vercel.com](https://vercel.com) → **Sign Up with GitHub**
+2. GitHub hesabınla giriş yap
+
+### 5.2. Projeyi Import Et
+1. Vercel Dashboard → **"Add New..."** → **"Project"**
+2. GitHub repo'nu seç: **lioradg** (veya repo adın)
+3. **"Import"** tıkla
+
+### 5.3. Environment Variables Ekle
+**Configure Project** ekranında **Environment Variables** bölümüne ekle:
+
+```
+DATABASE_URL = postgresql://postgres.xxxxx:[ŞİFREN]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+
+DIRECT_URL = postgresql://postgres.xxxxx:[ŞİFREN]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres
+
+SMTP_USER = rboguz06@gmail.com
+
+SMTP_PASSWORD = awbmowfyuwwvmfbv
+
+NEXTAUTH_SECRET = super-secret-random-key-change-in-production-327208468
+
+NEXTAUTH_URL = https://lioradg.vercel.app
+
+GOOGLE_CLIENT_ID = your-google-client-id-here
+
+GOOGLE_CLIENT_SECRET = your-google-client-secret-here
+
+NODE_ENV = production
+```
+
+**ÖNEMLİ:** Her satır ayrı variable olarak ekle!
+
+### 5.4. Deploy Et
+1. **"Deploy"** butonuna tıkla
+2. 2-3 dakika bekle
+3. **"Visit"** ile siteyi aç: `https://lioradg.vercel.app`
+
+---
+
+
+
+- Sağ üstten **“Sign Up”** (Kayıt Ol) tıkla.
+- E-posta adresinle veya **“Continue with Google”** ile kayıt ol.
+
+### 2. E-postayı doğrula (istersen)
+- Kayıttan sonra gelen doğrulama mailine tıkla (gerekebilir).
+
+### 3. Dashboard’a gir
+- Sol menüden **“API Keys”** (veya **“API Keys”** / **“Keys”**) seçeneğine tıkla.
+
+### 4. Yeni API key oluştur
+- **“Create API Key”** (veya **“Add API Key”**) butonuna tıkla.
+- **Name** kısmına örneğin `lioradg` veya `vercel` yaz (sadece senin için not).
+- **Permission** olarak **“Sending access”** (veya **“Full access”**) seçili olsun.
+- **“Add”** / **“Create”** butonuna tıkla.
+- Açılan ekranda **uzun bir key** görünecek (örn. `re_123abc...`).  
+  ⚠️ **Bu key sadece bir kez gösterilir.** Hemen kopyala; sayfayı kapatırsan bir daha göremezsin. Not defterine yapıştır veya güvenli bir yere kaydet.
+
+### 5. Key’i Vercel’e ekle
+- **Vercel**’e git: [vercel.com](https://vercel.com) → Giriş yap.
+- Projeni seç (örn. **lioradg**).
+- Üstten **“Settings”** → sol menüden **“Environment Variables”** tıkla.
+- **“Add New”** (veya **“Add”**) tıkla.
+- **Value:** Az önce kopyaladığın key’i yapıştır (başında/sonunda boşluk kalmasın).
+- **Environment:** **Production** (ve istersen Preview / Development da işaretle).
+- **“Save”** tıkla.
+
+### 6. (İsteğe bağlı) Gönderen adresi – MAIL_FROM
+- İstersen Vercel’de ek bir değişken ekle:
+  - **Name:** `MAIL_FROM`
+  (Domain doğruladıktan sonra bunu `noreply@lioradg.com.tr` gibi yapabilirsin.)
+
+### 7. Deploy’u yenile
+- Vercel’de **Deployments** sekmesine git.
+- En son deployment’ın sağındaki **üç nokta (⋯)** → **“Redeploy”** tıkla.
+- “Redeploy” onayı ver. Birkaç dakika sonra yeni ayarlar geçerli olur.
+
+### 8. Test et
+- Sitede **yeni bir e-posta** ile kayıt ol (daha önce hiç kullanmadığın bir adres).
+- Birkaç dakika içinde o adrese **hoş geldin** maili gelmeli.
+
+
+---
+
+## ADIM 6: Custom Domain (lioradg.com.tr)
+
+### 6.1. Vercel'de Domain Ekle
+1. Vercel Dashboard → Project → **Settings** → **Domains**
+2. **"Add Domain"** → `lioradg.com.tr` yaz
+3. DNS kayıtlarını gösterecek
+
+### 6.2. Domain Sağlayıcında DNS Ayarları
+Domain sağlayıcın (Natro, GoDaddy vb.) paneline git:
+
+**A Record:**
+```
+Type: A
+Name: @
+Value: 76.76.21.21
+```
+
+**CNAME Record:**
+```
+Type: CNAME
+Name: www
+Value: cname.vercel-dns.com
+```
+
+### 6.3. SSL Bekle
+- DNS değişikliği 5-60 dakika sürer
+- Vercel otomatik SSL sertifikası ekler
+- Hazır olunca `https://lioradg.com.tr` çalışır
+
+### 6.4. NEXTAUTH_URL Güncelle
+Vercel Dashboard → **Settings** → **Environment Variables**:
+```
+NEXTAUTH_URL = https://lioradg.com.tr
+```
+**"Redeploy"** tıkla
+
+---
+
+## ADIM 7: Database Migration (Production)
+
+Vercel'de deploy ettikten sonra, production database'e migration yap:
+
+### 7.1. Vercel CLI Kur
+```bash
+npm i -g vercel
+```
+
+### 7.2. Login
+```bash
+vercel login
+```
+
+### 7.3. Production Migration
+```bash
+vercel env pull .env.production
+npx prisma migrate deploy
+```
+
+---
+
+## ✅ Tamamlandı!
+
+Site artık canlı: **https://lioradg.com.tr**
+
+### Test Et:
+- ✅ Ana sayfa yükleniyor mu?
+- ✅ Ürünler görünüyor mu?
+- ✅ Kullanıcı kaydı çalışıyor mu?
+- ✅ Admin paneli erişilebilir mi?
+- ✅ Email gönderimi çalışıyor mu?
+
+---
+
+## 🔧 Güncellemeler (Otomatik Deploy)
+
+Artık her `git push` yaptığında Vercel otomatik deploy eder:
+
+```bash
+git add .
+git commit -m "Yeni özellik eklendi"
+git push
+```
+
+Vercel otomatik:
+1. Kodu çeker
+2. Build eder
+3. Deploy eder
+4. Production'a alır (2-3 dakika)
+
+---
+
+## 📊 Monitoring
+
+### Vercel Dashboard
+- **Analytics:** Ziyaretçi istatistikleri
+- **Logs:** Hata logları
+- **Deployments:** Tüm deploy geçmişi
+
+### Supabase Dashboard
+- **Table Editor:** Database içeriği
+- **SQL Editor:** Sorgular
+- **Logs:** Database logları
+
+---
+
+## 🚨 Sorun Giderme
+
+### Build Hatası
+```bash
+# Local'de test et
+npm run build
+# Hata varsa düzelt, sonra push et
+```
+
+### Database Connection Error
+- Environment variables doğru mu?
+- Supabase şifresi doğru mu?
+- `DATABASE_URL` ve `DIRECT_URL` doğru mu?
+
+### 500 Internal Server Error
+- Vercel Dashboard → **Logs** kontrol et
+- Supabase Dashboard → **Logs** kontrol et
+
+---
+
+## 💰 Maliyet (Ücretsiz Limitler)
+
+### Vercel Free Plan
+- ✅ 100GB bandwidth/ay
+- ✅ Sınırsız deploy
+- ✅ SSL sertifikası
+- ✅ Custom domain
+
+### Supabase Free Plan
+- ✅ 500MB database
+- ✅ 2GB bandwidth/ay
+- ✅ 50,000 query/ay
+
+**Bu limitler e-ticaret için yeterli!** (Aylık ~1000-5000 ziyaretçi)
+
+---
+
+## 🎯 Öneriler
+
+1. **NEXTAUTH_SECRET değiştir** (daha güçlü):
+   ```bash
+   openssl rand -base64 32
+   ```
+
+2. **Google OAuth aktif et** (opsiyonel):
+   - Google Cloud Console'da proje oluştur
+   - OAuth credentials al
+   - Vercel'de environment variables ekle
+
+3. **Email limiti artır**:
+   - Gmail günlük 500 email sınırı var
+
+4. **Backup**:
+   - Supabase otomatik backup yapıyor (7 gün)
+   - Manuel backup: SQL Editor → Export
+
+---
+
+## 📚 Kaynak
+
+- Vercel Docs: https://vercel.com/docs
+- Supabase Docs: https://supabase.com/docs
+- Prisma Docs: https://www.prisma.io/docs
+
+---
+
+**Hazırsın! 🎉**

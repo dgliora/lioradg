@@ -120,6 +120,7 @@ export async function PUT(
         startDate: new Date(data.startDate),
         endDate: new Date(data.endDate),
         active: data.active !== undefined ? data.active : undefined,
+        bannerImage: data.bannerImage !== undefined ? (data.bannerImage || null) : undefined,
       }
     })
 

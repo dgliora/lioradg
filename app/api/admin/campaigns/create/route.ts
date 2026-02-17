@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
         startDate: new Date(data.startDate),
         endDate: new Date(data.endDate),
         active: data.active !== undefined ? data.active : true,
+        bannerImage: data.bannerImage || null,
       }
     })
 
