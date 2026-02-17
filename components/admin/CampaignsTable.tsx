@@ -1,8 +1,37 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Badge, Button } from '@/components/ui'
 import Link from 'next/link'
+
+function Countdown({ endDate }: { endDate: Date }) {
+  const [timeLeft, setTimeLeft] = useState('')
+
+  useEffect(() => {
+    const calc = () => {
+      const diff = new Date(endDate).getTime() - Date.now()
+      if (diff <= 0) { setTimeLeft('Süresi doldu'); return }
+      const d = Math.floor(diff / 86400000)
+      const h = Math.floor((diff % 86400000) / 3600000)
+      const m = Math.floor((diff % 3600000) / 60000)
+      const s = Math.floor((diff % 60000) / 1000)
+      if (d > 0) setTimeLeft(`${d}g ${h}s ${m}d`)
+      else setTimeLeft(`${h}s ${m}d ${s}sn`)
+    }
+    calc()
+    const t = setInterval(calc, 1000)
+    return () => clearInterval(t)
+  }, [endDate])
+
+  const diff = new Date(endDate).getTime() - Date.now()
+  const isUrgent = diff < 86400000 // 1 günden az
+
+  return (
+    <span className={`text-xs font-mono font-semibold ${isUrgent ? 'text-red-600' : 'text-orange-600'}`}>
+      ⏱ {timeLeft}
+    </span>
+  )
+}
 
 interface Campaign {
   id: string
@@ -141,7 +170,8 @@ export function CampaignsTable({ campaigns }: CampaignsTableProps) {
                   {new Date(campaign.startDate).toLocaleDateString('tr-TR')}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600">
-                  {new Date(campaign.endDate).toLocaleDateString('tr-TR')}
+                  <div>{new Date(campaign.endDate).toLocaleDateString('tr-TR')}</div>
+                  {campaign.active && <Countdown endDate={campaign.endDate} />}
                 </td>
                 <td className="px-6 py-4">
                   <button

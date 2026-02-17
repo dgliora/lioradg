@@ -6,10 +6,19 @@ import { CampaignsTable } from '@/components/admin/CampaignsTable'
 export const dynamic = 'force-dynamic'
 
 async function getCampaigns() {
+  // Süresi dolmuş aktif kampanyaları otomatik pasif yap
+  await prisma.campaign.updateMany({
+    where: {
+      active: true,
+      endDate: { lt: new Date() },
+    },
+    data: { active: false },
+  })
+
   return await prisma.campaign.findMany({
     orderBy: [
-      { active: 'desc' }, // Aktif olanlar başında
-      { createdAt: 'desc' }, // Sonra en yeniler
+      { active: 'desc' },
+      { createdAt: 'desc' },
     ],
   })
 }

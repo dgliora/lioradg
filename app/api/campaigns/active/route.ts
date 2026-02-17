@@ -17,8 +17,11 @@ export async function GET() {
       select: {
         id: true,
         title: true,
+        description: true,
         value: true,
         type: true,
+        endDate: true,
+        code: true,
       },
       orderBy: {
         startDate: 'desc',
