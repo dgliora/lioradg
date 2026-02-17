@@ -7,9 +7,6 @@ export async function GET() {
     const campaigns = await prisma.campaign.findMany({
       where: {
         active: true,
-        startDate: {
-          lte: now,
-        },
         endDate: {
           gte: now,
         }

@@ -5,6 +5,13 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Card, Button } from '@/components/ui'
 
+// UTC tarihini yerel saat olarak datetime-local input için formatla
+function toLocalDatetime(isoStr: string) {
+  const d = new Date(isoStr)
+  const offset = d.getTimezoneOffset() * 60000
+  return new Date(d.getTime() - offset).toISOString().slice(0, 16)
+}
+
 type Category = {
   id: string
   name: string
@@ -109,8 +116,8 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
           targetCategories: data.targetCategories ? JSON.parse(data.targetCategories) : [],
           targetProducts: data.targetProducts ? JSON.parse(data.targetProducts) : [],
           usageLimit: data.usageLimit?.toString() || '',
-          startDate: new Date(data.startDate).toISOString().slice(0, 16),
-          endDate: new Date(data.endDate).toISOString().slice(0, 16),
+          startDate: toLocalDatetime(data.startDate),
+          endDate: toLocalDatetime(data.endDate),
           active: data.active,
           bannerImage: data.bannerImage || '',
         })
