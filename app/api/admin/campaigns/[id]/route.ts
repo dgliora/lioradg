@@ -146,6 +146,12 @@ export async function DELETE(
       )
     }
 
+    // Önce bu kampanyaya bağlı ürünlerin referansını temizle
+    await prisma.product.updateMany({
+      where: { activeCampaignId: params.id },
+      data: { activeCampaignId: null, salePrice: null },
+    })
+
     await prisma.campaign.delete({
       where: { id: params.id }
     })

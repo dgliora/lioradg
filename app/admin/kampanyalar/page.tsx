@@ -3,6 +3,8 @@ import { Card, Button } from '@/components/ui'
 import Link from 'next/link'
 import { CampaignsTable } from '@/components/admin/CampaignsTable'
 
+export const dynamic = 'force-dynamic'
+
 async function getCampaigns() {
   return await prisma.campaign.findMany({
     orderBy: [
