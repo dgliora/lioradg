@@ -14,11 +14,11 @@ const categorySlugMap: Record<string, string> = {
 }
 
 const categoryDefaultImage: Record<string, string> = {
-  'bitkisel-yaglar': '/images/bitkiselyaglar/gul.jpeg',
+  'bitkisel-yaglar': '/images/bitkiselyaglar/gul.jpg',
   'krem-bakim': '/images/krembakim/yogunnemlendiriciyuzkremi.jpg',
   'oda-tekstil-kokulari': '/images/odavetekstil/amber.jpeg',
-  'tonikler': '/images/tonikler/1.jpg',
-  'sampuan-sac-bakim': '/images/sampuan-sacbakim/1.jpg',
+  'tonikler': '/images/tonikler/biberiye.png',
+  'sampuan-sac-bakim': '/images/sampuan-sacbakim/japonkkirazsacsirkesi.png',
 }
 
 function slugFromName(name: string): string {
@@ -115,7 +115,7 @@ async function main() {
       slug: 'parfumler',
       description: 'Kalıcı ve büyüleyici parfüm koleksiyonumuz',
       icon: '💉',
-      image: '/images/parfumler/1.jpg',
+      image: '/images/bitkiselyaglar/gul.jpg',
       order: 1,
     },
     {
@@ -123,7 +123,7 @@ async function main() {
       slug: 'tonikler',
       description: 'Cildinizi canlandıran doğal tonikler',
       icon: '💧',
-      image: '/images/tonikler/1.jpg',
+      image: '/images/tonikler/biberiye.png',
       order: 2,
     },
     {
@@ -131,7 +131,7 @@ async function main() {
       slug: 'sampuan-sac-bakim',
       description: 'Saçlarınız için doğal bakım ürünleri',
       icon: '💆',
-      image: '/images/sampuan-sacbakim/1.jpg',
+      image: '/images/sampuan-sacbakim/japonkkirazsacsirkesi.png',
       order: 3,
     },
     {
@@ -147,7 +147,7 @@ async function main() {
       slug: 'bitkisel-yaglar',
       description: 'Difüzör için doğal esans yağları',
       icon: '🌿',
-      image: '/images/bitkiselyaglar/gul.jpeg',
+      image: '/images/bitkiselyaglar/gul.jpg',
       order: 5,
     },
     {
