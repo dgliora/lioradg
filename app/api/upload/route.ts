@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
 import { checkAdminAuth } from '@/lib/auth-server'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,15 +11,11 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData()
     const file = formData.get('file') as File
-    
+
     if (!file) {
-      return NextResponse.json(
-        { error: 'Dosya bulunamadı' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Dosya bulunamadı' }, { status: 400 })
     }
 
-    // Dosya tipini kontrol et
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
     if (!validTypes.includes(file.type)) {
       return NextResponse.json(
@@ -29,7 +24,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Dosya boyutunu kontrol et (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json(
         { error: 'Dosya boyutu 5MB\'dan küçük olmalıdır' },
@@ -37,42 +31,36 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Dosya adını oluştur (benzersiz)
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    
-    // Benzersiz dosya adı oluştur
+
     const timestamp = Date.now()
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-')
-    const fileName = `${timestamp}-${originalName}`
-    
-    // Uploads klasörünü oluştur (yoksa)
-    const uploadsDir = path.join(process.cwd(), 'public', 'images', 'uploads')
-    try {
-      await mkdir(uploadsDir, { recursive: true })
-    } catch (error) {
-      // Klasör zaten varsa hata vermez
+    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase()
+    const fileName = `uploads/${timestamp}-${originalName}`
+
+    const { error } = await supabaseAdmin.storage
+      .from('products')
+      .upload(fileName, buffer, {
+        contentType: file.type,
+        upsert: false,
+      })
+
+    if (error) {
+      console.error('Supabase upload error:', error)
+      return NextResponse.json({ error: 'Dosya yüklenirken hata oluştu' }, { status: 500 })
     }
 
-    // Dosyayı kaydet
-    const filePath = path.join(uploadsDir, fileName)
-    await writeFile(filePath, buffer)
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from('products')
+      .getPublicUrl(fileName)
 
-    // URL'i döndür
-    const imageUrl = `/images/uploads/${fileName}`
-
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      url: imageUrl,
-      fileName 
+      url: publicUrlData.publicUrl,
+      fileName,
     })
-
   } catch (error) {
     console.error('Upload error:', error)
-    return NextResponse.json(
-      { error: 'Dosya yüklenirken hata oluştu' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Dosya yüklenirken hata oluştu' }, { status: 500 })
   }
 }
-
