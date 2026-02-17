@@ -195,7 +195,7 @@ async function main() {
     }
     const name = (item['Ürün İsmi'] || '').trim()
     const slug = slugFromName(name)
-    const price = parsePrice(item['FİYAT '] ?? item['FİYAT'] ?? '0')
+    const price = parsePrice(item['FİYAT '] ?? '0')
     const barcode = item['BARKOD '] != null ? String(item['BARKOD ']) : (item as any)['BARKOD'] != null ? String((item as any)['BARKOD']) : null
     const defaultImg = productImageMap[slug] || categoryDefaultImage[catSlug] || '/images/placeholder.jpg'
     const isFeatured = featuredSlugs.has(slug)
