@@ -1,7 +1,38 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import * as fs from 'fs'
+import * as path from 'path'
 
 const prisma = new PrismaClient()
+
+const categorySlugMap: Record<string, string> = {
+  'Bitkisel Yağlar': 'bitkisel-yaglar',
+  'Cilt Bakım': 'krem-bakim',
+  'Oda ve Tekstil Kokuları': 'oda-tekstil-kokulari',
+  'Tonik': 'tonikler',
+  'Şampuan & Saç Bakım': 'sampuan-sac-bakim',
+}
+
+const categoryDefaultImage: Record<string, string> = {
+  'bitkisel-yaglar': '/images/bitkiselyaglar/gul.jpeg',
+  'krem-bakim': '/images/krembakim/yogunnemlendiriciyuzkremi.jpg',
+  'oda-tekstil-kokulari': '/images/odavetekstil/amber.jpeg',
+  'tonikler': '/images/tonikler/1.jpg',
+  'sampuan-sac-bakim': '/images/sampuan-sacbakim/1.jpg',
+}
+
+function slugFromName(name: string): string {
+  const tr: Record<string, string> = { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u', 'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u' }
+  let s = name
+  for (const [k, v] of Object.entries(tr)) s = s.replace(new RegExp(k, 'g'), v)
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+}
+
+function parsePrice(fiyat: string | number): number {
+  if (typeof fiyat === 'number') return fiyat
+  const num = fiyat.replace(/[^\d,.]/g, '').replace(',', '.')
+  return parseFloat(num) || 0
+}
 
 async function main() {
   console.log('🌱 Seeding database...')
@@ -83,484 +114,69 @@ async function main() {
     console.log(`✅ Kategori oluşturuldu: ${category.name}`)
   }
 
-  // Ürünleri oluştur
-  const products = [
-    // Parfümler
-    {
-      name: 'Erkek Parfüm - 100 ml',
-      slug: 'erkek-parfum-100ml',
-      description: 'Erkekler için özel olarak tasarlanmış, kalıcı ve etkileyici parfüm. Odunsu ve baharatlı notalar.',
-      content: 'Üst notalar: Bergamot, Limon\nOrta notalar: Lavanta, Karanfil\nAlt notalar: Sandal ağacı, Amber',
-      usage: 'Parfümü boyun, bilek ve kulak arkası gibi nabız noktalarına sıkın.',
-      price: 299.90,
-      salePrice: 249.90,
-      sku: 'PRF-ERK-001',
-      stock: 50,
-      images: '/images/parfumler/1.jpg',
-      featured: true,
-      categoryId: createdCategories['parfumler'].id,
-    },
-    {
-      name: 'Kadın Parfüm - 100 ml',
-      slug: 'kadin-parfum-100ml',
-      description: 'Zarif ve feminen bir koku. Çiçeksi ve meyvemsi notalar.',
-      content: 'Üst notalar: Gül, Yasemin\nOrta notalar: Iris, Turunç çiçeği\nAlt notalar: Vanilya, Misk',
-      usage: 'Parfümü boyun, bilek ve kulak arkası gibi nabız noktalarına sıkın.',
-      price: 299.90,
-      salePrice: 249.90,
-      sku: 'PRF-KDN-001',
-      stock: 50,
-      images: '/images/parfumler/2.jpg',
-      featured: true,
-      categoryId: createdCategories['parfumler'].id,
-    },
-    // Tonikler
-    {
-      name: 'Saf Biberiye Suyu Tonik - 100 ml',
-      slug: 'saf-biberiye-suyu-tonik-100ml',
-      description: 'Cildi canlandıran ve ferahlatan doğal biberiye suyu.',
-      content: '%100 doğal biberiye suyu. Paraben, alkol ve kimyasal katkı içermez.',
-      usage: 'Temizlenmiş yüze pamuk yardımıyla uygulayın. Günde 2 kez kullanılabilir.',
-      price: 149.90,
-      sku: 'TNK-BBR-001',
-      stock: 100,
-      images: '/images/tonikler/1.jpg',
-      featured: true,
-      categoryId: createdCategories['tonikler'].id,
-    },
-    {
-      name: 'Saf Ölmez Çiçek Suyu Tonik - 100 ml',
-      slug: 'saf-olmez-cicek-suyu-tonik-100ml',
-      description: 'Anti-aging özellikleriyle bilinen ölmez çiçek suyu.',
-      content: '%100 doğal ölmez çiçek (helichrysum) suyu. Tüm cilt tipleri için uygundur.',
-      usage: 'Temizlenmiş yüze pamuk yardımıyla uygulayın. Sabah ve akşam kullanılabilir.',
-      price: 169.90,
-      sku: 'TNK-OLM-001',
-      stock: 80,
-      images: '/images/tonikler/2.jpg',
-      categoryId: createdCategories['tonikler'].id,
-    },
-    {
-      name: 'Saf Gül Mayası Tonik - 100 ml',
-      slug: 'saf-gul-mayasi-tonik-100ml',
-      description: 'Cildi nemlendiren ve yumuşatan gül mayası tonik.',
-      content: '%100 doğal gül mayası. Cildi yatıştırır, kızarıklıkları azaltır.',
-      usage: 'Temizlenmiş cilde pamuk ile uygulayın. Günde 2-3 kez kullanılabilir.',
-      price: 159.90,
-      salePrice: 139.90,
-      sku: 'TNK-GUL-001',
-      stock: 90,
-      images: '/images/tonikler/3.jpg',
-      featured: true,
-      categoryId: createdCategories['tonikler'].id,
-    },
-    {
-      name: 'Japon Kiraz Çiçeği Saç Sirkesi - 200 ml',
-      slug: 'japon-kiraz-cicegi-sac-sirkesi-200ml',
-      description: 'Saçları parlatıp yumuşatan doğal saç sirkesi.',
-      content: 'Elma sirkesi bazlı, Japon kiraz çiçeği özlü doğal formül.',
-      usage: 'Şampuan sonrası saça uygulayın, 2-3 dakika bekleyin ve durulayın.',
-      price: 129.90,
-      sku: 'TNK-KRZ-001',
-      stock: 60,
-      images: '/images/tonikler/4.jpg',
-      categoryId: createdCategories['tonikler'].id,
-    },
-    {
-      name: 'Makyaj Temizleme Suyu',
-      slug: 'makyaj-temizleme-suyu',
-      description: 'Etkili ve nazik makyaj temizleme suyu.',
-      content: 'Micellar teknoloji ile geliştirilmiş, yağsız formül.',
-      usage: 'Pamuk yardımıyla yüze uygulayın ve makyajı temizleyin.',
-      price: 119.90,
-      sku: 'TNK-MKJ-001',
-      stock: 70,
-      images: '/images/tonikler/5.jpg',
-      categoryId: createdCategories['tonikler'].id,
-    },
-    // Şampuan & Saç Bakım
-    {
-      name: 'Biberiye Argan Yasemin Şampuanı - 400 ml',
-      slug: 'biberiye-argan-yasemin-sampuani-400ml',
-      description: 'Saç dökülmesini azaltan, saçları besleyen doğal şampuan.',
-      content: 'Biberiye, argan yağı ve yasemin özü içerir. SLS/SLES içermez.',
-      usage: 'Islak saça uygulayın, masaj yapın ve durulayın.',
-      price: 189.90,
-      salePrice: 169.90,
-      sku: 'SMP-BBR-001',
-      stock: 75,
-      images: '/images/sampuan-sacbakim/1.jpg',
-      featured: true,
-      categoryId: createdCategories['sampuan-sac-bakim'].id,
-    },
-    {
-      name: 'Melisa Buğday At Kuyruğu Saç Kremi - 400 ml',
-      slug: 'melisa-bugday-at-kuyrugu-sac-kremi-400ml',
-      description: 'Saçları yumuşatıp güçlendiren besleyici saç kremi.',
-      content: 'Melisa, buğday proteini ve at kuyruğu özü ile zenginleştirilmiş.',
-      usage: 'Şampuan sonrası saç uçlarına uygulayın, 2-3 dakika bekleyin ve durulayın.',
-      price: 179.90,
-      sku: 'SKM-MLS-001',
-      stock: 65,
-      images: '/images/sampuan-sacbakim/2.jpg',
-      categoryId: createdCategories['sampuan-sac-bakim'].id,
-    },
-    {
-      name: 'Tropikal Duş Jeli - 400 ml',
-      slug: 'tropikal-dus-jeli-400ml',
-      description: 'Ferahlatıcı tropikal kokusu ile günün enerjisi.',
-      content: 'Doğal özler ve gliserin içerir. Cildi kurutmaz.',
-      usage: 'Duş sırasında vücuda uygulayın, köpürtün ve durulayın.',
-      price: 159.90,
-      sku: 'DSJ-TRP-001',
-      stock: 80,
-      images: '/images/sampuan-sacbakim/3.jpg',
-      categoryId: createdCategories['sampuan-sac-bakim'].id,
-    },
-    // Krem Bakım
-    {
-      name: 'Yoğun Nemlendirici Yüz Kremi - 50 ml',
-      slug: 'yogun-nemlendirici-yuz-kremi-50ml',
-      description: 'Cildi derinlemesine nemlendiren yoğun bakım kremi.',
-      content: 'Hyaluronik asit, vitamin E ve panthenol içerir.',
-      usage: 'Temiz cilde masaj yaparak uygulayın. Sabah ve akşam kullanılabilir.',
-      price: 349.90,
-      salePrice: 299.90,
-      sku: 'KRM-YNK-001',
-      stock: 40,
-      images: '/images/krembakim/yogunnemlendiriciyuzkremi.jpg',
-      featured: true,
-      categoryId: createdCategories['krem-bakim'].id,
-    },
-    {
-      name: 'Yoğun Nemlendirici Serum - 30 ml',
-      slug: 'yogun-nemlendirici-serum-30ml',
-      description: 'Yoğun nemlendirici etki sağlayan serum.',
-      content: 'Kolajen, hyaluronik asit ve niacinamide içerir.',
-      usage: 'Temiz cilde 2-3 damla uygulayın, hafif masaj yapın.',
-      price: 299.90,
-      salePrice: 259.90,
-      sku: 'SRM-YNS-001',
-      stock: 50,
-      images: '/images/krembakim/yogunnemlendiricserum.jpg',
-      featured: true,
-      categoryId: createdCategories['krem-bakim'].id,
-    },
-    {
-      name: 'Sıkılaştırıcı Nemlendirici Yüz Kremi - 50 ml',
-      slug: 'sikilastirici-nemlendirici-yuz-kremi-50ml',
-      description: 'Cildi sıkılaştıran ve nemlendiren anti-aging yüz kremi.',
-      content: 'Peptit kompleksi, retinol alternatifleri ve shea butter içerir.',
-      usage: 'Gece temiz cilde uygulayın. Göz çevresinden kaçının.',
-      price: 379.90,
-      sku: 'KRM-SNK-001',
-      stock: 35,
-      images: '/images/krembakim/sikilastiricinemlendiriciyuzkremi.png',
-      categoryId: createdCategories['krem-bakim'].id,
-    },
-    {
-      name: 'Sıkılaştırıcı Nemlendirici Serum - 30 ml',
-      slug: 'sikilastirici-nemlendirici-serum-30ml',
-      description: 'Anti-aging etkili sıkılaştırıcı serum.',
-      content: 'Matrixyl 3000, argireline ve kolajen içerir.',
-      usage: 'Temiz cilde 2-3 damla uygulayın.',
-      price: 349.90,
-      sku: 'SRM-SNS-001',
-      stock: 45,
-      images: '/images/krembakim/sikilastiricinemlendiricserum.jpg',
-      categoryId: createdCategories['krem-bakim'].id,
-    },
-    {
-      name: 'Biberiye Özlü Bakım Kremi - 50 ml',
-      slug: 'biberiye-ozlu-bakim-kremi-50ml',
-      description: 'Biberiye özü ile zenginleştirilmiş canlandırıcı bakım kremi.',
-      content: 'Biberiye özü, E vitamini ve doğal yağlar içerir.',
-      usage: 'Temiz cilde masaj yaparak uygulayın.',
-      price: 299.90,
-      sku: 'KRM-BBR-001',
-      stock: 55,
-      images: '/images/krembakim/biberiye.png',
-      categoryId: createdCategories['krem-bakim'].id,
-    },
-    {
-      name: 'Gül Mayası Bakım Kremi - 50 ml',
-      slug: 'gul-mayasi-bakim-kremi-50ml',
-      description: 'Gül mayası ile cildi yenileyen ve nemlendiren bakım kremi.',
-      content: 'Gül mayası, hyaluronik asit içerir.',
-      usage: 'Sabah ve akşam temiz cilde uygulayın.',
-      price: 319.90,
-      sku: 'KRM-GUL-001',
-      stock: 50,
-      images: '/images/krembakim/gulmayasi.png',
-      categoryId: createdCategories['krem-bakim'].id,
-    },
-    {
-      name: 'Japon Kiraz Çiçeği Bakım Kremi - 50 ml',
-      slug: 'japon-kiraz-cicegi-bakim-kremi-50ml',
-      description: 'Japon kiraz çiçeği özlü aydınlatıcı bakım kremi.',
-      content: 'Japon kiraz çiçeği özü, C vitamini içerir.',
-      usage: 'Temiz cilde masaj yaparak uygulayın.',
-      price: 329.90,
-      sku: 'KRM-JPN-001',
-      stock: 40,
-      images: '/images/krembakim/japonkkiraz.png',
-      categoryId: createdCategories['krem-bakim'].id,
-    },
-    {
-      name: 'Ölmez Çiçek Bakım Kremi - 50 ml',
-      slug: 'olmez-cicek-bakim-kremi-50ml',
-      description: 'Ölmez çiçek özlü anti-aging bakım kremi.',
-      content: 'Ölmez çiçek özü, peptit kompleksi içerir.',
-      usage: 'Gece temiz cilde uygulayın.',
-      price: 359.90,
-      sku: 'KRM-OLM-001',
-      stock: 35,
-      images: '/images/krembakim/olmezcicek.png',
-      categoryId: createdCategories['krem-bakim'].id,
-    },
-    {
-      name: 'Tonik Makyaj Temizleme Suyu - 200 ml',
-      slug: 'tonik-makyaj-temizleme-suyu-200ml',
-      description: 'Cilt bakım tonik özellikli makyaj temizleme suyu.',
-      content: 'Micellar teknoloji, doğal bitki özleri içerir.',
-      usage: 'Pamuk yardımıyla yüze uygulayın ve makyajı temizleyin.',
-      price: 149.90,
-      sku: 'KRM-TMT-001',
-      stock: 60,
-      images: '/images/krembakim/tonikmakyatemizleme.png',
-      categoryId: createdCategories['krem-bakim'].id,
-    },
-    // Bitkisel Yağlar (Difüzör)
-    {
-      name: 'Afrika Yağı - 10 ml',
-      slug: 'afrika-yagi-10ml',
-      description: 'Egzotik ve sıcak Afrika esansları.',
-      content: 'Afrika baharatları ve odunsu notalar.',
-      usage: 'Difüzöre 3-4 damla ekleyin.',
-      price: 150,
-      sku: 'YAG-AFR-001',
-      stock: 75,
-      images: '/images/bitkiselyaglar/afrika.jpeg',
-      categoryId: createdCategories['bitkisel-yaglar'].id,
-    },
-    {
-      name: 'Biberiye Yağı - 10 ml',
-      slug: 'biberiye-yagi-10ml',
-      description: 'Zihin açıcı ve enerji verici biberiye esansı.',
-      content: '%100 saf biberiye esans yağı. Terapötik kalite.',
-      usage: 'Difüzöre 3-5 damla ekleyin. Konsantrasyonu artırır.',
-      price: 150,
-      sku: 'YAG-BBR-001',
-      stock: 100,
-      images: '/images/bitkiselyaglar/biberiye.jpeg',
-      categoryId: createdCategories['bitkisel-yaglar'].id,
-    },
-    {
-      name: 'Gül Yağı - 10 ml',
-      slug: 'gul-yagi-10ml',
-      description: 'Romantik ve rahatlatıcı gül esansı. Difüzör ve aromaterapi için.',
-      content: '%100 saf esans yağı. Sentetik katkı içermez.',
-      usage: 'Difüzöre 3-5 damla ekleyin veya seyreltilmiş şekilde masaj yağı olarak kullanın.',
-      price: 150,
-      sku: 'YAG-GUL-001',
-      stock: 120,
-      images: '/images/bitkiselyaglar/gul.jpeg',
-      featured: true,
-      categoryId: createdCategories['bitkisel-yaglar'].id,
-    },
-    {
-      name: 'Mango Yağı - 10 ml',
-      slug: 'mango-yagi-10ml',
-      description: 'Tropikal ve tatlı mango esansı.',
-      content: 'Doğal mango özü ile üretilmiş esans yağı.',
-      usage: 'Difüzöre 4-5 damla ekleyin.',
-      price: 150,
-      sku: 'YAG-MAN-001',
-      stock: 85,
-      images: '/images/bitkiselyaglar/mango.jpeg',
-      categoryId: createdCategories['bitkisel-yaglar'].id,
-    },
-    {
-      name: 'Nane Yağı - 10 ml',
-      slug: 'nane-yagi-10ml',
-      description: 'Ferahlatıcı ve solunum açıcı nane esansı.',
-      content: '%100 saf nane esans yağı.',
-      usage: 'Difüzöre 4-5 damla ekleyin. Soğuk algınlığında rahatlatır.',
-      price: 150,
-      sku: 'YAG-NAN-001',
-      stock: 110,
-      images: '/images/bitkiselyaglar/nane.jpeg',
-      categoryId: createdCategories['bitkisel-yaglar'].id,
-    },
-    {
-      name: 'Nar Yağı - 10 ml',
-      slug: 'nar-yagi-10ml',
-      description: 'Antioksidan zengin nar esansı.',
-      content: 'Doğal nar özü ile üretilmiş esans yağı.',
-      usage: 'Difüzöre 3-5 damla ekleyin.',
-      price: 150,
-      sku: 'YAG-NAR-001',
-      stock: 85,
-      images: '/images/bitkiselyaglar/nar.jpeg',
-      categoryId: createdCategories['bitkisel-yaglar'].id,
-    },
-    {
-      name: 'Pudra Yağı - 10 ml',
-      slug: 'pudra-yagi-10ml',
-      description: 'Temiz ve pudra kokusu. Bebek pudrası notaları.',
-      content: 'Pudra notaları içeren esans karışımı.',
-      usage: 'Difüzöre 3-4 damla ekleyin.',
-      price: 150,
-      sku: 'YAG-PDR-001',
-      stock: 100,
-      images: '/images/bitkiselyaglar/pudra.jpeg',
-      categoryId: createdCategories['bitkisel-yaglar'].id,
-    },
-    {
-      name: 'Sandal Ağacı Yağı - 10 ml',
-      slug: 'sandal-agaci-yagi-10ml',
-      description: 'Meditasyon ve rahatlama için sandal ağacı esansı.',
-      content: '%100 saf sandal ağacı esans yağı.',
-      usage: 'Difüzöre 3-4 damla ekleyin. Yoga ve meditasyon için ideal.',
-      price: 150,
-      sku: 'YAG-SND-001',
-      stock: 70,
-      images: '/images/bitkiselyaglar/sandalagaci.jpeg',
-      categoryId: createdCategories['bitkisel-yaglar'].id,
-    },
-    {
-      name: 'Vanilya Yağı - 10 ml',
-      slug: 'vanilya-yagi-10ml',
-      description: 'Tatlı ve rahatlatıcı vanilya esansı.',
-      content: 'Doğal vanilya özü ile üretilmiş esans yağı.',
-      usage: 'Difüzöre 4-5 damla ekleyin.',
-      price: 150,
-      sku: 'YAG-VAN-001',
-      stock: 90,
-      images: '/images/bitkiselyaglar/vanilya.jpeg',
-      categoryId: createdCategories['bitkisel-yaglar'].id,
-    },
-    // Oda ve Tekstil Kokuları
-    {
-      name: 'Amber Kokusu - 500 ml',
-      slug: 'amber-kokusu-500ml',
-      description: 'Sıcak ve sarıcı amber kokusu.',
-      content: 'Amber ve vanilya notaları. Kalıcı etki.',
-      usage: 'Ev tekstillerine ve odaya 20-30 cm mesafeden uygulayın.',
-      price: 400,
-      sku: 'ODA-AMB-001',
-      stock: 55,
-      images: '/images/odavetekstil/amber.jpeg',
-      categoryId: createdCategories['oda-tekstil-kokulari'].id,
-    },
-    {
-      name: 'Beyaz Sabun Kokusu - 500 ml',
-      slug: 'beyaz-sabun-kokusu-500ml',
-      description: 'Temiz ve ferah beyaz sabun kokusu.',
-      content: 'Uzun süre kalıcı formül. Leke yapmaz.',
-      usage: 'Tekstillere 20-30 cm uzaktan sıkın. Odaya da kullanılabilir.',
-      price: 400,
-      sku: 'ODA-BYS-001',
-      stock: 60,
-      images: '/images/odavetekstil/beyazsabun.jpeg',
-      categoryId: createdCategories['oda-tekstil-kokulari'].id,
-    },
-    {
-      name: 'Gül Kokusu - 500 ml',
-      slug: 'gul-kokusu-500ml',
-      description: 'Zarif ve romantik gül kokusu. Tüm mekanlara uygun.',
-      content: 'Çiçeksi notalar. Kalıcı formül.',
-      usage: 'Havaya, tekstillere ve perdelere 20-30 cm mesafeden sıkın.',
-      price: 400,
-      sku: 'ODA-GUL-001',
-      stock: 70,
-      images: '/images/odavetekstil/gul.jpeg',
-      featured: true,
-      categoryId: createdCategories['oda-tekstil-kokulari'].id,
-    },
-    {
-      name: 'İstanbul Kokusu - 500 ml',
-      slug: 'istanbul-kokusu-500ml',
-      description: 'Şehir dokusunu yansıtan özel İstanbul kokusu.',
-      content: 'Egzotik ve nostaljik notalar.',
-      usage: 'Oturma odası için idealdir. 20-30 cm uzaktan sıkın.',
-      price: 400,
-      sku: 'ODA-IST-001',
-      stock: 50,
-      images: '/images/odavetekstil/istanbul.jpeg',
-      categoryId: createdCategories['oda-tekstil-kokulari'].id,
-    },
-    {
-      name: 'Kiraz Kokusu - 500 ml',
-      slug: 'kiraz-kokusu-500ml',
-      description: 'Tatlı ve meyvemsi kiraz kokusu.',
-      content: 'Meyve notaları. Rahatlatıcı etki.',
-      usage: 'Yatak odası ve banyoda kullanım için ideal.',
-      price: 400,
-      sku: 'ODA-KRZ-001',
-      stock: 65,
-      images: '/images/odavetekstil/kiraz.jpeg',
-      categoryId: createdCategories['oda-tekstil-kokulari'].id,
-    },
-    {
-      name: 'Kudüs Kokusu - 500 ml',
-      slug: 'kudus-kokusu-500ml',
-      description: 'Mistik ve derin Kudüs kokusu.',
-      content: 'Baharat ve odunsu notalar.',
-      usage: '20-30 cm uzaktan sıkın.',
-      price: 400,
-      sku: 'ODA-KDS-001',
-      stock: 45,
-      images: '/images/odavetekstil/kudus.jpeg',
-      featured: true,
-      categoryId: createdCategories['oda-tekstil-kokulari'].id,
-    },
-    {
-      name: 'Milano Kokusu - 500 ml',
-      slug: 'milano-kokusu-500ml',
-      description: 'İtalyan zerafeti Milano kokusu.',
-      content: 'Zarif çiçek ve baharat karışımı.',
-      usage: 'Ev tekstillerine 20-30 cm mesafeden uygulayın.',
-      price: 400,
-      sku: 'ODA-MIL-001',
-      stock: 55,
-      images: '/images/odavetekstil/milano.jpeg',
-      categoryId: createdCategories['oda-tekstil-kokulari'].id,
-    },
-    {
-      name: 'Oud Kokusu - 500 ml',
-      slug: 'oud-kokusu-500ml',
-      description: 'Lüks ve etkileyici Oud kokusu. Oriental notalar.',
-      content: 'Oud ve baharat notaları. Premium kalite.',
-      usage: 'Oturma odası ve yatak odası için idealdir. 20-30 cm uzaktan sıkın.',
-      price: 400,
-      sku: 'ODA-OUD-001',
-      stock: 50,
-      images: '/images/odavetekstil/oud.jpeg',
-      featured: true,
-      categoryId: createdCategories['oda-tekstil-kokulari'].id,
-    },
-    {
-      name: 'Pudra Kokusu - 500 ml',
-      slug: 'pudra-kokusu-500ml',
-      description: 'Temiz ve ferah pudra kokusu. Ev tekstilleri için ideal.',
-      content: 'Uzun süre kalıcı formül. Leke yapmaz.',
-      usage: 'Tekstillere 20-30 cm uzaktan sıkın. Odaya da kullanılabilir.',
-      price: 400,
-      sku: 'ODA-PDR-002',
-      stock: 60,
-      images: '/images/odavetekstil/pudra.jpeg',
-      categoryId: createdCategories['oda-tekstil-kokulari'].id,
-    },
-  ]
+  // JSON'dan ürünleri yükle (images/urun_listesi_faydalari_guncel.json)
+  const jsonPath = path.join(process.cwd(), 'images', 'urun_listesi_faydalari_guncel.json')
+  let jsonItems: Array<{
+    'Kategori': string
+    'Ürün İsmi': string
+    'Kullanım Alanı': string
+    'Özellikleri': string
+    'Bilinen Faydaları': string
+    'BARKOD ': number
+    'FİYAT ': string
+  }> = []
+  try {
+    const raw = fs.readFileSync(jsonPath, 'utf-8').trim()
+    jsonItems = JSON.parse('[' + raw + ']')
+  } catch (e) {
+    console.warn('⚠️ JSON ürün listesi okunamadı, atlanıyor:', e)
+  }
 
-  for (const prod of products) {
+  for (const item of jsonItems) {
+    const catSlug = categorySlugMap[item['Kategori']]
+    if (!catSlug || !createdCategories[catSlug]) {
+      console.warn(`⚠️ Bilinmeyen kategori: ${item['Kategori']}, atlanıyor.`)
+      continue
+    }
+    const name = (item['Ürün İsmi'] || '').trim()
+    const slug = slugFromName(name)
+    const price = parsePrice(item['FİYAT '] ?? item['FİYAT'] ?? '0')
+    const barcode = item['BARKOD '] != null ? String(item['BARKOD ']) : (item as any)['BARKOD'] != null ? String((item as any)['BARKOD']) : null
+    const defaultImg = categoryDefaultImage[catSlug] || '/images/placeholder.jpg'
+
     const product = await prisma.product.upsert({
-      where: { slug: prod.slug },
-      update: { images: prod.images },
-      create: prod,
+      where: { slug },
+      update: {
+        name,
+        description: (item['Bilinen Faydaları'] || '').slice(0, 500),
+        content: item['Özellikleri'] || null,
+        usage: item['Kullanım Alanı'] || null,
+        features: item['Özellikleri'] || null,
+        benefits: item['Bilinen Faydaları'] || null,
+        barcode: barcode || undefined,
+        price,
+        sku: barcode || undefined,
+        categoryId: createdCategories[catSlug].id,
+      },
+      create: {
+        name,
+        slug,
+        description: (item['Bilinen Faydaları'] || '').slice(0, 500),
+        content: item['Özellikleri'] || null,
+        usage: item['Kullanım Alanı'] || null,
+        features: item['Özellikleri'] || null,
+        benefits: item['Bilinen Faydaları'] || null,
+        barcode: barcode || undefined,
+        price,
+        sku: barcode || undefined,
+        stock: 50,
+        images: defaultImg,
+        categoryId: createdCategories[catSlug].id,
+        featured: false,
+        active: true,
+      },
     })
-    console.log(`✅ Ürün oluşturuldu: ${product.name}`)
+    console.log(`✅ Ürün: ${product.name}`)
   }
 
   // Ayarları oluştur

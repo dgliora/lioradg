@@ -193,9 +193,12 @@ export function ProductDetail({ product }: ProductDetailProps) {
               )}
             </div>
 
-            {/* Short Description */}
-            {product.description && (
-              <p className="text-gray-700 mb-6">{product.description}</p>
+            {/* Short Description (benefits özeti veya description) */}
+            {(product.benefits || product.description) && (
+              <p className="text-gray-700 mb-6">
+                {(product.benefits || product.description || '').slice(0, 200)}
+                {(product.benefits || product.description || '').length > 200 ? '...' : ''}
+              </p>
             )}
 
             {/* Quantity & Add to Cart */}
@@ -299,12 +302,12 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <div className="prose max-w-none">
             {activeTab === 'description' && (
               <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {product.description || 'Bilgi bulunmamaktadır.'}
+                {product.features || product.content || 'Bilgi bulunmamaktadır.'}
               </div>
             )}
             {activeTab === 'content' && (
               <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {product.content || 'Bilgi bulunmamaktadır.'}
+                {product.benefits || product.description || 'Bilgi bulunmamaktadır.'}
               </div>
             )}
             {activeTab === 'usage' && (

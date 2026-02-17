@@ -31,6 +31,9 @@ export interface Product {
   description?: string | null
   content?: string | null
   usage?: string | null
+  features?: string | null
+  benefits?: string | null
+  barcode?: string | null
   price: number
   salePrice?: number | null
   sku?: string | null

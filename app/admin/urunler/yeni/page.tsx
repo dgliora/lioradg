@@ -23,6 +23,9 @@ export default function NewProductPage() {
     description: '',
     content: '',
     usage: '',
+    features: '',
+    benefits: '',
+    barcode: '',
     price: '',
     salePrice: '',
     sku: '',
@@ -248,40 +251,66 @@ export default function NewProductPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Açıklama
+                    Açıklama (kısa)
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={4}
+                    rows={2}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage focus:border-transparent"
-                    placeholder="Ürün açıklaması..."
+                    placeholder="Ürün kısa açıklaması..."
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    İçerik Bilgileri
+                    Özellikleri
                   </label>
                   <textarea
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    value={formData.features}
+                    onChange={(e) => setFormData({ ...formData, features: e.target.value })}
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage focus:border-transparent"
-                    placeholder="İçerik bilgileri..."
+                    placeholder="Ürün özellikleri..."
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Kullanım Talimatları
+                    Bilinen Faydaları
+                  </label>
+                  <textarea
+                    value={formData.benefits}
+                    onChange={(e) => setFormData({ ...formData, benefits: e.target.value })}
+                    rows={4}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage focus:border-transparent"
+                    placeholder="Bilinen faydalar..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Kullanım Alanı
                   </label>
                   <textarea
                     value={formData.usage}
                     onChange={(e) => setFormData({ ...formData, usage: e.target.value })}
-                    rows={3}
+                    rows={2}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage focus:border-transparent"
-                    placeholder="Nasıl kullanılır..."
+                    placeholder="Kullanım alanları..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    İçerik Bilgileri (opsiyonel)
+                  </label>
+                  <textarea
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    rows={2}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage focus:border-transparent"
+                    placeholder="Ek içerik..."
                   />
                 </div>
               </div>
@@ -309,7 +338,14 @@ export default function NewProductPage() {
                 />
 
                 <Input
-                  label="SKU / Barkod"
+                  label="Barkod"
+                  value={formData.barcode}
+                  onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                  helperText="Sadece admin panelde görünür"
+                />
+
+                <Input
+                  label="SKU"
                   value={formData.sku}
                   onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
                 />

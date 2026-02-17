@@ -86,6 +86,9 @@ model Product {
   description String?
   content     String?
   usage       String?
+  features    String?  // Özellikleri (JSON'dan)
+  benefits    String?  // Bilinen Faydaları (JSON'dan)
+  barcode     String?  // Barkod (sadece admin panelde gösterilir)
   price       Float
   salePrice   Float?
   costPrice   Float?

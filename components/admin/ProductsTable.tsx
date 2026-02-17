@@ -211,6 +211,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
                   />
                 </th>
                 <th className="px-6 py-4 font-medium">Ürün</th>
+                <th className="px-6 py-4 font-medium">Barkod</th>
                 <th className="px-6 py-4 font-medium">Kategori</th>
                 <th className="px-6 py-4 font-medium">Fiyat</th>
                 <th className="px-6 py-4 font-medium">Stok</th>
@@ -221,7 +222,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
             <tbody className="divide-y divide-gray-100">
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                     {searchQuery || selectedCategory !== 'all' || selectedStatus !== 'all'
                       ? 'Filtrelere uygun ürün bulunamadı'
                       : 'Henüz ürün eklenmemiş'}
@@ -254,6 +255,9 @@ export function ProductsTable({ products }: ProductsTableProps) {
                           <p className="text-sm text-gray-500">SKU: {product.sku || '-'}</p>
                         </div>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-mono text-gray-600">
+                      {(product as any).barcode || '-'}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {product.category.name}

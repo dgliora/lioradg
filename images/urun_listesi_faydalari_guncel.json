@@ -1,0 +1,341 @@
+
+ {
+  "Column1": 1,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Gül Yağı 10 ml",
+  "Kullanım Alanı": "Aromaterapi, cilt bakımı, masaj",
+  "Özellikleri": "Rahatlatıcı koku, cilt tonunu dengelemeye yardımcı, nem desteği sağlar",
+  "Bilinen Faydaları": "Gül yağı, antioksidan ve antimikrobiyal özellikleri sayesinde cilt bariyerinin korunmasına, nem dengesinin desteklenmesine ve inflamasyonun azaltılmasına katkı sağlar. Aromaterapide ise stres düzeyinin düşürülmesi ve psikolojik rahatlamanın desteklenmesi amacıyla kullanımı yaygındır.",
+  "BARKOD ": 868510640024,
+  "FİYAT ": "150 TL "
+ },
+ {
+  "Column1": 2,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Biberiye Yağı 10 ml",
+  "Kullanım Alanı": "Saç bakımı, aromaterapi, masaj",
+  "Özellikleri": "Canlandırıcı etki, saç derisini destekler, ferahlatıcı aroma",
+  "Bilinen Faydaları": "Biberiye yağının bilinen faydaları; dolaşımı desteklemesi, saç derisi sağlığına katkı sağlaması, kas ve eklem bölgelerinde rahatlatıcı etki göstermesi ve zihinsel uyanıklığı artırmaya yardımcı olmasıdır.",
+  "BARKOD ": 868510640031,
+  "FİYAT ": "150 TL "
+ },
+ {
+  "Column1": 3,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Amber Oud Yağı 10 ml",
+  "Kullanım Alanı": "Koku amaçlı kullanım, aromaterapi",
+  "Özellikleri": "Yoğun ve kalıcı doğu esansı, sıcak ve odunsu nota",
+  "Bilinen Faydaları": "Amber oud, sıcak ve odunsu aromasıyla rahatlatıcı ve dengeleyici etki gösteren, parfümeride kalıcılığı artırmak ve duygusal sakinlik hissini desteklemek amacıyla kullanılan aromatik bir bileşendir.",
+  "BARKOD ": 868510640048,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 4,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Vanilya Yağı 10 ml",
+  "Kullanım Alanı": "Ortam kokulandırma, masaj, aromaterapi",
+  "Özellikleri": "Tatlı ve yumuşak aroma, rahatlatıcı etki",
+  "Bilinen Faydaları": "Vanilya, hoş aromasıyla rahatlatıcı etki gösteren ve aromaterapide duygu durumunu dengelemeye yardımcı olan doğal bir aromatik bileşendir.",
+  "BARKOD ": 868510640055,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 5,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Sandal Ağacı Yağı 10 ml",
+  "Kullanım Alanı": "Meditasyon, cilt bakımı, aromaterapi",
+  "Özellikleri": "Odunsu ve kalıcı koku, sakinleştirici özellik",
+  "Bilinen Faydaları": "Sandal ağacı yağı, sandal ağacının odun kısmından elde edilen, sıcak ve odunsu aromaya sahip değerli bir uçucu yağdır. Aromaterapide sakinleştirici ve dengeleyici etkileriyle bilinirken, kozmetik ve parfümeride kalıcılık sağlaması nedeniyle sıkça tercih edilir. Aynı zamanda cilt bakım ürünlerinde yatıştırıcı ve destekleyici özellikleri nedeniyle kullanımı yaygındır.",
+  "BARKOD ": 868510640062,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 6,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Okaliptus Yağı 10 ml",
+  "Kullanım Alanı": "Buhar banyosu, aromaterapi, masaj",
+  "Özellikleri": "Ferahlık verir, nefes açıcı keskin aroma",
+  "Bilinen Faydaları": "Okaliptus yağı, ferahlatıcı ve keskin aromasıyla bilinen, aromaterapide solunumun rahatlatılmasına ve zihinsel açıklığın desteklenmesine yardımcı olan bir uçucu yağdır. Aynı zamanda ferahlatıcı etkisi nedeniyle masaj ve kişisel bakım ürünlerinde yaygın olarak kullanılır.",
+  "BARKOD ": 868510640079,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 7,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Japon Kiraz Yağı 10 ml",
+  "Kullanım Alanı": "Cilt bakımı, ortam kokusu",
+  "Özellikleri": "Hafif çiçeksi koku, hoş ve kalıcı esans",
+  "Bilinen Faydaları": "Japon kirazı (sakura), hafif ve zarif kokusuyla bilinen, daha çok parfümeri ve kozmetik ürünlerinde kullanılan aromatik bir esanstır. Rahatlatıcı ve duygusal dengeyi destekleyici etkisiyle ferahlık hissi yaratır ve ürünlere yumuşak, çiçeksi bir karakter kazandırır.",
+  "BARKOD ": 868510640086,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 8,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Okyanus Yağı 10 ml",
+  "Kullanım Alanı": "Ortam kokusu, araç kokusu",
+  "Özellikleri": "Temiz ve ferah deniz esintisi aroması",
+  "Bilinen Faydaları": "Okyanus yağı, deniz esintisini çağrıştıran ferah ve temiz kokusuyla bilinen, genellikle parfümeri ve kozmetik ürünlerinde kullanılan aromatik bir esanstır. Ferahlık, serinlik ve rahatlama hissi vermesi amacıyla tercih edilir.",
+  "BARKOD ": 868510640093,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 9,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Pudra Yağı 10 ml",
+  "Kullanım Alanı": "Ortam kokusu, tekstil kokulandırma",
+  "Özellikleri": "Temiz çamaşır hissi veren yumuşak koku",
+  "Bilinen Faydaları": "Pudra yağı, temiz ve yumuşak kokusuyla sakinlik ve ferahlık hissi veren, kozmetik ve parfümeri ürünlerinde hoş bir koku profili sağlamak amacıyla kullanılan aromatik bir yağdır.",
+  "BARKOD ": 868510640123,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 10,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Afrika Yağı 10 ml",
+  "Kullanım Alanı": "Ortam kokusu, aromaterapi",
+  "Özellikleri": "Egzotik ve baharatlı koku profili",
+  "Bilinen Faydaları": "Afrika yağı, sıcak, baharatlı ve odunsu notalarıyla bilinen, genellikle parfümeri ve kozmetik ürünlerinde kullanılan aromatik bir yağdır. Egzotik ve karakteristik kokusuyla derinlik hissi verirken, kalıcılığı artırmak ve güçlü bir koku profili oluşturmak amacıyla tercih edilir.",
+  "BARKOD ": 868510640116,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 11,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Sedir Ağacı Yağı 10 ml",
+  "Kullanım Alanı": "Aromaterapi, dolap kokusu",
+  "Özellikleri": "Odunsu aroma, rahatlatıcı ve dengeleyici",
+  "Bilinen Faydaları": "Sedir yağı, odunsu ve kuru aromasıyla bilinen, aromaterapide sakinleştirici ve dengeleyici etkileriyle öne çıkan bir uçucu yağdır. Kozmetik ve parfümeride kalıcılığı artırmak, cilt bakım ürünlerinde ise destekleyici ve yatıştırıcı özelliklerinden faydalanmak amacıyla yaygın olarak kullanılır.",
+  "BARKOD ": 868510640130,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 12,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Nane Yağı 10 ml",
+  "Kullanım Alanı": "Aromaterapi, masaj",
+  "Özellikleri": "Serinletici etki, ferahlatıcı koku",
+  "Bilinen Faydaları": "Nane yağı, ferahlatıcı ve serinletici etkisiyle bilinen, aromaterapide zihinsel uyanıklığı destekleyen ve kozmetik ürünlerinde ferahlık hissi vermek amacıyla kullanılan bir uçucu yağdır.",
+  "BARKOD ": 868510640147,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 13,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Mango Yağı 10 ml",
+  "Kullanım Alanı": "Ortam kokusu, kozmetik karışımlar",
+  "Özellikleri": "Tatlı ve tropikal meyve aroması",
+  "Bilinen Faydaları": "Mango yağı, cildi besleyici ve nemlendirici özellikleriyle bilinen, yumuşatıcı etkisi sayesinde cilt ve saç bakım ürünlerinde yaygın olarak kullanılan doğal bir yağdır. Antioksidan içeriğiyle cilt bariyerini desteklemeye yardımcı olur ve hoş, hafif tropikal bir his bırakır.",
+  "BARKOD ": 868510640154,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 14,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Nar Yağı 10 ml",
+  "Kullanım Alanı": "Cilt bakımı, aromaterapi",
+  "Özellikleri": "Meyvemsi koku, cildi beslemeye yardımcı",
+  "Bilinen Faydaları": "Nar yağı, güçlü antioksidan içeriğiyle cilt bariyerini destekleyen, nemlendirme ve yenilenme sürecine katkı sağlayan doğal bir yağdır. Cilt bakım ürünlerinde canlandırıcı ve yaşlanma karşıtı destekleyici özellikleri nedeniyle yaygın olarak kullanılır.",
+  "BARKOD ": 868510640161,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 15,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Aynısefa Yağı 10 ml",
+  "Kullanım Alanı": "Cilt bakımı, masaj",
+  "Özellikleri": "Hassas ciltler için yatıştırıcı destek",
+  "Bilinen Faydaları": "Aynı sefa yağı, yatıştırıcı ve onarıcı özellikleriyle bilinen, hassas ve tahrişe yatkın ciltlerde cilt bariyerini desteklemek amacıyla kozmetik ürünlerde yaygın olarak kullanılan doğal bir yağdır.",
+  "BARKOD ": 868510640178,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 16,
+  "Kategori": "Bitkisel Yağlar",
+  "Ürün İsmi": "Melisa Yağı 10 ml",
+  "Kullanım Alanı": "Aromaterapi, rahatlama",
+  "Özellikleri": "Sakinleştirici limonsu aroma",
+  "Bilinen Faydaları": "Delya yağı, çiçeksi ve yumuşak aromasıyla kozmetik ve parfümeri ürünlerinde hoş koku vermek amacıyla kullanılan aromatik bir yağdır; ferahlık ve zarif bir koku profili sağlamaya yardımcı olur.",
+  "BARKOD ": 868510640185,
+  "FİYAT ": "150 TL"
+ },
+ {
+  "Column1": 17,
+  "Kategori": "Cilt Bakım",
+  "Ürün İsmi": "Hyaluronic Acid Akgünlük Kremi 50 ml",
+  "Kullanım Alanı": "Yüz bakımı",
+  "Özellikleri": "Yoğun nemlendirme, cilt elastikiyetini destekler",
+  "Bilinen Faydaları": "Hyaluronik asit ve akgünlük (Boswellia) içeren krem, cildin nem tutma kapasitesini artırarak dolgunluk ve esneklik kazandırmaya yardımcı olurken, akgünlüğün yatıştırıcı ve destekleyici özellikleri sayesinde cilt bariyerinin korunmasına katkı sağlar",
+  "BARKOD ": 868510640222,
+  "FİYAT ": "600 TL"
+ },
+ {
+  "Column1": 18,
+  "Kategori": "Cilt Bakım",
+  "Ürün İsmi": "Collagen Peptit Nemlendirici Krem 50 ml",
+  "Kullanım Alanı": "Yüz bakımı",
+  "Özellikleri": "Kolajen destekli nem bakımı, cilt dolgunluğu sağlar",
+  "Bilinen Faydaları": "Kolajen peptit içeren nemlendirici krem, cildin nem dengesini destekleyerek daha pürüzsüz ve dolgun bir görünüm kazandırmaya yardımcı olur. Hafif yapısıyla cilt bariyerini destekler ve elastikiyet hissinin korunmasına katkı sağlar.",
+  "BARKOD ": 868510640239,
+  "FİYAT ": "600 TL"
+ },
+ {
+  "Column1": 19,
+  "Kategori": "Cilt Bakım",
+  "Ürün İsmi": "Hyalüronik Asit - Collagen Serum 30 ml",
+  "Kullanım Alanı": "Yüz bakımı, serum",
+  "Özellikleri": "Derinlemesine nem, cilt sıkılaştırma desteği",
+  "Bilinen Faydaları": "Hiyalüronik asit ve kolajen içeren serum, cildin yoğun nemlenmesine yardımcı olurken daha dolgun, pürüzsüz ve canlı bir görünüm kazandırmayı destekler. Hafif yapısı sayesinde cilt tarafından kolayca emilir ve günlük cilt bakım rutinlerinde nem ve elastikiyet desteği sağlamak amacıyla kullanılır.",
+  "BARKOD ": 868510640246,
+  "FİYAT ": "600 TL"
+ },
+ {
+  "Column1": 20,
+  "Kategori": "Cilt Bakım",
+  "Ürün İsmi": "Peptit Complex Acid Serum 30 ml",
+  "Kullanım Alanı": "Yüz bakımı, anti-aging",
+  "Özellikleri": "Peptit içerik, ince çizgi görünümünü azaltmaya yardımcı",
+  "Bilinen Faydaları": "Peptit kompleks asit içeren serum, cilt bariyerini desteklemeye ve cilt dokusunun daha pürüzsüz görünmesine yardımcı olur. Düzenli kullanımda nem dengesinin korunmasına ve cildin daha canlı bir görünüm kazanmasına katkı sağlar.",
+  "BARKOD ": 868510640253,
+  "FİYAT ": "600 TL"
+ },
+ {
+  "Column1": 21,
+  "Kategori": "Oda ve Tekstil Kokuları",
+  "Ürün İsmi": "Pudra Oda Kokusu 500 ml",
+  "Kullanım Alanı": "Ortam kokulandırma",
+  "Özellikleri": "Temiz ve pudramsı kalıcı oda kokusu",
+  "Bilinen Faydaları": "Pudra oda kokusu, temiz ve yumuşak aromasıyla ortama ferahlık ve sakinlik hissi kazandırır. Özellikle yaşam alanlarında hijyen ve konfor algısını güçlendirmek amacıyla tercih edilir.",
+  "BARKOD ": 868510640260,
+  "FİYAT ": "400 TL"
+ },
+ {
+  "Column1": 22,
+  "Kategori": "Oda ve Tekstil Kokuları",
+  "Ürün İsmi": "Oud Oda Kokusu 500 ml",
+  "Kullanım Alanı": "Ortam kokulandırma",
+  "Özellikleri": "Yoğun ve lüks doğu kokusu",
+  "Bilinen Faydaları": "Oud oda kokusu, derin ve odunsu aromasıyla ortama sıcak, sofistike ve kalıcı bir koku profili kazandırır. Lüks ve huzurlu bir atmosfer oluşturmak amacıyla yaşam alanlarında tercih edilir.",
+  "BARKOD ": 868510640277,
+  "FİYAT ": "400 TL"
+ },
+ {
+  "Column1": 23,
+  "Kategori": "Oda ve Tekstil Kokuları",
+  "Ürün İsmi": "Amber Oda Kokusu 500 ml",
+  "Kullanım Alanı": "Ortam kokulandırma",
+  "Özellikleri": "Sıcak ve kalıcı amber esansı",
+  "Bilinen Faydaları": "Amber oda kokusu, sıcak ve yumuşak aromasıyla ortama huzurlu, davetkâr ve sofistike bir atmosfer kazandırır. Kalıcı koku profili sayesinde yaşam alanlarında konfor ve rahatlama hissini desteklemek amacıyla tercih edilir.",
+  "BARKOD ": 868510640284,
+  "FİYAT ": "400 TL "
+ },
+ {
+  "Column1": 24,
+  "Kategori": "Oda ve Tekstil Kokuları",
+  "Ürün İsmi": "Beyaz Sabun Oda Kokusu 500 ml",
+  "Kullanım Alanı": "Ortam kokulandırma",
+  "Özellikleri": "Temizlik hissi veren sabun kokusu",
+  "Bilinen Faydaları": "Ortam havasını tazeleyerek hoş ve kalıcı bir koku sağlar.",
+  "BARKOD ": 868510640291,
+  "FİYAT ": "400 TL"
+ },
+ {
+  "Column1": 25,
+  "Kategori": "Oda ve Tekstil Kokuları",
+  "Ürün İsmi": "Japon Kiraz Çiçeği Oda Kokusu 500 ml",
+  "Kullanım Alanı": "Ortam kokulandırma",
+  "Özellikleri": "Hafif çiçeksi ve hoş aroma",
+  "Bilinen Faydaları": "Hafif çiçeksi kokusuyla ferah ve zarif bir atmosfer sağlar.",
+  "BARKOD ": 868510640307,
+  "FİYAT ": "400 TL"
+ },
+ {
+  "Column1": 26,
+  "Kategori": "Oda ve Tekstil Kokuları",
+  "Ürün İsmi": "Milano Oda Kokusu 500 ml",
+  "Kullanım Alanı": "Ortam kokulandırma",
+  "Özellikleri": "Parfümsü ve sofistike şehir kokusu",
+  "Bilinen Faydaları": "Ortam havasını tazeleyerek hoş ve kalıcı bir koku sağlar.",
+  "BARKOD ": 868510640314,
+  "FİYAT ": "400 TL"
+ },
+ {
+  "Column1": 27,
+  "Kategori": "Oda ve Tekstil Kokuları",
+  "Ürün İsmi": "Kudüs Oda Kokusu 500 ml",
+  "Kullanım Alanı": "Ortam kokulandırma",
+  "Özellikleri": "Baharatlı ve mistik koku tonu",
+  "Bilinen Faydaları": "Ortam havasını tazeleyerek hoş ve kalıcı bir koku sağlar.",
+  "BARKOD ": 868510640321,
+  "FİYAT ": "400 TL"
+ },
+ {
+  "Column1": 28,
+  "Kategori": "Oda ve Tekstil Kokuları",
+  "Ürün İsmi": "İstanbul Oda Kokusu 500 ml",
+  "Kullanım Alanı": "Ortam kokulandırma",
+  "Özellikleri": "Çiçeksi ve odunsu dengeli aroma",
+  "Bilinen Faydaları": "Ortam havasını tazeleyerek hoş ve kalıcı bir koku sağlar.",
+  "BARKOD ": 868510640338,
+  "FİYAT ": "400 TL"
+ },
+ {
+  "Column1": 29,
+  "Kategori": "Oda ve Tekstil Kokuları",
+  "Ürün İsmi": "Gül Oda Kokusu 500 ml",
+  "Kullanım Alanı": "Ortam kokulandırma",
+  "Özellikleri": "Klasik gül kokusu, ferahlatıcı etki",
+  "Bilinen Faydaları": "Ortam havasını tazeleyerek hoş ve kalıcı bir koku sağlar.",
+  "BARKOD ": 868510640345,
+  "FİYAT ": "400 TL "
+ },
+ {
+  "Column1": 30,
+  "Kategori": "Tonik",
+  "Ürün İsmi": "Saf Biberiye Suyu Tonik 100 ml",
+  "Kullanım Alanı": "Cilt ve saç bakımı",
+  "Özellikleri": "Canlandırıcı bitki suyu, gözenek sıkılaştırmaya yardımcı",
+  "Bilinen Faydaları": "Biberiye suyu tonik, cildi ferahlatmaya ve dengelemeye yardımcı olan, özellikle yağlı ve karma ciltlerde arındırıcı etki sunan bitkisel bir toniktir. Ciltte canlılık hissi sağlar ve günlük bakım rutinlerinde destekleyici olarak kullanılır.",
+  "BARKOD ": 868510640352,
+  "FİYAT ": "350 TL"
+ },
+ {
+  "Column1": 31,
+  "Kategori": "Tonik",
+  "Ürün İsmi": "Saf Gül Mayası Tonik 100 ml",
+  "Kullanım Alanı": "Cilt bakımı",
+  "Özellikleri": "Cildi yatıştırır, nem dengesine destek olur",
+  "Bilinen Faydaları": "Gül mayası tonik, fermente gül özleri sayesinde cildi nemlendirmeye ve yatıştırmaya yardımcı olan, cilt bariyerini destekleyen doğal bir toniktir. Cilde canlılık kazandırır ve günlük bakım rutinlerinde dengeleyici etki sunar.",
+  "BARKOD ": 868510640369,
+  "FİYAT ": "400 TL "
+ },
+ {
+  "Column1": 32,
+  "Kategori": "Tonik",
+  "Ürün İsmi": "Saf Ölmez Çiçek Suyu Tonik 100 ml",
+  "Kullanım Alanı": "Cilt bakımı",
+  "Özellikleri": "Yenileyici bitki suyu, hassas ciltler için uygun",
+  "Bilinen Faydaları": "Saf ölmez çiçeği suyu, nemlendirici, yenileyici, arındırıcı, güçlü yaşlanma karşıtı ve kırışıklık önleyici özelliklere sahiptir. Ayrıca cilt izlerine ve cilt rengi değişimlerine yardımcı olur. Doğal ölmez çiçeği suyu cilt tonunu eşitler ve cilt kırışıklıklarını gidermeye yardımcı olur",
+  "BARKOD ": 868510640376,
+  "FİYAT ": "400 TL "
+ },
+ {
+  "Column1": 33,
+  "Kategori": "Cilt Bakım",
+  "Ürün İsmi": "Makyaj Temizleme Suyu 100 ml",
+  "Kullanım Alanı": "Yüz temizliği",
+  "Özellikleri": "Makyaj kalıntılarını nazikçe temizler",
+  "Bilinen Faydaları": "Makyaj temizleme suyu, misel teknolojisi sayesinde makyajı, ciltte biriken kiri ve fazla sebumu nazikçe çözen hafif yapılı bir temizleme ürünüdür. Durulama gerektirmeden cildi arındırmaya yardımcı olurken, cilt bariyerini yormadan ferahlık hissi sağlar. Günlük kullanım için uygun olup tüm cilt tiplerinde, özellikle hassas ciltlerde konforlu ve pratik bir temizlik sunar.",
+  "BARKOD ": 868510640384,
+  "FİYAT ": "350 TL"
+ },
+ {
+  "Column1": 34,
+  "Kategori": "Şampuan & Saç Bakım",
+  "Ürün İsmi": "Japon Kiraz Çiçeği Saç Sirkesi 200 ml",
+  "Kullanım Alanı": "Saç bakımı",
+  "Özellikleri": "Saça parlaklık verir, hoş koku sağlar",
+  "Bilinen Faydaları": "Japon kiraz çiçeği saç sirkesi, saç derisini nazikçe arındırmaya ve pH dengesini desteklemeye yardımcı olan, çiçeksi ve ferah kokusuyla öne çıkan bir saç bakım ürünüdür. Saçlara parlaklık ve yumuşaklık kazandırmayı desteklerken, hoş aroması sayesinde kullanım sırasında ferah ve temiz bir his sunar.",
+  "BARKOD ": 868510640392,
+  "FİYAT ": "350 TL"
+ }
