@@ -3,11 +3,15 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
+    const now = new Date()
     const campaigns = await prisma.campaign.findMany({
       where: {
         active: true,
+        startDate: {
+          lte: now,
+        },
         endDate: {
-          gte: new Date(),
+          gte: now,
         }
       },
       select: {
