@@ -36,6 +36,7 @@ function parsePrice(fiyat: string | number): number {
 
 // Slug → fotoğraf haritası (images/ klasöründeki gerçek dosyalar)
 // Fotoğrafı olmayan ürünler: '' (boş) → sitede görüntü gösterilmez
+// Birden fazla fotoğraf virgülle ayrılır (kutulu + normal gibi)
 const productImageMap: Record<string, string> = {
   // Bitkisel Yağlar
   'gul-yagi-10-ml':           '/images/bitkiselyaglar/gul.jpg',
@@ -54,28 +55,28 @@ const productImageMap: Record<string, string> = {
   'nar-yagi-10-ml':           '/images/bitkiselyaglar/nar.jpg',
   'aynisefa-yagi-10-ml':      '',   // fotoğraf yok
   'melisa-yagi-10-ml':        '/images/bitkiselyaglar/melisa.jpg',
-  // Cilt Bakım (Krem Bakım)
-  'hyaluronic-acid-akgunluk-kremi-50-ml':        '/images/krembakim/yogunnemlendiriciyuzkremi.jpg,/images/krembakim/yogunnemlendiriciyuzkremi2.png',
-  'collagen-peptit-nemlendirici-krem-50-ml':     '/images/krembakim/sikilastiricinemlendiriciyuzkremi.png,/images/krembakim/sikilastiricinemlendiriciyuzkremi2.jpg',
-  'hyaluronik-asit-collagen-serum-30-ml':        '/images/krembakim/yogunnemlendiricserum.jpg,/images/krembakim/yogunnemlendiricserum2.png',
-  'peptit-complex-acid-serum-30-ml':             '/images/krembakim/sikilastiricinemlendiricserum.jpg,/images/krembakim/sikilastiricinemlendiricserum2.png',
-  'makyaj-temizleme-suyu-100-ml':                '/images/krembakim/tonikmakyatemizleme.png',
+  // Cilt Bakım (Krem Bakım) - 2 fotoğraflı ürünler (kutulu + normal)
+  'hyaluronic-acid-akgunluk-kremi-50-ml':    '/images/krembakim/yogunnemlendiriciyuzkremi.jpg,/images/krembakim/yogunnemlendiriciyuzkremi2.png',
+  'collagen-peptit-nemlendirici-krem-50-ml': '/images/krembakim/sikilastiricinemlendiriciyuzkremi.png,/images/krembakim/sikilastiricinemlendiriciyuzkremi2.jpg',
+  'hyaluronik-asit-collagen-serum-30-ml':    '/images/krembakim/yogunnemlendiricserum.jpg,/images/krembakim/yogunnemlendiricserum2.png',
+  'peptit-complex-acid-serum-30-ml':         '/images/krembakim/sikilastiricinemlendiricserum.jpg,/images/krembakim/sikilastiricinemlendiricserum2.png',
+  'makyaj-temizleme-suyu-100-ml':            '/images/tonikler/tonikmakyatemizleme.png',
   // Oda ve Tekstil Kokuları
   'pudra-oda-kokusu-500-ml':              '/images/odavetekstil/pudra.jpeg',
-  'oud-oda-kokusu-500-ml':                '/images/odavetekstil/oud.jpeg',
-  'amber-oda-kokusu-500-ml':              '/images/odavetekstil/amber.jpeg',
-  'beyaz-sabun-oda-kokusu-500-ml':        '/images/odavetekstil/beyazsabun.jpeg',
-  'japon-kiraz-cicegi-oda-kokusu-500-ml': '/images/odavetekstil/kiraz.jpeg',
-  'milano-oda-kokusu-500-ml':             '/images/odavetekstil/milano.jpeg',
-  'kudus-oda-kokusu-500-ml':              '/images/odavetekstil/kudus.jpeg',
-  'istanbul-oda-kokusu-500-ml':           '/images/odavetekstil/istanbul.jpeg',
-  'gul-oda-kokusu-500-ml':               '/images/odavetekstil/gul.jpeg',
-  // Tonik
-  'saf-biberiye-suyu-tonik-100-ml':       '/images/tonikler/1.jpg',
-  'saf-gul-mayasi-tonik-100-ml':          '/images/tonikler/3.jpg',
-  'saf-olmez-cicek-suyu-tonik-100-ml':    '/images/tonikler/2.jpg',
+  'oud-oda-kokusu-500-ml':               '/images/odavetekstil/oud.jpeg',
+  'amber-oda-kokusu-500-ml':             '/images/odavetekstil/amber.jpeg',
+  'beyaz-sabun-oda-kokusu-500-ml':       '/images/odavetekstil/beyazsabun.jpeg',
+  'japon-kiraz-cicegi-oda-kokusu-500-ml':'/images/odavetekstil/kiraz.jpeg',
+  'milano-oda-kokusu-500-ml':            '/images/odavetekstil/milano.jpeg',
+  'kudus-oda-kokusu-500-ml':             '/images/odavetekstil/kudus.jpeg',
+  'istanbul-oda-kokusu-500-ml':          '/images/odavetekstil/istanbul.jpeg',
+  'gul-oda-kokusu-500-ml':              '/images/odavetekstil/gul.jpeg',
+  // Tonik (isimli fotoğraflar)
+  'saf-biberiye-suyu-tonik-100-ml':      '/images/tonikler/biberiye.png',
+  'saf-gul-mayasi-tonik-100-ml':         '/images/tonikler/gulmayasi.png',
+  'saf-olmez-cicek-suyu-tonik-100-ml':   '/images/tonikler/olmezcicek.png',
   // Şampuan & Saç Bakım
-  'japon-kiraz-cicegi-sac-sirkesi-200-ml': '/images/tonikler/4.jpg',
+  'japon-kiraz-cicegi-sac-sirkesi-200-ml': '/images/sampuan-sacbakim/japonkkirazsacsirkesi.png',
 }
 
 // Öne çıkan ürünler
