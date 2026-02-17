@@ -35,24 +35,25 @@ function parsePrice(fiyat: string | number): number {
 }
 
 // Slug → fotoğraf haritası (images/ klasöründeki gerçek dosyalar)
+// Fotoğrafı olmayan ürünler: '' (boş) → sitede görüntü gösterilmez
 const productImageMap: Record<string, string> = {
   // Bitkisel Yağlar
-  'gul-yagi-10-ml':           '/images/bitkiselyaglar/gul.jpeg',
-  'biberiye-yagi-10-ml':      '/images/bitkiselyaglar/biberiye.jpeg',
-  'amber-oud-yagi-10-ml':     '/images/bitkiselyaglar/gul.jpeg',
-  'vanilya-yagi-10-ml':       '/images/bitkiselyaglar/vanilya.jpeg',
-  'sandal-agaci-yagi-10-ml':  '/images/bitkiselyaglar/sandalagaci.jpeg',
-  'okaliptus-yagi-10-ml':     '/images/bitkiselyaglar/nane.jpeg',
-  'japon-kiraz-yagi-10-ml':   '/images/bitkiselyaglar/gul.jpeg',
-  'okyanus-yagi-10-ml':       '/images/bitkiselyaglar/nane.jpeg',
-  'pudra-yagi-10-ml':         '/images/bitkiselyaglar/pudra.jpeg',
-  'afrika-yagi-10-ml':        '/images/bitkiselyaglar/afrika.jpeg',
-  'sedir-agaci-yagi-10-ml':   '/images/bitkiselyaglar/sandalagaci.jpeg',
-  'nane-yagi-10-ml':          '/images/bitkiselyaglar/nane.jpeg',
-  'mango-yagi-10-ml':         '/images/bitkiselyaglar/mango.jpeg',
-  'nar-yagi-10-ml':           '/images/bitkiselyaglar/nar.jpeg',
-  'aynisefa-yagi-10-ml':      '/images/bitkiselyaglar/gul.jpeg',
-  'melisa-yagi-10-ml':        '/images/bitkiselyaglar/nane.jpeg',
+  'gul-yagi-10-ml':           '/images/bitkiselyaglar/gul.jpg',
+  'biberiye-yagi-10-ml':      '/images/bitkiselyaglar/biberiye.jpg',
+  'amber-oud-yagi-10-ml':     '/images/bitkiselyaglar/amberoud.jpg',
+  'vanilya-yagi-10-ml':       '/images/bitkiselyaglar/vanilya.jpg',
+  'sandal-agaci-yagi-10-ml':  '/images/bitkiselyaglar/sandalagaci.jpg',
+  'okaliptus-yagi-10-ml':     '',   // fotoğraf yok
+  'japon-kiraz-yagi-10-ml':   '',   // fotoğraf yok
+  'okyanus-yagi-10-ml':       '',   // fotoğraf yok
+  'pudra-yagi-10-ml':         '/images/bitkiselyaglar/pudra.jpg',
+  'afrika-yagi-10-ml':        '/images/bitkiselyaglar/afrika.jpg',
+  'sedir-agaci-yagi-10-ml':   '',   // fotoğraf yok
+  'nane-yagi-10-ml':          '/images/bitkiselyaglar/nane.jpg',
+  'mango-yagi-10-ml':         '/images/bitkiselyaglar/mango.jpg',
+  'nar-yagi-10-ml':           '/images/bitkiselyaglar/nar.jpg',
+  'aynisefa-yagi-10-ml':      '',   // fotoğraf yok
+  'melisa-yagi-10-ml':        '/images/bitkiselyaglar/melisa.jpg',
   // Cilt Bakım (Krem Bakım)
   'hyaluronic-acid-akgunluk-kremi-50-ml':        '/images/krembakim/yogunnemlendiriciyuzkremi.jpg,/images/krembakim/yogunnemlendiriciyuzkremi2.png',
   'collagen-peptit-nemlendirici-krem-50-ml':     '/images/krembakim/sikilastiricinemlendiriciyuzkremi.png,/images/krembakim/sikilastiricinemlendiriciyuzkremi2.jpg',
@@ -197,7 +198,8 @@ async function main() {
     const slug = slugFromName(name)
     const price = parsePrice(item['FİYAT '] ?? '0')
     const barcode = item['BARKOD '] != null ? String(item['BARKOD ']) : (item as any)['BARKOD'] != null ? String((item as any)['BARKOD']) : null
-    const defaultImg = productImageMap[slug] || categoryDefaultImage[catSlug] || '/images/placeholder.jpg'
+    // slug haritasında varsa onu kullan ('' de dahil), yoksa kategori default'u
+    const mappedImg = productImageMap.hasOwnProperty(slug) ? productImageMap[slug] : (categoryDefaultImage[catSlug] || '')
     const isFeatured = featuredSlugs.has(slug)
 
     const product = await prisma.product.upsert({
@@ -212,7 +214,7 @@ async function main() {
         barcode: barcode || undefined,
         price,
         sku: barcode || undefined,
-        images: defaultImg,
+        images: mappedImg,
         featured: isFeatured,
         categoryId: createdCategories[catSlug].id,
       },
@@ -228,7 +230,7 @@ async function main() {
         price,
         sku: barcode || undefined,
         stock: 50,
-        images: defaultImg,
+        images: mappedImg,
         featured: isFeatured,
         categoryId: createdCategories[catSlug].id,
         active: true,
