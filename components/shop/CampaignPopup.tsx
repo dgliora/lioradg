@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { CampaignCountdownSmall } from '@/components/shop/CampaignCountdown'
 
 type Campaign = {
   id: string
@@ -11,29 +12,6 @@ type Campaign = {
   type: 'PERCENTAGE' | 'FIXED' | 'FREE_SHIPPING'
   endDate: string
   code: string | null
-}
-
-function Countdown({ endDate }: { endDate: string }) {
-  const [timeLeft, setTimeLeft] = useState('')
-
-  useEffect(() => {
-    const calc = () => {
-      const diff = new Date(endDate).getTime() - Date.now()
-      if (diff <= 0) { setTimeLeft(''); return }
-      const d = Math.floor(diff / 86400000)
-      const h = Math.floor((diff % 86400000) / 3600000)
-      const m = Math.floor((diff % 3600000) / 60000)
-      const s = Math.floor((diff % 60000) / 1000)
-      if (d > 0) setTimeLeft(`${d} gün ${h} saat ${m} dk`)
-      else setTimeLeft(`${h} saat ${m} dk ${s} sn`)
-    }
-    calc()
-    const t = setInterval(calc, 1000)
-    return () => clearInterval(t)
-  }, [endDate])
-
-  if (!timeLeft) return null
-  return <span className="font-mono font-bold">{timeLeft}</span>
 }
 
 export function CampaignPopup() {
@@ -118,14 +96,11 @@ export function CampaignPopup() {
           )}
 
           {/* Sayaç */}
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-gray-500">
-            <svg className="w-3.5 h-3.5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Kalan süre: </span>
-            <span className="text-orange-500">
-              <Countdown endDate={campaign.endDate} />
-            </span>
+          <div className="mt-3 bg-orange-50 rounded-xl px-3 py-2">
+            <p className="text-xs text-gray-500 mb-1 text-center">⏱ Kalan süre</p>
+            <div className="flex justify-center">
+              <CampaignCountdownSmall endDate={campaign.endDate} />
+            </div>
           </div>
 
           {/* Buton */}

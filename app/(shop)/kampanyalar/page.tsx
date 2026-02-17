@@ -1,9 +1,8 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { Card, Badge, Button } from '@/components/ui'
 import { getAllProducts } from '@/lib/api/products'
-import { formatPrice } from '@/lib/utils'
 import { prisma } from '@/lib/prisma'
+import { CampaignCountdown } from '@/components/shop/CampaignCountdown'
 
 export default async function CampaignsPage() {
   // Aktif kampanyaları getir
@@ -45,34 +44,62 @@ export default async function CampaignsPage() {
             <h2 className="text-h2 font-serif font-bold text-neutral mb-6">
               ✨ Şu Anda Aktif Kampanyalar
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {activeCampaigns.map((campaign) => (
-                <Card key={campaign.id} className="bg-gradient-to-br from-sage/5 to-sage/10 border-2 border-sage/30 hover:border-sage transition-all">
-                  <div>
-                    <div className="flex items-start justify-between mb-4">
+                <div key={campaign.id} className="rounded-2xl overflow-hidden shadow-lg">
+                  {/* Üst gradient başlık */}
+                  <div className="bg-gradient-to-r from-sage to-sage-dark text-white px-6 py-5">
+                    <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h3 className="text-lg font-bold text-neutral-900">{campaign.title}</h3>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-white/70 text-xs font-semibold uppercase tracking-wider">✨ Aktif Kampanya</span>
+                        </div>
+                        <h3 className="text-xl font-bold">{campaign.title}</h3>
                         {campaign.description && (
-                          <p className="text-sm text-neutral-600 mt-1">{campaign.description}</p>
+                          <p className="text-white/80 text-sm mt-1">{campaign.description}</p>
                         )}
                       </div>
-                      <Badge variant="success" className="whitespace-nowrap ml-2">
-                        {campaign.type === 'PERCENTAGE' ? `%${campaign.value}` : 
-                         campaign.type === 'FIXED' ? `₺${campaign.value}` :
-                         'Ücretsiz Kargo'}
-                      </Badge>
+                      <div className="bg-white/20 rounded-xl px-4 py-2 text-center flex-shrink-0">
+                        <div className="text-2xl font-black">
+                          {campaign.type === 'PERCENTAGE' ? `%${campaign.value}` :
+                           campaign.type === 'FIXED' ? `₺${campaign.value}` : '🚚'}
+                        </div>
+                        <div className="text-xs text-white/80 mt-0.5">
+                          {campaign.type === 'PERCENTAGE' ? 'İndirim' :
+                           campaign.type === 'FIXED' ? 'İndirim' : 'Ücretsiz Kargo'}
+                        </div>
+                      </div>
                     </div>
-                    
-                    <div className="flex items-center justify-between text-sm text-neutral-600 mt-4 pt-4 border-t border-sage/20">
-                      <span>
-                        {new Date(campaign.startDate).toLocaleDateString('tr-TR')} - {new Date(campaign.endDate).toLocaleDateString('tr-TR')}
-                      </span>
-                      <Link href="/urunler" className="text-sage font-semibold hover:underline">
-                        Hemen Alışverişe Başla →
-                      </Link>
+
+                    {/* Geri sayım */}
+                    <div className="mt-5">
+                      <p className="text-white/70 text-xs text-center mb-3 uppercase tracking-wider font-medium">⏱ Kampanya Bitimine Kalan Süre</p>
+                      <CampaignCountdown endDate={campaign.endDate.toISOString()} />
                     </div>
                   </div>
-                </Card>
+
+                  {/* Alt bilgi */}
+                  <div className="bg-white px-6 py-4 flex items-center justify-between">
+                    {campaign.code ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Kupon:</span>
+                        <span className="font-mono font-bold text-sage tracking-widest bg-sage/10 px-3 py-1 rounded-lg">
+                          {campaign.code}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-500">
+                        Otomatik uygulanır
+                      </span>
+                    )}
+                    <Link
+                      href="/urunler"
+                      className="bg-sage hover:bg-sage-dark text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+                    >
+                      Alışverişe Başla →
+                    </Link>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
