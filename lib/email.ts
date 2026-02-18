@@ -7,12 +7,14 @@ const FROM_DESTEK  = 'Lioradg Destek <destek@lioradg.com.tr>'
 const FROM_SATIS   = 'Lioradg Satış <satis@lioradg.com.tr>'
 const FROM_FATURA  = 'Lioradg Fatura <fatura@lioradg.com.tr>'
 
+const TEST_EMAIL = process.env.TEST_EMAIL || ''
+
 const subjectEmailMap: Record<string, { from: string; to: string; label: string }> = {
-  genel:  { from: FROM_INFO,   to: 'info@lioradg.com.tr',   label: 'Genel' },
-  destek: { from: FROM_DESTEK, to: 'destek@lioradg.com.tr', label: 'Teknik Destek' },
-  satis:  { from: FROM_SATIS,  to: 'satis@lioradg.com.tr',  label: 'Satış' },
-  fatura: { from: FROM_FATURA, to: 'fatura@lioradg.com.tr', label: 'Fatura' },
-  iade:   { from: FROM_DESTEK, to: 'destek@lioradg.com.tr', label: 'İptal & İade' },
+  genel:  { from: FROM_INFO,   to: TEST_EMAIL || 'info@lioradg.com.tr',   label: 'Genel' },
+  destek: { from: FROM_DESTEK, to: TEST_EMAIL || 'destek@lioradg.com.tr', label: 'Teknik Destek' },
+  satis:  { from: FROM_SATIS,  to: TEST_EMAIL || 'satis@lioradg.com.tr',  label: 'Satış' },
+  fatura: { from: FROM_FATURA, to: TEST_EMAIL || 'fatura@lioradg.com.tr', label: 'Fatura' },
+  iade:   { from: FROM_DESTEK, to: TEST_EMAIL || 'destek@lioradg.com.tr', label: 'İptal & İade' },
 }
 
 export async function sendWelcomeEmail(to: string, name: string) {
