@@ -100,17 +100,65 @@ export function Footer() {
         </div>
       </div>
 
+      {/* Ödeme Yöntemleri */}
+      <div className="border-t border-white/10">
+        <div className="container mx-auto px-4 py-5">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-neutral-light">Güvenli Ödeme Yöntemleri</p>
+            <div className="flex items-center gap-3 flex-wrap justify-center">
+              {/* Visa */}
+              <div className="bg-white rounded-md px-3 py-1.5 flex items-center">
+                <svg viewBox="0 0 780 500" className="h-5 w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="780" height="500" rx="40" fill="white"/>
+                  <path d="M293.2 348.73L321.82 152.12H366.72L338.08 348.73H293.2Z" fill="#00579F"/>
+                  <path d="M524.28 156.07C515.24 152.54 500.93 148.71 483.07 148.71C438.72 148.71 407.12 171.59 406.9 204.88C406.67 229.71 429.84 243.55 447.41 251.85C465.42 260.35 471.46 265.74 471.39 273.28C471.28 284.97 457.27 290.26 444.17 290.26C425.81 290.26 416.07 287.63 400.96 281.03L395.04 278.32L388.6 319.12C399.19 323.73 418.79 327.71 439.14 327.91C486.36 327.91 517.34 305.3 517.67 269.81C517.84 250.27 506.04 235.27 480.64 222.88C464.37 214.79 454.51 209.45 454.61 201.43C454.61 194.28 462.88 186.64 480.96 186.64C496.21 186.41 507.4 189.83 516.1 193.36L520.32 195.29L526.58 155.77L524.28 156.07Z" fill="#00579F"/>
+                  <path d="M640.81 152.12H606.38C595.86 152.12 588.01 155.12 583.47 165.91L517.04 348.72H564.22C564.22 348.72 571.83 328.16 573.55 323.53C578.63 323.53 624.48 323.6 631.01 323.6C632.35 329.5 636.46 348.72 636.46 348.72H678.05L640.81 152.12ZM586.43 288.06C590.06 278.4 604.45 239.49 604.45 239.49C604.22 239.86 607.97 229.86 610.12 223.78L612.97 238.13C612.97 238.13 621.42 277.95 623.1 288.06H586.43V288.06Z" fill="#00579F"/>
+                  <path d="M236.27 152.12L192.32 279.23L187.57 255.81C179.37 228.89 153.72 199.55 124.99 185.01L165.15 348.62H212.68L284.86 152.12H236.27V152.12Z" fill="#00579F"/>
+                  <path d="M151.23 152.12H77.25L76.62 155.54C133.73 169.73 172.06 203.14 187.57 255.82L171.79 166.11C169.12 155.57 161.42 152.47 151.23 152.12Z" fill="#FAA61A"/>
+                </svg>
+              </div>
+              {/* Mastercard */}
+              <div className="bg-white rounded-md px-3 py-1.5 flex items-center">
+                <svg viewBox="0 0 131.39 86.9" className="h-5 w-auto" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="131.39" height="86.9" rx="8" fill="white"/>
+                  <circle cx="49.75" cy="43.45" r="32.45" fill="#EB001B"/>
+                  <circle cx="81.64" cy="43.45" r="32.45" fill="#F79E1B"/>
+                  <path d="M65.7 19.2A32.36 32.36 0 0 1 81.64 43.45 32.36 32.36 0 0 1 65.7 67.7a32.36 32.36 0 0 1-15.95-24.25A32.36 32.36 0 0 1 65.7 19.2z" fill="#FF5F00"/>
+                </svg>
+              </div>
+              {/* iyzico */}
+              <div className="bg-white rounded-md px-3 py-1.5 flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="#00A86B"/>
+                </svg>
+                <span className="text-xs font-bold text-[#00A86B]">iyzico</span>
+              </div>
+              {/* SSL */}
+              <div className="bg-white rounded-md px-3 py-1.5 flex items-center gap-1.5">
+                <svg className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <span className="text-xs font-bold text-green-600">SSL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-neutral-light">
             <p>© {currentYear} LIORADG. Tüm hakları saklıdır.</p>
-            <div className="flex gap-6">
+            <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/gizlilik-politikasi" className="hover:text-rose transition-colors">
                 Gizlilik Politikası
               </Link>
               <Link href="/kullanim-sartlari" className="hover:text-rose transition-colors">
                 Kullanım Şartları
+              </Link>
+              <Link href="/mesafeli-satis-sozlesmesi" className="hover:text-rose transition-colors">
+                Mesafeli Satış Sözleşmesi
               </Link>
               <Link href="/kvkk" className="hover:text-rose transition-colors">
                 KVKK Aydınlatma
