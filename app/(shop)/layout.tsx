@@ -8,6 +8,8 @@ import { Footer } from '@/components/shop/Footer'
 import { TrustBadges } from '@/components/shop/TrustBadges'
 import { MobileBottomNav } from '@/components/shop/MobileBottomNav'
 import { ToastProvider } from '@/components/ui'
+import { CampaignModal } from '@/components/shop/CampaignModal'
+import { CampaignPopup } from '@/components/shop/CampaignPopup'
 
 export default function ShopLayout({
   children,
@@ -25,6 +27,8 @@ export default function ShopLayout({
               <TrustBadges />
               <Footer />
               <MobileBottomNav />
+              <CampaignModal />
+              <CampaignPopup />
             </div>
           </ParallaxProvider>
         </ToastProvider>
