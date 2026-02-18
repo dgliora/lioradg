@@ -63,20 +63,8 @@ export default function RegisterPage() {
         return
       }
 
-      // 2) NextAuth ile otomatik giriş yap (session oluştursun)
-      const signInResult = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      })
-
-      if (signInResult?.ok) {
-        showToast(`Hoş geldiniz ${data.user.name}! Hesabınız oluşturuldu.`, 'success')
-        window.location.href = '/account'
-      } else {
-        showToast('Hesabınız oluşturuldu. Lütfen giriş yapın.', 'success')
-        window.location.href = '/giris'
-      }
+      showToast('Hesabınız oluşturuldu! Lütfen e-postanızı kontrol edin ve hesabınızı doğrulayın.', 'success')
+      setFormData({ name: '', email: '', password: '', passwordConfirm: '', emailConsent: false, smsConsent: false, termsConsent: false })
     } catch (error) {
       showToast('Bir hata oluştu', 'error')
     } finally {

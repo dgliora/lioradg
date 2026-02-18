@@ -13,6 +13,8 @@ export async function createUser(data: {
   name: string
   email: string
   password: string
+  verificationToken?: string
+  verificationExpiry?: Date
 }) {
   const hashedPassword = await hashPassword(data.password)
   
@@ -22,6 +24,8 @@ export async function createUser(data: {
       email: data.email,
       password: hashedPassword,
       role: 'USER',
+      verificationToken: data.verificationToken,
+      verificationExpiry: data.verificationExpiry,
     },
   })
 }

@@ -37,13 +37,18 @@ export const { handlers, auth, signIn } = NextAuth({
             return null
           }
 
+          if (!user.emailVerified) {
+            throw new Error('EMAIL_NOT_VERIFIED')
+          }
+
           return {
             id: user.id,
             email: user.email,
             name: user.name,
             role: user.role,
           }
-        } catch (error) {
+        } catch (error: any) {
+          if (error.message === 'EMAIL_NOT_VERIFIED') throw error
           console.error('Authorize error:', error)
           return null
         }

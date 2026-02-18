@@ -40,7 +40,11 @@ function LoginContent() {
       })
 
       if (result?.error) {
-        showToast('E-posta veya şifre hatalı', 'error')
+        if (result.error === 'EMAIL_NOT_VERIFIED') {
+          showToast('Lütfen önce e-posta adresinizi doğrulayın. Gelen kutunuzu kontrol edin.', 'error')
+        } else {
+          showToast('E-posta veya şifre hatalı', 'error')
+        }
         setIsSubmitting(false)
         return
       }

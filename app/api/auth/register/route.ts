@@ -1,54 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createUser, getUserByEmail } from '@/lib/auth'
-import { sendWelcomeEmail } from '@/lib/email'
+import { sendVerificationEmail } from '@/lib/email'
+import { randomBytes } from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
     const { name, email, password, emailConsent, smsConsent } = await request.json()
 
-    // Validate input
     if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: 'Tüm alanları doldurun' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Tüm alanları doldurun' }, { status: 400 })
     }
 
-    // Check if user exists
     const existingUser = await getUserByEmail(email)
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'Bu e-posta adresi zaten kayıtlı' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Bu e-posta adresi zaten kayıtlı' }, { status: 400 })
     }
 
-    // Create user
-    const user = await createUser({ name, email, password })
+    const verificationToken = randomBytes(32).toString('hex')
+    const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000)
 
-    // Send welcome email
+    const user = await createUser({ name, email, password, verificationToken, verificationExpiry })
+
     try {
-      await sendWelcomeEmail(email, name)
+      await sendVerificationEmail(email, name, verificationToken)
     } catch (emailError) {
-      console.error('Welcome email error:', emailError)
-      // Don't fail registration if email fails
+      console.error('Verification email error:', emailError)
     }
 
     return NextResponse.json({
-      message: 'Kayıt başarılı',
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      message: 'Kayıt başarılı. Lütfen e-postanızı kontrol edin ve hesabınızı doğrulayın.',
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
     })
   } catch (error) {
     console.error('Register error:', error)
-    return NextResponse.json(
-      { error: 'Kayıt sırasında bir hata oluştu' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Kayıt sırasında bir hata oluştu' }, { status: 500 })
   }
 }
-

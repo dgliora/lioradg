@@ -143,6 +143,47 @@ export async function sendResetEmail(to: string, token: string, name?: string) {
   }
 }
 
+export async function sendVerificationEmail(to: string, name: string, token: string) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr'
+  const verifyUrl = `${siteUrl}/email-dogrula?token=${token}`
+
+  try {
+    await resend.emails.send({
+      from: FROM_INFO,
+      to,
+      subject: 'Lioradg - E-posta Adresinizi Doğrulayın',
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head><meta charset="utf-8"></head>
+          <body style="font-family:Arial,sans-serif;line-height:1.6;color:#2C2C2C;margin:0;padding:0;">
+            <div style="max-width:600px;margin:0 auto;padding:20px;">
+              <div style="background:linear-gradient(135deg,#8B9D83 0%,#A8B99C 100%);color:white;padding:40px 20px;text-align:center;border-radius:16px 16px 0 0;">
+                <h1 style="margin:0;font-size:32px;font-family:Georgia,serif;">LIORADG</h1>
+                <p style="margin:10px 0 0 0;opacity:0.9;">E-posta Doğrulama</p>
+              </div>
+              <div style="background:white;padding:40px 20px;border:1px solid #E8E1D9;border-top:none;border-radius:0 0 16px 16px;">
+                <h2 style="color:#8B9D83;font-family:Georgia,serif;">Merhaba, ${name}!</h2>
+                <p>Hesabınızı aktifleştirmek için aşağıdaki butona tıklayarak e-posta adresinizi doğrulayın.</p>
+                <div style="text-align:center;margin:30px 0;">
+                  <a href="${verifyUrl}" style="display:inline-block;background:#8B9D83;color:white;padding:14px 32px;text-decoration:none;border-radius:12px;font-weight:600;">E-postamı Doğrula</a>
+                </div>
+                <div style="background:#F5F1ED;padding:20px;border-radius:12px;margin:20px 0;">
+                  <p style="margin:0;font-size:13px;color:#5A5A5A;">Bu link 24 saat içinde geçerlidir. Eğer bu talebi siz yapmadıysanız dikkate almayabilirsiniz.</p>
+                </div>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+    })
+    return { success: true }
+  } catch (error) {
+    console.error('Verification email error:', error)
+    return { success: false, error }
+  }
+}
+
 export async function sendContactEmail(data: {
   name: string
   email: string
