@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const { cartTotal } = await request.json()
@@ -12,14 +14,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Admin ayarlarından ücretsiz kargo limitini kontrol et
+    const freeShippingMinSetting = await prisma.setting.findUnique({
+      where: { key: 'free_shipping_min_amount' },
+    })
+    if (freeShippingMinSetting) {
+      const minAmount = parseFloat(freeShippingMinSetting.value)
+      if (!isNaN(minAmount) && minAmount > 0 && cartTotal >= minAmount) {
+        return NextResponse.json({ freeShipping: true, debug: { cartTotal, minAmount, scope: 'SETTINGS' } })
+      }
+    }
+
     // Aktif ücretsiz kargo kampanyalarını getir
     const campaigns = await prisma.campaign.findMany({
       where: {
         active: true,
         type: 'FREE_SHIPPING',
-        startDate: {
-          lte: new Date(),
-        },
         endDate: {
           gte: new Date(),
         }

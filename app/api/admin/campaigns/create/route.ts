@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { checkAdminAuth } from '@/lib/auth-server'
+import { applyCampaignDiscount } from '@/lib/campaign-service'
 
 export async function POST(request: NextRequest) {
   try {
@@ -77,6 +78,15 @@ export async function POST(request: NextRequest) {
         bannerImage: data.bannerImage || null,
       }
     })
+
+    // Kampanya aktif oluşturulduysa hemen indirimi uygula
+    if (campaign.active) {
+      try {
+        await applyCampaignDiscount(campaign.id)
+      } catch (e) {
+        console.error('İndirim uygulanırken hata:', e)
+      }
+    }
 
     return NextResponse.json(campaign, { status: 201 })
   } catch (error) {

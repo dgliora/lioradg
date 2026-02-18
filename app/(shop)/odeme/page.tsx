@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { Card, Input, Button, useToast } from '@/components/ui'
 import { useCartStore } from '@/lib/store/cartStore'
 import { formatPrice } from '@/lib/utils'
+import { calculateShippingFee } from '@/lib/utils/shipping'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -14,6 +15,7 @@ export default function CheckoutPage() {
   const { showToast } = useToast()
   const [step, setStep] = useState(1)
   const [mounted, setMounted] = useState(false)
+  const [shippingCost, setShippingCost] = useState(0)
   const [formData, setFormData] = useState({
     // Step 1: Shipping Address
     fullName: '',
@@ -39,7 +41,15 @@ export default function CheckoutPage() {
     }
   }, [mounted, items.length, router])
 
-  const shippingCost = getTotalPrice() >= 500 ? 0 : 29.90
+  // Kargo ücretini ayarlardan ve kampanyalardan hesapla
+  useEffect(() => {
+    if (mounted) {
+      calculateShippingFee(getTotalPrice()).then(fee => {
+        setShippingCost(fee)
+      })
+    }
+  }, [mounted, items])
+
   const total = getTotalPrice() + shippingCost
 
   if (!mounted || items.length === 0) {
