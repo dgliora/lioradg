@@ -28,6 +28,7 @@ export function Header() {
     phone: '+90 530 208 47 47',
     email: 'info@lioradg.com.tr',
     instagram: 'https://instagram.com/dgliora',
+    whatsapp: '905302084747',
   })
   const cartItems = useCartStore((state) => state.items)
   const favoriteItems = useFavoritesStore((state) => state.items)
@@ -115,7 +116,7 @@ export function Header() {
                 </svg>
               </a>
               <a 
-                href="https://wa.me/905302084747" 
+                href={`https://wa.me/${contactInfo.whatsapp}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full transition-colors"
