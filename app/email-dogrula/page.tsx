@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { LogoLioraDG } from '@/components/LogoLioraDG'
 
-export default function EmailVerifyPage() {
+function EmailVerifyContent() {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
@@ -85,5 +85,17 @@ export default function EmailVerifyPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function EmailVerifyPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-sage border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <EmailVerifyContent />
+    </Suspense>
   )
 }
