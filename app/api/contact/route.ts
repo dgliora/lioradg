@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
     const result = await sendContactEmail({ name, email, subject: subject || 'genel', message })
 
     if (!result.success) {
+      console.error('SMTP Error detail:', JSON.stringify(result.error, Object.getOwnPropertyNames(result.error as object)))
       return NextResponse.json({ error: 'Mesaj gönderilemedi, lütfen tekrar deneyin' }, { status: 500 })
     }
 

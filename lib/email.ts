@@ -1,11 +1,13 @@
 import nodemailer from 'nodemailer'
 
 function createTransporter(user: string, pass: string) {
+  const port = Number(process.env.SMTP_PORT) || 587
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'mail.lioradg.com.tr',
-    port: Number(process.env.SMTP_PORT) || 465,
-    secure: true,
+    port,
+    secure: port === 465,
     auth: { user, pass },
+    tls: { rejectUnauthorized: false },
   })
 }
 
