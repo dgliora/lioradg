@@ -63,8 +63,7 @@ export default function RegisterPage() {
         return
       }
 
-      showToast('Hesabınız oluşturuldu! Lütfen e-postanızı kontrol edin ve hesabınızı doğrulayın.', 'success')
-      setFormData({ name: '', email: '', password: '', passwordConfirm: '', emailConsent: false, smsConsent: false, termsConsent: false })
+      window.location.href = `/kayit-basarili?email=${encodeURIComponent(formData.email)}`
     } catch (error) {
       showToast('Bir hata oluştu', 'error')
     } finally {

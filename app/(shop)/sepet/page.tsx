@@ -118,15 +118,9 @@ export default function CartPage() {
     cartStore.updateQuantity(productId, newQuantity)
   }
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (asGuest = false) => {
     if (cartItems.length === 0) {
       showToast('Sepetiniz boş', 'warning')
-      return
-    }
-
-    if (!user) {
-      showToast('Ödeme için giriş yapmanız gerekiyor', 'info')
-      router.push('/giris')
       return
     }
 
@@ -134,8 +128,8 @@ export default function CartPage() {
     showToast('Ödeme sayfasına yönlendiriliyor...', 'info')
     setTimeout(() => {
       setIsSubmitting(false)
-      router.push('/odeme')
-    }, 1000)
+      router.push(asGuest ? '/odeme?misafir=1' : '/odeme')
+    }, 500)
   }
 
   if (cartItems.length === 0) {
@@ -303,16 +297,40 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <Button
-                  fullWidth
-                  size="lg"
-                  onClick={handleCheckout}
-                  loading={isSubmitting}
-                  disabled={cartItems.length === 0}
-                  className="bg-gradient-to-r from-sage to-sage-dark hover:from-sage-dark hover:to-sage text-white font-semibold py-3 mb-4"
-                >
-                  {isSubmitting ? 'Yönlendiriliyor...' : `Ödemeye Geç - ${(totalPrice + shippingFee).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}`}
-                </Button>
+                {user ? (
+                  <Button
+                    fullWidth
+                    size="lg"
+                    onClick={() => handleCheckout(false)}
+                    loading={isSubmitting}
+                    disabled={cartItems.length === 0}
+                    className="bg-gradient-to-r from-sage to-sage-dark hover:from-sage-dark hover:to-sage text-white font-semibold py-3 mb-3"
+                  >
+                    {isSubmitting ? 'Yönlendiriliyor...' : `Ödemeye Geç - ${(totalPrice + shippingFee).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}`}
+                  </Button>
+                ) : (
+                  <div className="space-y-3 mb-3">
+                    <Button
+                      fullWidth
+                      size="lg"
+                      onClick={() => router.push('/giris?callbackUrl=/odeme')}
+                      disabled={cartItems.length === 0}
+                      className="bg-gradient-to-r from-sage to-sage-dark hover:from-sage-dark hover:to-sage text-white font-semibold py-3"
+                    >
+                      Giriş Yap ve Öde
+                    </Button>
+                    <button
+                      onClick={() => handleCheckout(true)}
+                      disabled={cartItems.length === 0 || isSubmitting}
+                      className="w-full border-2 border-sage text-sage py-3 rounded-xl font-semibold hover:bg-sage/5 transition-colors disabled:opacity-50"
+                    >
+                      Misafir Olarak Devam Et
+                    </button>
+                    <p className="text-xs text-center text-neutral-500">
+                      Üye olarak daha hızlı takip edebilirsiniz
+                    </p>
+                  </div>
+                )}
 
                 <div className="text-center text-xs text-neutral-medium space-y-1">
                   <p className="font-medium">Güvenli Alışveriş</p>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, Input, Button, useToast } from '@/components/ui'
@@ -11,12 +11,16 @@ import { calculateShippingFee } from '@/lib/utils/shipping'
 
 export default function CheckoutPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isGuest = searchParams.get('misafir') === '1'
   const { items, getTotalPrice, clearCart } = useCartStore()
   const { showToast } = useToast()
   const [step, setStep] = useState(1)
   const [mounted, setMounted] = useState(false)
   const [shippingCost, setShippingCost] = useState(0)
   const [formData, setFormData] = useState({
+    // Misafir için
+    guestEmail: '',
     // Step 1: Shipping Address
     fullName: '',
     phone: '',
@@ -133,6 +137,19 @@ export default function CheckoutPage() {
                       <h2 className="text-h2 font-semibold text-neutral-900">
                         Teslimat Adresi
                       </h2>
+                      {isGuest && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                          <p className="text-sm text-blue-700 mb-3 font-medium">Misafir olarak devam ediyorsunuz</p>
+                          <Input
+                            label="E-posta Adresiniz"
+                            type="email"
+                            value={formData.guestEmail}
+                            onChange={(e) => setFormData({ ...formData, guestEmail: e.target.value })}
+                            placeholder="Sipariş bilgileri bu adrese gönderilecek"
+                            required
+                          />
+                        </div>
+                      )}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
                         <Input
                           label="Ad Soyad"
