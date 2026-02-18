@@ -1,14 +1,18 @@
 import nodemailer from 'nodemailer'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER || 'rboguz06@gmail.com',
-    pass: process.env.SMTP_PASSWORD || 'temp-password',
-  },
-})
+function createTransporter(user: string, pass: string) {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'mail.lioradg.com.tr',
+    port: Number(process.env.SMTP_PORT) || 465,
+    secure: true,
+    auth: { user, pass },
+  })
+}
+
+const transporter = createTransporter(
+  process.env.SMTP_USER || 'info@lioradg.com.tr',
+  process.env.SMTP_PASSWORD || ''
+)
 
 const isDevelopment = false
 
@@ -208,6 +212,52 @@ export async function sendResetEmail(to: string, token: string, name?: string) {
     return { success: true }
   } catch (error) {
     console.error('Reset email send error:', error)
+    return { success: false, error }
+  }
+}
+
+const subjectEmailMap: Record<string, { user: string; pass: string; label: string }> = {
+  genel:   { user: process.env.SMTP_USER         || 'info@lioradg.com.tr',    pass: process.env.SMTP_PASSWORD         || '', label: 'Genel' },
+  destek:  { user: process.env.SMTP_USER_DESTEK  || 'destek@lioradg.com.tr',  pass: process.env.SMTP_PASSWORD_DESTEK  || '', label: 'Teknik Destek' },
+  satis:   { user: process.env.SMTP_USER_SATIS   || 'satis@lioradg.com.tr',   pass: process.env.SMTP_PASSWORD_SATIS   || '', label: 'Satış' },
+  fatura:  { user: process.env.SMTP_USER_FATURA  || 'fatura@lioradg.com.tr',  pass: process.env.SMTP_PASSWORD_FATURA  || '', label: 'Fatura' },
+  iade:    { user: process.env.SMTP_USER_DESTEK  || 'destek@lioradg.com.tr',  pass: process.env.SMTP_PASSWORD_DESTEK  || '', label: 'İptal & İade' },
+}
+
+export async function sendContactEmail(data: {
+  name: string
+  email: string
+  subject: string
+  message: string
+}) {
+  const account = subjectEmailMap[data.subject] || subjectEmailMap.genel
+  const tr = createTransporter(account.user, account.pass)
+
+  try {
+    await tr.sendMail({
+      from: `"${data.name}" <${account.user}>`,
+      to: account.user,
+      replyTo: data.email,
+      subject: `[İletişim - ${account.label}] ${data.name}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+          <div style="background:linear-gradient(135deg,#8B9D83,#A8B99C);color:white;padding:30px;border-radius:12px 12px 0 0;">
+            <h2 style="margin:0;">Yeni İletişim Mesajı</h2>
+          </div>
+          <div style="background:white;padding:30px;border:1px solid #E8E1D9;border-top:none;border-radius:0 0 12px 12px;">
+            <p><strong>Gönderen:</strong> ${data.name}</p>
+            <p><strong>E-posta:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
+            <p><strong>Konu:</strong> ${account.label}</p>
+            <hr style="border:none;border-top:1px solid #E8E1D9;margin:20px 0;" />
+            <p><strong>Mesaj:</strong></p>
+            <p style="background:#F5F1ED;padding:16px;border-radius:8px;white-space:pre-wrap;">${data.message}</p>
+          </div>
+        </div>
+      `,
+    })
+    return { success: true }
+  } catch (error) {
+    console.error('Contact email error:', error)
     return { success: false, error }
   }
 }

@@ -11,19 +11,31 @@ export default function ContactPage() {
     message: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
-    // TODO: Send email based on subject
-    console.log('Contact form:', formData)
-    
-    setTimeout(() => {
-      alert('Mesajınız başarıyla gönderildi. En kısa sürede size dönüş yapacağız.')
-      setFormData({ name: '', email: '', subject: 'genel', message: '' })
+    setStatus('idle')
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      if (res.ok) {
+        setStatus('success')
+        setFormData({ name: '', email: '', subject: 'genel', message: '' })
+      } else {
+        setStatus('error')
+      }
+    } catch {
+      setStatus('error')
+    } finally {
       setIsSubmitting(false)
-    }, 1000)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -81,6 +93,7 @@ export default function ContactPage() {
                     <option value="destek">Teknik Destek (destek@lioradg.com.tr)</option>
                     <option value="satis">Satış & Sipariş (satis@lioradg.com.tr)</option>
                     <option value="fatura">Fatura İşlemleri (fatura@lioradg.com.tr)</option>
+                    <option value="iade">İptal & İade (destek@lioradg.com.tr)</option>
                   </select>
                 </div>
                 <div>
@@ -99,6 +112,17 @@ export default function ContactPage() {
                 <Button type="submit" size="lg" fullWidth loading={isSubmitting}>
                   Gönder
                 </Button>
+
+                {status === 'success' && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                    ✓ Mesajınız başarıyla gönderildi. En kısa sürede size dönüş yapacağız.
+                  </div>
+                )}
+                {status === 'error' && (
+                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                    ✗ Mesaj gönderilemedi. Lütfen tekrar deneyin veya doğrudan e-posta gönderin.
+                  </div>
+                )}
               </form>
             </Card>
 
