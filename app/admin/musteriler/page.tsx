@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { CustomersTable } from '@/components/admin/CustomersTable'
 
+export const dynamic = 'force-dynamic'
+
 async function getCustomers() {
   return await prisma.user.findMany({
     where: {
