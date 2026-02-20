@@ -37,7 +37,7 @@ export function Footer() {
                 width={160}
                 height={40}
                 showImage={true}
-                darkBg={true}
+                className="invert"
               />
             </div>
             <p className="text-sm leading-relaxed mb-6 text-neutral-light">
