@@ -3,14 +3,25 @@
 import { useState, useEffect } from 'react'
 import { Input, Button } from '@/components/ui'
 
+interface Province {
+  code: string
+  name: string
+}
+
+interface District {
+  code: string
+  name: string
+  provinceCode: string
+}
+
 interface AddressFormData {
   title: string
   fullName: string
   phone: string
-  province: string
   provinceCode: string
-  district: string
+  province: string
   districtCode: string
+  district: string
   neighborhood: string
   postalCode: string
   addressLine: string
@@ -29,26 +40,99 @@ export function AddressForm({
   isSubmitting = false,
   initialData,
 }: AddressFormProps) {
+  const [mounted, setMounted] = useState(false)
+  const [provinces, setProvinces] = useState<Province[]>([])
+  const [districts, setDistricts] = useState<District[]>([])
+  const [loading, setLoading] = useState({ provinces: false, districts: false })
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
   const [formData, setFormData] = useState<AddressFormData>({
     title: '',
     fullName: '',
     phone: '',
-    province: '',
     provinceCode: '',
-    district: '',
+    province: '',
     districtCode: '',
+    district: '',
     neighborhood: '',
     postalCode: '',
     addressLine: '',
   })
 
   useEffect(() => {
+    setMounted(true)
+    loadProvinces()
+  }, [])
+
+  useEffect(() => {
     if (initialData) {
-      setFormData((prev) => ({ ...prev, ...initialData }))
+      setFormData((prev) => ({
+        ...prev,
+        ...initialData,
+        provinceCode: initialData.provinceCode || '',
+        districtCode: initialData.districtCode || '',
+      }))
+      if (initialData.provinceCode) {
+        loadDistricts(initialData.provinceCode)
+      }
     }
   }, [initialData])
+
+  const loadProvinces = async () => {
+    setLoading((prev) => ({ ...prev, provinces: true }))
+    try {
+      const res = await fetch('/api/addresses/provinces')
+      if (res.ok) {
+        const data = await res.json()
+        setProvinces(Array.isArray(data) ? data : [])
+      } else {
+        setErrors((prev) => ({ ...prev, provinces: 'İller yüklenemedi' }))
+      }
+    } catch {
+      setErrors((prev) => ({ ...prev, provinces: 'İller yüklenemedi' }))
+    } finally {
+      setLoading((prev) => ({ ...prev, provinces: false }))
+    }
+  }
+
+  const loadDistricts = async (provinceCode: string) => {
+    setLoading((prev) => ({ ...prev, districts: true }))
+    setDistricts([])
+    try {
+      const res = await fetch(`/api/addresses/districts?province=${provinceCode}`)
+      if (res.ok) {
+        const data = await res.json()
+        setDistricts(Array.isArray(data) ? data : [])
+      } else {
+        setErrors((prev) => ({ ...prev, districts: 'İlçeler yüklenemedi' }))
+      }
+    } catch {
+      setErrors((prev) => ({ ...prev, districts: 'İlçeler yüklenemedi' }))
+    } finally {
+      setLoading((prev) => ({ ...prev, districts: false }))
+    }
+  }
+
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const code = e.target.value
+    const selected = provinces.find((p) => p.code === code)
+    setFormData({
+      ...formData,
+      provinceCode: code,
+      province: selected?.name || '',
+      districtCode: '',
+      district: '',
+    })
+    setErrors((prev) => ({ ...prev, province: '', district: '' }))
+    if (code) loadDistricts(code)
+  }
+
+  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const code = e.target.value
+    const selected = districts.find((d) => d.code === code)
+    setFormData({ ...formData, districtCode: code, district: selected?.name || '' })
+    setErrors((prev) => ({ ...prev, district: '' }))
+  }
 
   const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, '')
@@ -58,11 +142,10 @@ export function AddressForm({
     return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 9)} ${digits.slice(9, 11)}`
   }
 
-  const handleChange =
+  const handleInputChange =
     (field: keyof AddressFormData) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const value =
-        field === 'phone' ? formatPhone(e.target.value) : e.target.value
+      const value = field === 'phone' ? formatPhone(e.target.value) : e.target.value
       setFormData((prev) => ({ ...prev, [field]: value }))
       setErrors((prev) => ({ ...prev, [field]: '' }))
     }
@@ -74,8 +157,9 @@ export function AddressForm({
     if (!formData.fullName.trim()) newErrors.fullName = 'Ad soyad giriniz'
     if (formData.phone.replace(/\D/g, '').length !== 11)
       newErrors.phone = 'Geçerli telefon giriniz (0 ile başlayarak 11 hane)'
-    if (!formData.province.trim()) newErrors.province = 'İl giriniz'
-    if (!formData.district.trim()) newErrors.district = 'İlçe giriniz'
+    if (!formData.provinceCode) newErrors.province = 'İl seçiniz'
+    if (!formData.districtCode) newErrors.district = 'İlçe seçiniz'
+    if (!formData.neighborhood.trim()) newErrors.neighborhood = 'Mahalle / Köy giriniz'
     if (!formData.addressLine.trim()) newErrors.addressLine = 'Adres detayı giriniz'
 
     if (Object.keys(newErrors).length > 0) {
@@ -83,13 +167,11 @@ export function AddressForm({
       return
     }
 
-    // provinceCode / districtCode alanlarını province/district ile doldur (geriye dönük uyumluluk)
-    onSubmit({
-      ...formData,
-      provinceCode: formData.provinceCode || formData.province,
-      districtCode: formData.districtCode || formData.district,
-    })
+    onSubmit(formData)
   }
+
+  const selectClass =
+    'w-full h-[52px] px-5 rounded-button border-[1.5px] border-warm-100 text-base bg-white focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10 transition-all disabled:bg-warm-50 disabled:cursor-not-allowed'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -97,7 +179,7 @@ export function AddressForm({
         id="title"
         label="Adres Başlığı"
         value={formData.title}
-        onChange={handleChange('title')}
+        onChange={handleInputChange('title')}
         placeholder="Ev, İş, Yazlık vb."
         error={errors.title}
       />
@@ -107,7 +189,7 @@ export function AddressForm({
           id="fullName"
           label="Ad Soyad *"
           value={formData.fullName}
-          onChange={handleChange('fullName')}
+          onChange={handleInputChange('fullName')}
           required
           error={errors.fullName}
         />
@@ -116,7 +198,7 @@ export function AddressForm({
           label="Telefon *"
           type="tel"
           value={formData.phone}
-          onChange={handleChange('phone')}
+          onChange={handleInputChange('phone')}
           placeholder="05XX XXX XX XX"
           required
           error={errors.phone}
@@ -124,33 +206,69 @@ export function AddressForm({
         />
       </div>
 
+      {/* İl ve İlçe */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          id="province"
-          label="İl *"
-          value={formData.province}
-          onChange={handleChange('province')}
-          placeholder="İstanbul"
-          required
-          error={errors.province}
-        />
-        <Input
-          id="district"
-          label="İlçe *"
-          value={formData.district}
-          onChange={handleChange('district')}
-          placeholder="Kadıköy"
-          required
-          error={errors.district}
-        />
+        <div>
+          <label className="block text-sm font-medium text-neutral-medium mb-2">
+            İl <span className="text-danger">*</span>
+          </label>
+          <select
+            id="province"
+            value={formData.provinceCode}
+            onChange={handleProvinceChange}
+            required
+            disabled={loading.provinces}
+            className={selectClass}
+          >
+            <option value="">
+              {loading.provinces ? 'Yükleniyor...' : 'İl Seçiniz...'}
+            </option>
+            {provinces.map((p) => (
+              <option key={p.code} value={p.code}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+          {errors.province && <p className="mt-2 text-sm text-danger">{errors.province}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-neutral-medium mb-2">
+            İlçe <span className="text-danger">*</span>
+          </label>
+          <select
+            id="district"
+            value={formData.districtCode}
+            onChange={handleDistrictChange}
+            required
+            disabled={!formData.provinceCode || loading.districts}
+            className={selectClass}
+          >
+            <option value="">
+              {loading.districts
+                ? 'Yükleniyor...'
+                : formData.provinceCode
+                ? 'İlçe Seçiniz...'
+                : 'Önce il seçiniz'}
+            </option>
+            {districts.map((d) => (
+              <option key={d.code} value={d.code}>
+                {d.name}
+              </option>
+            ))}
+          </select>
+          {errors.district && <p className="mt-2 text-sm text-danger">{errors.district}</p>}
+        </div>
       </div>
 
+      {/* Mahalle — zorunlu */}
       <Input
         id="neighborhood"
-        label="Mahalle / Köy"
+        label="Mahalle / Köy *"
         value={formData.neighborhood}
-        onChange={handleChange('neighborhood')}
+        onChange={handleInputChange('neighborhood')}
         placeholder="Mahalle veya köy adını giriniz"
+        required
         error={errors.neighborhood}
       />
 
@@ -161,7 +279,7 @@ export function AddressForm({
         <textarea
           id="addressLine"
           value={formData.addressLine}
-          onChange={handleChange('addressLine')}
+          onChange={handleInputChange('addressLine')}
           required
           rows={3}
           placeholder="Sokak, cadde, bina no, daire no, kat, apartman adı vb."
@@ -176,7 +294,7 @@ export function AddressForm({
         id="postalCode"
         label="Posta Kodu (Opsiyonel)"
         value={formData.postalCode}
-        onChange={handleChange('postalCode')}
+        onChange={handleInputChange('postalCode')}
         placeholder="34000"
       />
 
@@ -190,7 +308,7 @@ export function AddressForm({
         >
           İptal
         </Button>
-        <Button type="submit" fullWidth loading={isSubmitting}>
+        <Button type="submit" fullWidth loading={isSubmitting} disabled={!mounted}>
           {initialData ? 'Adresi Güncelle' : 'Adresi Kaydet'}
         </Button>
       </div>
