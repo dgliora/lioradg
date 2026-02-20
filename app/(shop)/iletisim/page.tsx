@@ -214,14 +214,26 @@ export default function ContactPage() {
               {/* Map */}
               <Card padding="none" className="overflow-hidden">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.7545825229973!2d28.6524!3d41.0082!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDHCsDAwJzI5LjUiTiAyOMKwMzknMDguNiJF!5e0!3m2!1str!2str!4v1234567890"
+                  src="https://maps.google.com/maps?q=Ard%C4%B1%C3%A7l%C4%B1+Mahallesi+Do%C4%9Fan+Arasl%C4%B1+Bulvar%C4%B1+Esenyurt+%C4%B0stanbul&t=&z=15&ie=UTF8&iwloc=B&output=embed"
                   width="100%"
                   height="300"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
+                  title="Lioradg Konumu"
                 />
+                <a
+                  href="https://maps.google.com/maps?q=Ardıçlı+Mahallesi+Doğan+Araslı+Bulvarı+Esenyurt+İstanbul"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 py-3 text-sm font-medium text-sage hover:text-sage-dark border-t border-warm-100 transition-colors bg-warm-50 hover:bg-warm-100"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  Google Maps'te Aç
+                </a>
               </Card>
             </div>
           </div>
