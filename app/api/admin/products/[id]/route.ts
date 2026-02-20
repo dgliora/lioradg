@@ -63,7 +63,13 @@ export async function PUT(
       categoryId,
       featured,
       active,
+      metaTitle: rawMetaTitle,
+      metaDescription: rawMetaDescription,
     } = body
+
+    const metaTitle = rawMetaTitle?.trim() || null
+    const metaDescription = rawMetaDescription?.trim() ||
+      (description ? description.slice(0, 155) + (description.length > 155 ? '...' : '') : null)
 
     // Validasyon
     if (!name || !slug || !price || !stock || !categoryId) {
@@ -103,6 +109,8 @@ export async function PUT(
         price: parseFloat(price),
         salePrice: salePrice ? parseFloat(salePrice) : null,
         costPrice: costPrice ? parseFloat(costPrice) : null,
+        metaTitle,
+        metaDescription,
         sku: sku || null,
         stock: parseInt(stock),
         images: images || '/images/placeholder.jpg',

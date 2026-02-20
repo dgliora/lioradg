@@ -25,11 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: siteDescription,
     keywords: 'kozmetik, bitkisel ürünler, doğal kozmetik, krem, parfüm, tonik, bakım ürünleri, liora dg',
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.vercel.app'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr'),
     openGraph: {
       type: 'website',
       locale: 'tr_TR',
-      url: process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.vercel.app',
+      url: process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr',
       siteName: 'Liora DG',
       title: siteTitle,
       description: siteDescription,

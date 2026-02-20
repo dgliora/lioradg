@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.vercel.app'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr'
 
   // Statik sayfalar
   const staticPages: MetadataRoute.Sitemap = [
@@ -27,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Ürünler
   let productPages: MetadataRoute.Sitemap = []
   try {
-    const products = await prisma.product.findMany({ select: { slug: true, updatedAt: true } })
+    const products = await prisma.product.findMany({ where: { active: true }, select: { slug: true, updatedAt: true } })
     productPages = products.map((p) => ({
       url: `${baseUrl}/urun/${p.slug}`,
       lastModified: p.updatedAt,

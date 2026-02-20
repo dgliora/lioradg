@@ -4,6 +4,8 @@ import { getAllProducts } from '@/lib/api/products'
 import { ProductsPageClient } from '@/components/shop/ProductsPageClient'
 import { Metadata } from 'next'
 
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr'
+
 interface ProductListingPageProps {
   params: { kategori: string }
   searchParams: {
@@ -19,14 +21,39 @@ export async function generateMetadata({
   const category = await getCategoryBySlug(params.kategori)
 
   if (!category) {
-    return {
-      title: 'Kategori Bulunamadı',
-    }
+    return { title: 'Kategori Bulunamadı' }
   }
 
+  const title = (category as any).metaTitle
+    ? `${(category as any).metaTitle} - Lioradg`
+    : `${category.name} - Lioradg`
+  const description = (category as any).metaDescription ||
+    category.description ||
+    `${category.name} kategorisindeki tüm doğal ve organik ürünleri keşfedin. Lioradg — Atelier Istanbul.`
+  const canonical = `${baseUrl}/urunler/${category.slug}`
+  const imageUrl = (category as any).image
+    ? ((category as any).image.startsWith('http') ? (category as any).image : `${baseUrl}${(category as any).image}`)
+    : undefined
+
   return {
-    title: `${category.name} - Lioradg`,
-    description: category.description || `${category.name} kategorisindeki tüm ürünler`,
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      siteName: 'Lioradg',
+      locale: 'tr_TR',
+      type: 'website',
+      ...(imageUrl && { images: [{ url: imageUrl, width: 800, height: 600, alt: category.name }] }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(imageUrl && { images: [imageUrl] }),
+    },
   }
 }
 

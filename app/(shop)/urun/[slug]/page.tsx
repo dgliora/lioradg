@@ -8,7 +8,7 @@ interface ProductPageProps {
   params: { slug: string }
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.vercel.app'
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr'
 
 export async function generateMetadata({
   params,
@@ -28,14 +28,20 @@ export async function generateMetadata({
   const image = product.images?.split(',')[0]?.trim()
   const imageUrl = image ? (image.startsWith('http') ? image : `${baseUrl}${image.startsWith('/') ? '' : '/'}${image}`) : undefined
 
+  const canonical = `${baseUrl}/urun/${product.slug}`
+
   return {
     title,
     description,
+    alternates: { canonical },
     openGraph: {
       title,
       description,
       type: 'website',
-      ...(imageUrl && { images: [{ url: imageUrl, width: 600, height: 600, alt: product.name }] }),
+      url: canonical,
+      siteName: 'Lioradg',
+      locale: 'tr_TR',
+      ...(imageUrl && { images: [{ url: imageUrl, width: 800, height: 800, alt: product.name }] }),
     },
     twitter: {
       card: 'summary_large_image',
@@ -55,8 +61,34 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const relatedProducts = await getRelatedProducts(product.categoryId, product.id)
 
+  const price = product.salePrice || product.price
+  const image = product.images?.split(',')[0]?.trim()
+  const imageUrl = image ? (image.startsWith('http') ? image : `${baseUrl}${image.startsWith('/') ? '' : '/'}${image}`) : undefined
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description || product.name,
+    url: `${baseUrl}/urun/${product.slug}`,
+    ...(imageUrl && { image: imageUrl }),
+    brand: { '@type': 'Brand', name: 'Lioradg' },
+    offers: {
+      '@type': 'Offer',
+      url: `${baseUrl}/urun/${product.slug}`,
+      priceCurrency: 'TRY',
+      price: price.toFixed(2),
+      availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      seller: { '@type': 'Organization', name: 'Lioradg' },
+    },
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ProductDetail product={product} />
 
       {relatedProducts.length > 0 && (

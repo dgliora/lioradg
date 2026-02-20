@@ -4,8 +4,17 @@ import { ProductsPageClient } from '@/components/shop/ProductsPageClient'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Tüm Ürünler - Lioradg',
-  description: 'Tüm ürünlerimizi keşfedin',
+  title: 'Tüm Ürünler — Doğal & Organik Kozmetik | Lioradg',
+  description: 'Lioradg\'in tüm doğal ve bitkisel kozmetik ürünlerini keşfedin. Parfüm, tonik, krem, şampuan, oda kokuları ve daha fazlası.',
+  alternates: { canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr'}/urunler` },
+  openGraph: {
+    title: 'Tüm Ürünler — Lioradg',
+    description: 'Doğal ve bitkisel kozmetik ürünleri. Parfüm, tonik, krem, oda kokuları.',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr'}/urunler`,
+    siteName: 'Lioradg',
+    locale: 'tr_TR',
+    type: 'website',
+  },
 }
 
 interface AllProductsPageProps {
