@@ -127,10 +127,40 @@ export default function CheckoutPage() {
       return
     }
 
-    // TODO: Create order API call
-    console.log('Create order:', formData)
-    
-    const orderNumber = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+    // Sipariş oluştur
+    const orderItems = items.map((item) => ({
+      productId: item.product.id,
+      quantity: item.quantity,
+    }))
+
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName: formData.fullName,
+        phone: formData.phone,
+        city: formData.city,
+        district: formData.district,
+        neighborhood: formData.neighborhood,
+        address: formData.address,
+        postalCode: formData.postalCode,
+        guestEmail: isGuest ? formData.guestEmail : undefined,
+        items: orderItems,
+        subtotal: getTotalPrice(),
+        shippingCost,
+        discount: 0,
+        total,
+      }),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      showToast(data.error || 'Sipariş oluşturulamadı', 'error')
+      return
+    }
+
+    const orderNumber = data.orderNumber
 
     // Sipariş adresini profil adreslerine otomatik kaydet (sadece giriş yapmış kullanıcılar için)
     if (!isGuest && formData.fullName && formData.provinceCode) {
