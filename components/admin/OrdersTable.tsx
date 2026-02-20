@@ -126,8 +126,30 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
     }
   }
 
+  const stats = [
+    { label: 'Bekleyen',   count: orders.filter(o => o.status === 'PENDING').length,                              color: 'bg-yellow-500', text: 'text-yellow-700' },
+    { label: 'Hazırlanan', count: orders.filter(o => ['CONFIRMED','PROCESSING'].includes(o.status)).length,       color: 'bg-blue-500',   text: 'text-blue-700' },
+    { label: 'Kargoda',    count: orders.filter(o => o.status === 'SHIPPED').length,                              color: 'bg-purple-500', text: 'text-purple-700' },
+    { label: 'Tamamlanan', count: orders.filter(o => o.status === 'DELIVERED').length,                            color: 'bg-green-500',  text: 'text-green-700' },
+  ]
+
   return (
     <div className="space-y-4">
+      {/* İstatistik Kartları */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {stats.map((s) => (
+          <Card key={s.label} padding="lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">{s.label}</p>
+                <p className={`text-2xl font-bold mt-1 ${s.text}`}>{s.count}</p>
+              </div>
+              <div className={`w-10 h-10 ${s.color} rounded-lg opacity-15`} />
+            </div>
+          </Card>
+        ))}
+      </div>
+
       {/* Filtreler */}
       <Card>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
