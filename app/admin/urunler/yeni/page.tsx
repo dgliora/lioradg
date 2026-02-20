@@ -28,6 +28,7 @@ export default function NewProductPage() {
     barcode: '',
     price: '',
     salePrice: '',
+    costPrice: '',
     sku: '',
     stock: '',
     images: '',
@@ -337,6 +338,15 @@ export default function NewProductPage() {
                   value={formData.salePrice}
                   onChange={(e) => setFormData({ ...formData, salePrice: e.target.value })}
                   helperText="Boş bırakabilirsiniz"
+                />
+
+                <Input
+                  label="Maliyet Fiyatı (TL)"
+                  type="number"
+                  step="0.01"
+                  value={formData.costPrice}
+                  onChange={(e) => setFormData({ ...formData, costPrice: e.target.value })}
+                  helperText="Net kar hesabı için (müşteri görmez)"
                 />
 
                 <Input
