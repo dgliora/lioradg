@@ -99,11 +99,12 @@ async function main() {
   const admin = await prisma.user.upsert({
     where: { email: 'admin@lioradg.com.tr' },
     update: {},
-    create: {
+      create: {
       email: 'admin@lioradg.com.tr',
       name: 'Liora Admin',
       password: hashedPassword,
       role: 'ADMIN',
+      emailVerified: new Date(),
     },
   })
   console.log('✅ Admin kullanıcısı oluşturuldu:', admin.email)
