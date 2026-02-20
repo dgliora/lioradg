@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, Input, Button, useToast } from '@/components/ui'
@@ -11,10 +12,25 @@ import { calculateShippingFee } from '@/lib/utils/shipping'
 
 interface Province { code: string; name: string }
 interface District { code: string; name: string }
+interface SavedAddress {
+  id: string
+  title: string
+  fullName: string
+  phone: string
+  provinceCode: string
+  province: string
+  districtCode: string
+  district: string
+  neighborhood: string
+  postalCode: string
+  addressLine: string
+  isDefault?: boolean
+}
 
 export default function CheckoutPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { data: session } = useSession()
   const isGuest = searchParams.get('misafir') === '1'
   const { items, getTotalPrice, clearCart } = useCartStore()
   const { showToast } = useToast()
@@ -26,6 +42,8 @@ export default function CheckoutPage() {
   const [loadingProvinces, setLoadingProvinces] = useState(false)
   const [loadingDistricts, setLoadingDistricts] = useState(false)
   const [addressErrors, setAddressErrors] = useState<Record<string, string>>({})
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     // Misafir için
     guestEmail: '',
@@ -52,7 +70,47 @@ export default function CheckoutPage() {
       .then((data) => setProvinces(Array.isArray(data) ? data : []))
       .catch(() => {})
       .finally(() => setLoadingProvinces(false))
-  }, [])
+
+    // Kayıtlı adresleri localStorage'dan yükle
+    if (!isGuest) {
+      try {
+        const saved = localStorage.getItem('user-addresses')
+        if (saved) {
+          const addrs: SavedAddress[] = JSON.parse(saved)
+          setSavedAddresses(addrs)
+          // Varsayılan adres varsa otomatik seç
+          const def = addrs.find((a) => a.isDefault) || addrs[0]
+          if (def) applyAddress(def)
+        }
+      } catch {}
+    }
+  }, [isGuest])
+
+  const applyAddress = (addr: SavedAddress) => {
+    setSelectedAddressId(addr.id)
+    setFormData((prev) => ({
+      ...prev,
+      fullName: addr.fullName,
+      phone: addr.phone,
+      provinceCode: addr.provinceCode || '',
+      city: addr.province || addr.district || '',
+      districtCode: addr.districtCode || '',
+      district: addr.district || '',
+      neighborhood: addr.neighborhood || '',
+      address: addr.addressLine || '',
+      postalCode: addr.postalCode || '',
+    }))
+    setAddressErrors({})
+    // İl seçiliyse ilçeleri yükle
+    if (addr.provinceCode) {
+      setLoadingDistricts(true)
+      fetch(`/api/addresses/districts?province=${addr.provinceCode}`)
+        .then((r) => r.json())
+        .then((data) => setDistricts(Array.isArray(data) ? data : []))
+        .catch(() => {})
+        .finally(() => setLoadingDistricts(false))
+    }
+  }
 
   const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const code = e.target.value
@@ -256,6 +314,65 @@ export default function CheckoutPage() {
                       <h2 className="text-h2 font-semibold text-neutral-900">
                         Teslimat Adresi
                       </h2>
+
+                      {/* Kayıtlı adresler */}
+                      {!isGuest && savedAddresses.length > 0 && (
+                        <div className="space-y-3">
+                          <p className="text-sm font-medium text-neutral-600">Kayıtlı Adresleriniz</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {savedAddresses.map((addr) => (
+                              <button
+                                key={addr.id}
+                                type="button"
+                                onClick={() => applyAddress(addr)}
+                                className={`text-left p-4 rounded-xl border-2 transition-all ${
+                                  selectedAddressId === addr.id
+                                    ? 'border-sage bg-sage/5'
+                                    : 'border-warm-100 hover:border-sage/40'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between mb-1">
+                                  <p className="text-sm font-semibold text-neutral truncate">{addr.title || 'Adres'}</p>
+                                  {selectedAddressId === addr.id && (
+                                    <svg className="w-4 h-4 text-sage flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                  )}
+                                </div>
+                                <p className="text-xs text-neutral-medium">{addr.fullName}</p>
+                                <p className="text-xs text-neutral-medium truncate">
+                                  {addr.neighborhood ? `${addr.neighborhood}, ` : ''}{addr.district} / {addr.province}
+                                </p>
+                              </button>
+                            ))}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedAddressId(null)
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  fullName: '', phone: '', provinceCode: '', city: '',
+                                  districtCode: '', district: '', neighborhood: '', address: '', postalCode: '',
+                                }))
+                                setDistricts([])
+                                setAddressErrors({})
+                              }}
+                              className={`text-left p-4 rounded-xl border-2 border-dashed transition-all ${
+                                selectedAddressId === null && !formData.fullName
+                                  ? 'border-sage bg-sage/5'
+                                  : 'border-warm-200 hover:border-sage/40'
+                              }`}
+                            >
+                              <p className="text-sm font-medium text-sage">+ Yeni Adres Kullan</p>
+                              <p className="text-xs text-neutral-medium mt-0.5">Farklı bir adres gir</p>
+                            </button>
+                          </div>
+                          <div className="border-t border-warm-100 pt-4">
+                            <p className="text-sm font-medium text-neutral-600 mb-3">Adres Detayları</p>
+                          </div>
+                        </div>
+                      )}
+
                       {isGuest && (
                         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                           <p className="text-sm text-blue-700 mb-3 font-medium">Misafir olarak devam ediyorsunuz</p>
