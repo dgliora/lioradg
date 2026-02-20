@@ -6,46 +6,20 @@ import Link from 'next/link'
 import { useAuth } from '@/lib/contexts/AuthContext'
 
 const menuItems = [
-  {
-    icon: '🏠',
-    label: 'Hesap Özeti',
-    href: '/account',
-  },
-  {
-    icon: '📦',
-    label: 'Siparişlerim',
-    href: '/account/siparislerim',
-  },
-  {
-    icon: '📍',
-    label: 'Adreslerim',
-    href: '/account/adreslerim',
-  },
-  {
-    icon: '❤️',
-    label: 'Favorilerim',
-    href: '/account/favorilerim',
-  },
-  {
-    icon: '👤',
-    label: 'Profil Bilgilerim',
-    href: '/account/profil',
-  },
+  { icon: '🏠', label: 'Hesap Özeti', href: '/account' },
+  { icon: '📦', label: 'Siparişlerim', href: '/account/siparislerim' },
+  { icon: '📍', label: 'Adreslerim', href: '/account/adreslerim' },
+  { icon: '❤️', label: 'Favorilerim', href: '/account/favorilerim' },
+  { icon: '👤', label: 'Profil', href: '/account/profil' },
 ]
 
-export default function AccountLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function AccountLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const { user, isLoading, logout } = useAuth()
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/giris')
-    }
+    if (!isLoading && !user) router.push('/giris')
   }, [user, isLoading, router])
 
   if (isLoading || !user) return null
@@ -57,24 +31,54 @@ export default function AccountLayout({
 
   return (
     <div className="min-h-screen bg-warm-50">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-6 md:py-12">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-h1 font-serif font-bold text-neutral mb-2">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-h1 font-serif font-bold text-neutral mb-1">
               Hesabım
             </h1>
-            <p className="text-neutral-medium">
+            <p className="text-sm text-neutral-medium">
               Hoş geldiniz, <span className="font-medium text-sage">{user.name}</span>
             </p>
           </div>
 
-          {/* Layout: Sol Menü + Sağ İçerik */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Sol Sidebar - Menü */}
-            <aside className="lg:col-span-3">
+          {/* Mobil: Yatay kaydırmalı menü */}
+          <div className="lg:hidden mb-4 -mx-4 px-4">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {menuItems.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap text-sm font-medium transition-all shrink-0 ${
+                      isActive
+                        ? 'bg-sage text-white shadow-button'
+                        : 'bg-white text-neutral-medium hover:text-sage border border-warm-100'
+                    }`}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              })}
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full whitespace-nowrap text-sm font-medium bg-white text-danger border border-warm-100 shrink-0"
+              >
+                <span>🚪</span>
+                <span>Çıkış</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop: Sol sidebar + sağ içerik */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            {/* Sol Sidebar — sadece desktop */}
+            <aside className="hidden lg:block lg:col-span-3">
               <div className="bg-white rounded-card shadow-soft p-6 sticky top-24">
-                <nav className="space-y-2">
+                <nav className="space-y-1">
                   {menuItems.map((item) => {
                     const isActive = pathname === item.href
                     return (
@@ -106,9 +110,9 @@ export default function AccountLayout({
               </div>
             </aside>
 
-            {/* Sağ İçerik Alanı */}
+            {/* İçerik Alanı */}
             <main className="lg:col-span-9">
-              <div className="bg-white rounded-card shadow-soft p-8">
+              <div className="bg-white rounded-card shadow-soft p-4 md:p-8">
                 {children}
               </div>
             </main>
@@ -118,4 +122,3 @@ export default function AccountLayout({
     </div>
   )
 }
-

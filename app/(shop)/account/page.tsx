@@ -28,23 +28,23 @@ export default function AccountPage() {
   return (
     <div className="space-y-6">
       {/* Welcome Card */}
-      <div className="bg-gradient-to-r from-sage/5 to-rose/5 rounded-lg p-6 border-2 border-sage/20">
-        <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-sage to-sage-dark flex items-center justify-center text-white text-2xl font-serif flex-shrink-0">
+      <div className="bg-gradient-to-r from-sage/5 to-rose/5 rounded-xl p-4 md:p-6 border-2 border-sage/20">
+        <div className="flex items-start gap-3 md:gap-4">
+          <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-sage to-sage-dark flex items-center justify-center text-white text-xl md:text-2xl font-serif flex-shrink-0">
             {user.name.charAt(0).toUpperCase()}
           </div>
-          <div className="flex-1">
-            <h2 className="text-h3 font-serif text-sage mb-2">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl md:text-h3 font-serif text-sage mb-1 md:mb-2">
               🎉 Hoş Geldiniz!
             </h2>
-            <p className="text-neutral-medium mb-3">
+            <p className="text-sm md:text-base text-neutral-medium mb-2 md:mb-3">
               <strong className="text-neutral">{user.name}</strong>, Lioradg ailesine katıldığınız için teşekkür ederiz.
             </p>
-            <p className="text-sm text-neutral-medium">
+            <p className="text-xs md:text-sm text-neutral-medium hidden sm:block">
               E-posta adresinize bir hoş geldiniz mesajı gönderdik. Özel fırsatlardan haberdar olmak için e-posta kutunuzu kontrol edin.
             </p>
-            <div className="mt-4 pt-4 border-t border-sage/20">
-              <p className="text-sm text-neutral-medium">
+            <div className="mt-3 pt-3 border-t border-sage/20">
+              <p className="text-xs md:text-sm text-neutral-medium break-all">
                 <span className="font-medium text-sage">{user.email}</span>
               </p>
             </div>
@@ -53,18 +53,18 @@ export default function AccountPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-gradient-to-br from-sage/10 to-sage/5 rounded-lg p-6 text-center border border-sage/20">
-          <div className="text-4xl font-serif font-bold text-sage mb-2">0</div>
-          <div className="text-sm text-neutral-medium font-medium">Toplam Sipariş</div>
+      <div className="grid grid-cols-3 gap-3 md:gap-4">
+        <div className="bg-gradient-to-br from-sage/10 to-sage/5 rounded-xl p-3 md:p-6 text-center border border-sage/20">
+          <div className="text-2xl md:text-4xl font-serif font-bold text-sage mb-1 md:mb-2">0</div>
+          <div className="text-[11px] md:text-sm text-neutral-medium font-medium leading-tight">Toplam<br className="sm:hidden" /> Sipariş</div>
         </div>
-        <div className="bg-gradient-to-br from-rose/10 to-rose/5 rounded-lg p-6 text-center border border-rose/20">
-          <div className="text-4xl font-serif font-bold text-rose mb-2">{favorites.length}</div>
-          <div className="text-sm text-neutral-medium font-medium">Favori Ürün</div>
+        <div className="bg-gradient-to-br from-rose/10 to-rose/5 rounded-xl p-3 md:p-6 text-center border border-rose/20">
+          <div className="text-2xl md:text-4xl font-serif font-bold text-rose mb-1 md:mb-2">{favorites.length}</div>
+          <div className="text-[11px] md:text-sm text-neutral-medium font-medium leading-tight">Favori<br className="sm:hidden" /> Ürün</div>
         </div>
-        <div className="bg-gradient-to-br from-warm-100 to-warm-50 rounded-lg p-6 text-center border border-warm-200">
-          <div className="text-4xl font-serif font-bold text-neutral mb-2">{addressCount}</div>
-          <div className="text-sm text-neutral-medium font-medium">Kayıtlı Adres</div>
+        <div className="bg-gradient-to-br from-warm-100 to-warm-50 rounded-xl p-3 md:p-6 text-center border border-warm-200">
+          <div className="text-2xl md:text-4xl font-serif font-bold text-neutral mb-1 md:mb-2">{addressCount}</div>
+          <div className="text-[11px] md:text-sm text-neutral-medium font-medium leading-tight">Kayıtlı<br className="sm:hidden" /> Adres</div>
         </div>
       </div>
 
