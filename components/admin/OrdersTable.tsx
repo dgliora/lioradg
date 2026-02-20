@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Card, Badge, Button } from '@/components/ui'
 import { formatPrice } from '@/lib/utils'
 import type { Order, User, OrderItem, Product } from '@prisma/client'
@@ -287,10 +288,20 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
                         <td className="px-6 py-4 text-sm text-gray-600">
                           {new Date(order.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </td>
-                        <td className="px-6 py-4">
-                          <svg className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
+                        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/admin/siparisler/${order.id}`}
+                              className="text-xs px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+                            >
+                              Detay
+                            </Link>
+                            <svg className={`w-4 h-4 text-gray-400 transition-transform cursor-pointer ${isExpanded ? 'rotate-180' : ''}`}
+                              onClick={(e) => { e.stopPropagation(); setExpandedId(isExpanded ? null : order.id) }}
+                              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
                         </td>
                       </tr>
                       {isExpanded && (
