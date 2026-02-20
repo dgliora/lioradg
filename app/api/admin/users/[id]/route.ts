@@ -1,64 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { checkAdminAuth } from '@/lib/auth-server'
+import { auth } from '@/lib/auth-options'
+import { hashPassword } from '@/lib/auth'
 
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const auth = await checkAdminAuth()
-  if (!auth.isAdmin) {
-    return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 })
+async function requireAdmin() {
+  const session = await auth()
+  if (!session?.user || (session.user as any).role !== 'ADMIN') return null
+  return session
+}
+
+// PATCH: kullanıcı güncelle (isim, şifre, izinler)
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await requireAdmin()
+  if (!session) return NextResponse.json({ error: 'Yetkisiz' }, { status: 403 })
+
+  const { name, email, password, permissions } = await req.json()
+
+  const data: any = {}
+  if (name) data.name = name
+  if (email) data.email = email
+  if (password) data.password = await hashPassword(password)
+  if (permissions !== undefined) data.permissions = JSON.stringify(permissions)
+
+  const user = await prisma.user.update({
+    where: { id: params.id },
+    data,
+    select: { id: true, name: true, email: true, role: true, permissions: true },
+  })
+
+  return NextResponse.json(user)
+}
+
+// DELETE: kullanıcı sil (kendi kendini silemesin)
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await requireAdmin()
+  if (!session) return NextResponse.json({ error: 'Yetkisiz' }, { status: 403 })
+
+  if (params.id === (session.user as any).id) {
+    return NextResponse.json({ error: 'Kendi hesabınızı silemezsiniz.' }, { status: 400 })
   }
-  if (auth.role !== 'ADMIN') {
-    return NextResponse.json(
-      { error: 'Sadece admin müşteri silebilir' },
-      { status: 403 }
-    )
-  }
 
-  const id = params.id
-  if (!id) {
-    return NextResponse.json({ error: 'Kullanıcı id gerekli' }, { status: 400 })
-  }
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id },
-      include: {
-        _count: { select: { orders: true } },
-      },
-    })
-
-    if (!user) {
-      return NextResponse.json({ error: 'Müşteri bulunamadı' }, { status: 404 })
-    }
-
-    if (user.role === 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Admin hesaplar buradan silinemez' },
-        { status: 400 }
-      )
-    }
-
-    if (user._count.orders > 0) {
-      return NextResponse.json(
-        { error: 'Siparişi olan müşteri silinemez. Sipariş yoksa tekrar deneyin.' },
-        { status: 400 }
-      )
-    }
-
-    await prisma.cart.deleteMany({ where: { userId: id } })
-    await prisma.address.deleteMany({ where: { userId: id } })
-    await prisma.review.deleteMany({ where: { userId: id } })
-    await prisma.user.delete({ where: { id } })
-
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Müşteri silinirken hata:', error)
-    return NextResponse.json(
-      { error: 'Müşteri silinirken hata oluştu' },
-      { status: 500 }
-    )
-  }
+  await prisma.user.delete({ where: { id: params.id } })
+  return NextResponse.json({ success: true })
 }

@@ -46,6 +46,7 @@ export const { handlers, auth, signIn } = NextAuth({
             email: user.email,
             name: user.name,
             role: user.role,
+            permissions: user.permissions || '[]',
           }
         } catch (error: any) {
           if (error.message === 'EMAIL_NOT_VERIFIED') throw error
@@ -83,19 +84,21 @@ export const { handlers, auth, signIn } = NextAuth({
           token.role = user.role as any
           token.email = user.email
           token.name = user.name
+          token.permissions = (user as any).permissions || '[]'
           return token
         }
         
         if (!token.role && token.email) {
           const dbUser = await prisma.user.findUnique({
             where: { email: token.email as string },
-            select: { id: true, role: true, name: true, email: true },
+            select: { id: true, role: true, name: true, email: true, permissions: true },
           })
           if (dbUser) {
             token.id = dbUser.id
             token.role = dbUser.role
             token.name = dbUser.name
             token.email = dbUser.email
+            token.permissions = dbUser.permissions || '[]'
           }
         }
         
@@ -112,6 +115,7 @@ export const { handlers, auth, signIn } = NextAuth({
           session.user.role = token.role as string
           session.user.name = token.name as string
           session.user.email = token.email as string
+          ;(session.user as any).permissions = token.permissions as string || '[]'
         }
         return session
       } catch (error) {

@@ -56,6 +56,7 @@ model User {
   resetTokenExpiry     DateTime?
   verificationToken    String?
   verificationExpiry   DateTime?
+  permissions          String?   @default("[]")
 
   addresses Address[]
   orders    Order[]
