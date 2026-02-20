@@ -107,6 +107,9 @@ export function Header() {
               <Link href="/siparis-takip" className="hover:text-warm-100 transition-colors whitespace-nowrap hidden sm:inline">
                 Sipariş Takip
               </Link>
+              <Link href="/blog" className="hover:text-warm-100 transition-colors whitespace-nowrap hidden md:inline">
+                Blog
+              </Link>
               <Link href="/iletisim" className="hover:text-warm-100 transition-colors whitespace-nowrap hidden md:inline">
                 İletişim
               </Link>

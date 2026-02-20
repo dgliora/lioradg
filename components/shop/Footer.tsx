@@ -68,6 +68,7 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li><Link href="/" className="text-neutral-light hover:text-rose transition-colors">Ana Sayfa</Link></li>
               <li><Link href="/hakkimizda" className="text-neutral-light hover:text-rose transition-colors">Hakkımızda</Link></li>
+              <li><Link href="/blog" className="text-neutral-light hover:text-rose transition-colors">Blog</Link></li>
               <li><Link href="/iletisim" className="text-neutral-light hover:text-rose transition-colors">İletişim</Link></li>
               <li><Link href="/kampanyalar" className="text-neutral-light hover:text-rose transition-colors">Kampanyalar</Link></li>
             </ul>

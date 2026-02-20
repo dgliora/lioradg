@@ -26,6 +26,7 @@ const ALL_NAV = [
   { name: 'Kampanyalar',  href: '/admin/kampanyalar',    icon: '🎁', permission: 'campaigns' },
   { name: 'Müşteriler',   href: '/admin/musteriler',     icon: '👥', permission: 'customers' },
   { name: 'E-Bülten',     href: '/admin/newsletter',     icon: '📧', permission: 'newsletter' },
+  { name: 'Blog',         href: '/admin/blog',           icon: '✍️', permission: 'blog' },
   { name: 'Kullanıcılar', href: '/admin/kullanicilar',   icon: '🔑', permission: 'users' },
   { name: 'Ayarlar',      href: '/admin/ayarlar',        icon: '⚙️', permission: 'settings' },
 ]

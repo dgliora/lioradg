@@ -296,6 +296,27 @@ model MailLog {
   @@map("mail_logs")
 }
 
+model BlogPost {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  excerpt         String
+  content         String   @db.Text
+  coverImage      String?
+  published       Boolean  @default(false)
+  metaTitle       String?
+  metaDescription String?
+  tags            String?
+  author          String   @default("Lioradg Ekibi")
+  readingTime     Int      @default(5)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([slug])
+  @@index([published])
+  @@map("blog_posts")
+}
+
 model NewsletterSubscriber {
   id          String   @id @default(cuid())
   email       String   @unique

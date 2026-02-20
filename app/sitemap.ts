@@ -24,6 +24,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   } catch { /* DB bağlantı hatası olursa boş dön */ }
 
+  // Blog
+  let blogPages: MetadataRoute.Sitemap = []
+  try {
+    const blogs = await prisma.blogPost.findMany({ where: { published: true }, select: { slug: true, updatedAt: true } })
+    blogPages = blogs.map((b) => ({
+      url: `${baseUrl}/blog/${b.slug}`,
+      lastModified: b.updatedAt,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }))
+    if (blogs.length > 0) {
+      blogPages.unshift({ url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.7 })
+    }
+  } catch { }
+
   // Ürünler
   let productPages: MetadataRoute.Sitemap = []
   try {
@@ -36,5 +51,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   } catch { /* DB bağlantı hatası olursa boş dön */ }
 
-  return [...staticPages, ...categoryPages, ...productPages]
+  return [...staticPages, ...categoryPages, ...blogPages, ...productPages]
 }
