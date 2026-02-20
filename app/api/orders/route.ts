@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
+import { sendOrderConfirmationEmail } from '@/lib/email'
 
 export async function GET() {
   const session = await auth()
@@ -131,6 +132,14 @@ export async function POST(req: NextRequest) {
       await prisma.cartItem.deleteMany({
         where: { cart: { userId: session.user.id } },
       })
+    }
+
+    // Sipariş onay e-postası gönder
+    const emailTo = guestEmail || session?.user?.email
+    if (emailTo) {
+      sendOrderConfirmationEmail(emailTo, order.orderNumber, total).catch((err) =>
+        console.error('Sipariş e-postası gönderilemedi:', err)
+      )
     }
 
     return NextResponse.json({ success: true, orderNumber: order.orderNumber })

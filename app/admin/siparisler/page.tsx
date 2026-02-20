@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma'
 import { Card } from '@/components/ui'
 import { OrdersTable } from '@/components/admin/OrdersTable'
 
+export const dynamic = 'force-dynamic'
+
 async function getOrders() {
   return await prisma.order.findMany({
     include: {
