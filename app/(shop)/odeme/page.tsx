@@ -78,7 +78,43 @@ export default function CheckoutPage() {
     console.log('Create order:', formData)
     
     const orderNumber = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase()
-    
+
+    // Sipariş adresini profil adreslerine otomatik kaydet (sadece giriş yapmış kullanıcılar için)
+    if (!isGuest && formData.fullName && formData.city) {
+      try {
+        const saved = localStorage.getItem('user-addresses')
+        const existing: Array<Record<string, unknown>> = saved ? JSON.parse(saved) : []
+
+        // Aynı içerikli adres zaten varsa tekrar ekleme
+        const alreadyExists = existing.some(
+          (a) =>
+            a.province === formData.city &&
+            a.district === formData.district &&
+            a.addressLine === formData.address
+        )
+
+        if (!alreadyExists) {
+          const newAddr = {
+            id: Date.now().toString(),
+            title: `Sipariş ${orderNumber}`,
+            fullName: formData.fullName,
+            phone: formData.phone,
+            province: formData.city,
+            provinceCode: formData.city,
+            district: formData.district,
+            districtCode: formData.district,
+            neighborhood: '',
+            postalCode: formData.postalCode,
+            addressLine: formData.address,
+            isDefault: existing.length === 0,
+          }
+          localStorage.setItem('user-addresses', JSON.stringify([...existing, newAddr]))
+        }
+      } catch {
+        // localStorage hatası sessizce geç
+      }
+    }
+
     clearCart()
     showToast('Siparişiniz başarıyla oluşturuldu!', 'success')
     router.push(`/siparis-tamamlandi/${orderNumber}`)

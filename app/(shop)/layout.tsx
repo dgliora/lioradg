@@ -11,6 +11,7 @@ import { ToastProvider } from '@/components/ui'
 import { CampaignModal } from '@/components/shop/CampaignModal'
 import { CampaignPopup } from '@/components/shop/CampaignPopup'
 import { CartSync } from '@/components/CartSync'
+import { FavoriteSync } from '@/components/FavoriteSync'
 
 export default function ShopLayout({
   children,
@@ -31,6 +32,7 @@ export default function ShopLayout({
               <CampaignModal />
               <CampaignPopup />
               <CartSync />
+              <FavoriteSync />
             </div>
           </ParallaxProvider>
         </ToastProvider>

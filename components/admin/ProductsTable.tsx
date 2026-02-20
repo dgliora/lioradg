@@ -9,6 +9,7 @@ import type { Product, Category } from '@prisma/client'
 
 type ProductWithCategory = Product & {
   category: Category
+  _count?: { favorites: number }
 }
 
 interface ProductsTableProps {
@@ -215,6 +216,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
                 <th className="px-6 py-4 font-medium">Kategori</th>
                 <th className="px-6 py-4 font-medium">Fiyat</th>
                 <th className="px-6 py-4 font-medium">Stok</th>
+                <th className="px-6 py-4 font-medium">Favori</th>
                 <th className="px-6 py-4 font-medium">Durum</th>
                 <th className="px-6 py-4 font-medium">İşlemler</th>
               </tr>
@@ -222,7 +224,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
             <tbody className="divide-y divide-gray-100">
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
                     {searchQuery || selectedCategory !== 'all' || selectedStatus !== 'all'
                       ? 'Filtrelere uygun ürün bulunamadı'
                       : 'Henüz ürün eklenmemiş'}
@@ -291,6 +293,14 @@ export function ProductsTable({ products }: ProductsTableProps) {
                         }`}
                       >
                         {product.stock} adet
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="flex items-center gap-1 text-sm text-rose-500 font-medium">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        {product._count?.favorites ?? 0}
                       </span>
                     </td>
                     <td className="px-6 py-4">

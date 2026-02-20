@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic'
 import { Product } from '@/types'
 import { Card, Badge, Button, useToast } from '@/components/ui'
 import { formatPrice } from '@/lib/utils'
+import { useSession } from 'next-auth/react'
 import { useCartStore } from '@/lib/store/cartStore'
 import { useFavoritesStore } from '@/lib/store/favoritesStore'
 
@@ -18,8 +19,9 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const [isMounted, setIsMounted] = useState(false)
+  const { data: session } = useSession()
   const addItem = useCartStore((state) => state.addItem)
-  const { addItem: addFavorite, removeItem: removeFavorite, isFavorite } = useFavoritesStore()
+  const { toggleFavorite, isFavorite } = useFavoritesStore()
   const { showToast } = useToast()
   
   useEffect(() => {
@@ -83,13 +85,8 @@ export function ProductCard({ product }: ProductCardProps) {
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  if (isFav) {
-                    removeFavorite(product.id)
-                    showToast('Favorilerden çıkarıldı', 'info')
-                  } else {
-                    addFavorite(product)
-                    showToast('Favorilere eklendi!', 'success')
-                  }
+                  toggleFavorite(product, !!session?.user?.id)
+                  showToast(isFav ? 'Favorilerden çıkarıldı' : 'Favorilere eklendi!', isFav ? 'info' : 'success')
                 }}
                 className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-soft transition-all flex items-center justify-center ${
                   isFav 

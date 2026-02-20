@@ -3,15 +3,17 @@ import { prisma } from '@/lib/prisma'
 import { Button } from '@/components/ui'
 import { ProductsTable } from '@/components/admin/ProductsTable'
 
+export const dynamic = 'force-dynamic'
+
 async function getProducts() {
-  return await prisma.product.findMany({
+  const products = await prisma.product.findMany({
     include: {
       category: true,
+      _count: { select: { favorites: true } },
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: { createdAt: 'desc' },
   })
+  return products
 }
 
 export default async function AdminProductsPage() {

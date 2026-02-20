@@ -6,8 +6,10 @@ interface FavoritesStore {
   items: Product[]
   addItem: (product: Product) => void
   removeItem: (productId: string) => void
+  toggleFavorite: (product: Product, isLoggedIn: boolean) => void
   isFavorite: (productId: string) => boolean
   getTotalItems: () => number
+  syncFromServer: (productIds: string[], allProducts: Product[]) => void
 }
 
 export const useFavoritesStore = create<FavoritesStore>()(
@@ -29,12 +31,42 @@ export const useFavoritesStore = create<FavoritesStore>()(
         }))
       },
 
+      toggleFavorite: (product, isLoggedIn) => {
+        const { isFavorite, addItem, removeItem } = get()
+        const alreadyFav = isFavorite(product.id)
+
+        // Optimistic update
+        if (alreadyFav) {
+          removeItem(product.id)
+        } else {
+          addItem(product)
+        }
+
+        // DB sync for logged in users
+        if (isLoggedIn) {
+          fetch('/api/favorites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: product.id }),
+          }).catch(() => {
+            // Rollback on error
+            if (alreadyFav) addItem(product)
+            else removeItem(product.id)
+          })
+        }
+      },
+
       isFavorite: (productId) => {
         return get().items.some((item) => item.id === productId)
       },
 
       getTotalItems: () => {
         return get().items.length
+      },
+
+      syncFromServer: (productIds, allProducts) => {
+        const products = allProducts.filter((p) => productIds.includes(p.id))
+        set({ items: products })
       },
     }),
     {
@@ -52,4 +84,3 @@ export const useFavoritesStore = create<FavoritesStore>()(
     }
   )
 )
-

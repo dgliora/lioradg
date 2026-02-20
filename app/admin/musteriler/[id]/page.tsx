@@ -18,6 +18,17 @@ async function getCustomer(id: string) {
           },
         },
       },
+      cart: {
+        include: {
+          items: {
+            include: {
+              product: {
+                select: { id: true, name: true, images: true, price: true, salePrice: true, slug: true },
+              },
+            },
+          },
+        },
+      },
       _count: { select: { orders: true } },
     },
   })
@@ -184,6 +195,60 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Sepetteki Ürünler */}
+          {customer.cart && customer.cart.items.length > 0 && (
+            <div className="bg-white border border-amber-200 rounded-xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+                  Sepette Bekleyen Ürünler
+                </h2>
+                <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded-full">
+                  {customer.cart.items.length} ürün
+                </span>
+              </div>
+              <div className="space-y-3">
+                {customer.cart.items.map((item) => {
+                  const finalPrice = item.product.salePrice ?? item.product.price
+                  return (
+                    <div key={item.id} className="flex items-center gap-3">
+                      {getFirstImage(item.product.images) ? (
+                        <img
+                          src={getFirstImage(item.product.images)}
+                          alt={item.product.name}
+                          className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-gray-100"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-800 truncate">{item.product.name}</p>
+                        <p className="text-xs text-gray-400">{item.quantity} adet × {formatPrice(finalPrice)}</p>
+                      </div>
+                      <p className="text-sm font-semibold text-amber-700 whitespace-nowrap">
+                        {formatPrice(finalPrice * item.quantity)}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+              <div className="mt-3 pt-3 border-t border-amber-100 flex justify-between text-sm">
+                <span className="text-gray-500">Toplam</span>
+                <span className="font-bold text-amber-700">
+                  {formatPrice(
+                    customer.cart.items.reduce(
+                      (s, i) => s + (i.product.salePrice ?? i.product.price) * i.quantity,
+                      0
+                    )
+                  )}
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                Son güncelleme: {new Date(customer.cart.updatedAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+              </p>
             </div>
           )}
 
