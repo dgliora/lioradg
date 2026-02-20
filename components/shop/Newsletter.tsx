@@ -12,15 +12,24 @@ export function Newsletter() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // TODO: Newsletter subscription API
-    console.log('Newsletter subscription:', email)
-    
-    // Simulate API call
-    setTimeout(() => {
-      showToast('E-bültene başarıyla abone oldunuz!', 'success')
-      setEmail('')
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        showToast(data.message || 'E-bültene başarıyla abone oldunuz!', 'success')
+        setEmail('')
+      } else {
+        showToast(data.error || 'Bir hata oluştu.', 'error')
+      }
+    } catch {
+      showToast('Bir hata oluştu, tekrar deneyin.', 'error')
+    } finally {
       setIsSubmitting(false)
-    }, 1000)
+    }
   }
 
   return (

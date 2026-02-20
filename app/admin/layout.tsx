@@ -37,6 +37,7 @@ function AdminLayoutContent({
     { name: 'Siparişler', href: '/admin/siparisler', icon: '🛒' },
     { name: 'Kampanyalar', href: '/admin/kampanyalar', icon: '🎁' },
     { name: 'Müşteriler', href: '/admin/musteriler', icon: '👥' },
+    { name: 'E-Bülten', href: '/admin/newsletter', icon: '📧' },
     { name: 'Ayarlar', href: '/admin/ayarlar', icon: '⚙️' },
   ]
 

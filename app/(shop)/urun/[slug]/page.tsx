@@ -19,12 +19,12 @@ export async function generateMetadata({
     return { title: 'Ürün Bulunamadı' }
   }
 
-  const title = `${product.name} - Lioradg`
   const price = product.salePrice || product.price
-  const description =
-    (product.description?.slice(0, 155) || product.name) +
+  const title = ((product as any).metaTitle ? `${(product as any).metaTitle} - Lioradg` : `${product.name} - Lioradg`)
+  const description = (product as any).metaDescription ||
+    ((product.description?.slice(0, 155) || product.name) +
     (product.description && product.description.length > 155 ? '...' : '') +
-    ` | ${formatPrice(price)}`
+    ` | ${formatPrice(price)}`)
   const image = product.images?.split(',')[0]?.trim()
   const imageUrl = image ? (image.startsWith('http') ? image : `${baseUrl}${image.startsWith('/') ? '' : '/'}${image}`) : undefined
 

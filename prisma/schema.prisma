@@ -67,15 +67,17 @@ model User {
 }
 
 model Category {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String    @unique
-  description String?
-  icon        String?
-  image       String?
-  order       Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  description     String?
+  icon            String?
+  image           String?
+  order           Int       @default(0)
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   products Product[]
 
@@ -98,10 +100,12 @@ model Product {
   sku         String?  @unique
   stock       Int      @default(0)
   images      String
-  featured    Boolean  @default(false)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  featured        Boolean  @default(false)
+  active          Boolean  @default(true)
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -289,4 +293,17 @@ model MailLog {
 
   @@index([email, type, sentAt])
   @@map("mail_logs")
+}
+
+model NewsletterSubscriber {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String?
+  active      Boolean  @default(true)
+  source      String?  @default("website")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([email])
+  @@map("newsletter_subscribers")
 }

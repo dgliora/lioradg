@@ -34,6 +34,8 @@ export default function NewProductPage() {
     categoryId: '',
     featured: false,
     active: true,
+    metaTitle: '',
+    metaDescription: '',
   })
 
   useEffect(() => {
@@ -507,6 +509,55 @@ export default function NewProductPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </Card>
+
+            {/* SEO */}
+            <Card>
+              <h2 className="text-xl font-semibold text-gray-900 mb-1">SEO</h2>
+              <p className="text-sm text-gray-500 mb-5">Boş bırakırsanız ürün adı ve açıklaması kullanılır.</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Meta Başlık <span className="text-gray-400 font-normal text-xs">(max 60 karakter)</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={60}
+                    value={formData.metaTitle}
+                    onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
+                    placeholder={formData.name || 'Ürün adı kullanılacak'}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sage"
+                  />
+                  <p className="text-xs text-gray-400 mt-1 text-right">{formData.metaTitle.length}/60</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Meta Açıklama <span className="text-gray-400 font-normal text-xs">(max 160 karakter)</span>
+                  </label>
+                  <textarea
+                    maxLength={160}
+                    rows={3}
+                    value={formData.metaDescription}
+                    onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
+                    placeholder={formData.description?.slice(0, 80) || 'Ürün açıklaması kullanılacak'}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sage resize-none"
+                  />
+                  <p className="text-xs text-gray-400 mt-1 text-right">{formData.metaDescription.length}/160</p>
+                </div>
+                {/* Önizleme */}
+                {(formData.metaTitle || formData.name) && (
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <p className="text-xs text-gray-500 mb-2 font-medium">Google Önizleme</p>
+                    <p className="text-blue-700 text-base font-medium leading-tight line-clamp-1">
+                      {formData.metaTitle || formData.name} — Lioradg
+                    </p>
+                    <p className="text-green-700 text-xs mt-0.5">lioradg.com.tr/urun/{formData.slug || '...'}</p>
+                    <p className="text-gray-600 text-sm mt-1 line-clamp-2 leading-snug">
+                      {formData.metaDescription || formData.description?.slice(0, 160) || 'Açıklama girilmedi.'}
+                    </p>
+                  </div>
+                )}
               </div>
             </Card>
 
