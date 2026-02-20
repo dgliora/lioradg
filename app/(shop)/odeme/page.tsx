@@ -9,6 +9,9 @@ import { useCartStore } from '@/lib/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import { calculateShippingFee } from '@/lib/utils/shipping'
 
+interface Province { code: string; name: string }
+interface District { code: string; name: string }
+
 export default function CheckoutPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -18,18 +21,24 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(1)
   const [mounted, setMounted] = useState(false)
   const [shippingCost, setShippingCost] = useState(0)
+  const [provinces, setProvinces] = useState<Province[]>([])
+  const [districts, setDistricts] = useState<District[]>([])
+  const [loadingProvinces, setLoadingProvinces] = useState(false)
+  const [loadingDistricts, setLoadingDistricts] = useState(false)
+  const [addressErrors, setAddressErrors] = useState<Record<string, string>>({})
   const [formData, setFormData] = useState({
     // Misafir için
     guestEmail: '',
     // Step 1: Shipping Address
     fullName: '',
     phone: '',
-    address: '',
+    provinceCode: '',
     city: '',
+    districtCode: '',
     district: '',
+    neighborhood: '',
+    address: '',
     postalCode: '',
-    // Step 2: Billing (same as shipping)
-    billingSame: true,
     // Step 3: Agreements
     salesAgreement: false,
     kvkk: false,
@@ -37,7 +46,36 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setMounted(true)
+    setLoadingProvinces(true)
+    fetch('/api/addresses/provinces')
+      .then((r) => r.json())
+      .then((data) => setProvinces(Array.isArray(data) ? data : []))
+      .catch(() => {})
+      .finally(() => setLoadingProvinces(false))
   }, [])
+
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const code = e.target.value
+    const selected = provinces.find((p) => p.code === code)
+    setFormData((prev) => ({ ...prev, provinceCode: code, city: selected?.name || '', districtCode: '', district: '' }))
+    setAddressErrors((prev) => ({ ...prev, city: '', district: '' }))
+    setDistricts([])
+    if (code) {
+      setLoadingDistricts(true)
+      fetch(`/api/addresses/districts?province=${code}`)
+        .then((r) => r.json())
+        .then((data) => setDistricts(Array.isArray(data) ? data : []))
+        .catch(() => {})
+        .finally(() => setLoadingDistricts(false))
+    }
+  }
+
+  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const code = e.target.value
+    const selected = districts.find((d) => d.code === code)
+    setFormData((prev) => ({ ...prev, districtCode: code, district: selected?.name || '' }))
+    setAddressErrors((prev) => ({ ...prev, district: '' }))
+  }
 
   useEffect(() => {
     if (mounted && items.length === 0) {
@@ -63,6 +101,21 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Step 1 validasyon
+    if (step === 1) {
+      const errs: Record<string, string> = {}
+      if (!formData.fullName.trim()) errs.fullName = 'Ad soyad giriniz'
+      if (!formData.phone.trim()) errs.phone = 'Telefon giriniz'
+      if (!formData.provinceCode) errs.city = 'İl seçiniz'
+      if (!formData.districtCode) errs.district = 'İlçe seçiniz'
+      if (!formData.neighborhood.trim()) errs.neighborhood = 'Mahalle / Köy giriniz'
+      if (!formData.address.trim()) errs.address = 'Adres detayı giriniz'
+      if (Object.keys(errs).length > 0) {
+        setAddressErrors(errs)
+        return
+      }
+    }
+
     if (step < 3) {
       setStep(step + 1)
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -80,16 +133,16 @@ export default function CheckoutPage() {
     const orderNumber = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase()
 
     // Sipariş adresini profil adreslerine otomatik kaydet (sadece giriş yapmış kullanıcılar için)
-    if (!isGuest && formData.fullName && formData.city) {
+    if (!isGuest && formData.fullName && formData.provinceCode) {
       try {
         const saved = localStorage.getItem('user-addresses')
         const existing: Array<Record<string, unknown>> = saved ? JSON.parse(saved) : []
 
-        // Aynı içerikli adres zaten varsa tekrar ekleme
         const alreadyExists = existing.some(
           (a) =>
-            a.province === formData.city &&
-            a.district === formData.district &&
+            a.provinceCode === formData.provinceCode &&
+            a.districtCode === formData.districtCode &&
+            a.neighborhood === formData.neighborhood &&
             a.addressLine === formData.address
         )
 
@@ -100,10 +153,10 @@ export default function CheckoutPage() {
             fullName: formData.fullName,
             phone: formData.phone,
             province: formData.city,
-            provinceCode: formData.city,
+            provinceCode: formData.provinceCode,
             district: formData.district,
-            districtCode: formData.district,
-            neighborhood: '',
+            districtCode: formData.districtCode,
+            neighborhood: formData.neighborhood,
             postalCode: formData.postalCode,
             addressLine: formData.address,
             isDefault: existing.length === 0,
@@ -188,46 +241,86 @@ export default function CheckoutPage() {
                       )}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
                         <Input
-                          label="Ad Soyad"
+                          label="Ad Soyad *"
                           value={formData.fullName}
-                          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                          onChange={(e) => { setFormData({ ...formData, fullName: e.target.value }); setAddressErrors((p) => ({ ...p, fullName: '' })) }}
                           required
+                          error={addressErrors.fullName}
                         />
                         <Input
-                          label="Telefon"
+                          label="Telefon *"
                           type="tel"
                           value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="0500 000 00 00"
+                          onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setAddressErrors((p) => ({ ...p, phone: '' })) }}
+                          placeholder="05XX XXX XX XX"
                           required
+                          error={addressErrors.phone}
                         />
                       </div>
+
+                      {/* İl / İlçe dropdown */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-medium mb-2">
+                            İl <span className="text-danger">*</span>
+                          </label>
+                          <select
+                            value={formData.provinceCode}
+                            onChange={handleProvinceChange}
+                            required
+                            disabled={loadingProvinces}
+                            className="w-full h-[52px] px-5 rounded-button border-[1.5px] border-warm-100 text-base bg-white focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10 transition-all disabled:bg-warm-50 disabled:cursor-not-allowed"
+                          >
+                            <option value="">{loadingProvinces ? 'Yükleniyor...' : 'İl Seçiniz...'}</option>
+                            {provinces.map((p) => (
+                              <option key={p.code} value={p.code}>{p.name}</option>
+                            ))}
+                          </select>
+                          {addressErrors.city && <p className="mt-2 text-sm text-danger">{addressErrors.city}</p>}
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-medium mb-2">
+                            İlçe <span className="text-danger">*</span>
+                          </label>
+                          <select
+                            value={formData.districtCode}
+                            onChange={handleDistrictChange}
+                            required
+                            disabled={!formData.provinceCode || loadingDistricts}
+                            className="w-full h-[52px] px-5 rounded-button border-[1.5px] border-warm-100 text-base bg-white focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10 transition-all disabled:bg-warm-50 disabled:cursor-not-allowed"
+                          >
+                            <option value="">
+                              {loadingDistricts ? 'Yükleniyor...' : formData.provinceCode ? 'İlçe Seçiniz...' : 'Önce il seçiniz'}
+                            </option>
+                            {districts.map((d) => (
+                              <option key={d.code} value={d.code}>{d.name}</option>
+                            ))}
+                          </select>
+                          {addressErrors.district && <p className="mt-2 text-sm text-danger">{addressErrors.district}</p>}
+                        </div>
+                      </div>
+
                       <Input
-                        label="Adres"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        placeholder="Mahalle, sokak, bina no, daire no"
+                        label="Mahalle / Köy *"
+                        value={formData.neighborhood}
+                        onChange={(e) => { setFormData({ ...formData, neighborhood: e.target.value }); setAddressErrors((p) => ({ ...p, neighborhood: '' })) }}
+                        placeholder="Mahalle veya köy adını giriniz"
                         required
+                        error={addressErrors.neighborhood}
                       />
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-                        <Input
-                          label="İl"
-                          value={formData.city}
-                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                          required
-                        />
-                        <Input
-                          label="İlçe"
-                          value={formData.district}
-                          onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                          required
-                        />
-                        <Input
-                          label="Posta Kodu"
-                          value={formData.postalCode}
-                          onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                        />
-                      </div>
+                      <Input
+                        label="Adres Detayı *"
+                        value={formData.address}
+                        onChange={(e) => { setFormData({ ...formData, address: e.target.value }); setAddressErrors((p) => ({ ...p, address: '' })) }}
+                        placeholder="Sokak, cadde, bina no, daire no"
+                        required
+                        error={addressErrors.address}
+                      />
+                      <Input
+                        label="Posta Kodu (Opsiyonel)"
+                        value={formData.postalCode}
+                        onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                      />
                     </div>
                   )}
 
