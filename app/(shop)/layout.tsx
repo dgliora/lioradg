@@ -10,6 +10,7 @@ import { MobileBottomNav } from '@/components/shop/MobileBottomNav'
 import { ToastProvider } from '@/components/ui'
 import { CampaignModal } from '@/components/shop/CampaignModal'
 import { CampaignPopup } from '@/components/shop/CampaignPopup'
+import { CartSync } from '@/components/CartSync'
 
 export default function ShopLayout({
   children,
@@ -29,6 +30,7 @@ export default function ShopLayout({
               <MobileBottomNav />
               <CampaignModal />
               <CampaignPopup />
+              <CartSync />
             </div>
           </ParallaxProvider>
         </ToastProvider>
