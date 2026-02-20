@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { checkAdminAuth } from '@/lib/auth-server'
+import { sendShippingEmail } from '@/lib/email'
 
 export async function GET(
   _req: NextRequest,
@@ -50,6 +51,11 @@ export async function PATCH(
     const body = await req.json()
     const { status, trackingNumber, notes } = body
 
+    const prevOrder = await prisma.order.findUnique({
+      where: { id: params.id },
+      select: { status: true, trackingNumber: true, orderNumber: true, user: { select: { email: true, name: true } } },
+    })
+
     const updateData: Record<string, unknown> = {}
     if (status !== undefined) updateData.status = status
     if (trackingNumber !== undefined) updateData.trackingNumber = trackingNumber || null
@@ -59,6 +65,17 @@ export async function PATCH(
       where: { id: params.id },
       data: updateData,
     })
+
+    // Durum SHIPPED yapıldıysa kargo e-postası gönder
+    if (status === 'SHIPPED' && prevOrder?.status !== 'SHIPPED' && prevOrder?.user) {
+      const finalTracking = trackingNumber ?? prevOrder.trackingNumber
+      sendShippingEmail(
+        prevOrder.user.email,
+        prevOrder.user.name,
+        prevOrder.orderNumber,
+        finalTracking || null
+      ).catch((err) => console.error('Kargo e-postası gönderilemedi:', err))
+    }
 
     return NextResponse.json({ success: true, order })
   } catch (error) {

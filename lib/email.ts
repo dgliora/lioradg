@@ -184,6 +184,77 @@ export async function sendVerificationEmail(to: string, name: string, token: str
   }
 }
 
+export async function sendShippingEmail(
+  to: string,
+  name: string,
+  orderNumber: string,
+  trackingNumber: string | null
+) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lioradg.com.tr'
+
+  try {
+    await resend.emails.send({
+      from: FROM_SATIS,
+      to,
+      subject: `Siparişiniz Kargoya Verildi! #${orderNumber}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head><meta charset="utf-8"></head>
+          <body style="font-family:Arial,sans-serif;line-height:1.6;color:#2C2C2C;margin:0;padding:0;">
+            <div style="max-width:600px;margin:0 auto;padding:20px;">
+              <div style="background:linear-gradient(135deg,#8B9D83 0%,#A8B99C 100%);color:white;padding:40px 20px;text-align:center;border-radius:16px 16px 0 0;">
+                <div style="font-size:48px;margin-bottom:10px;">🚚</div>
+                <h1 style="margin:0;font-size:28px;font-family:Georgia,serif;">Siparişiniz Yolda!</h1>
+                <p style="margin:10px 0 0 0;opacity:0.9;">LIORADG — Atelier Istanbul</p>
+              </div>
+              <div style="background:white;padding:40px 20px;border:1px solid #E8E1D9;border-top:none;border-radius:0 0 16px 16px;">
+                <h2 style="color:#8B9D83;font-family:Georgia,serif;">Merhaba, ${name}!</h2>
+                <p>Harika haber! <strong>#${orderNumber}</strong> numaralı siparişiniz kargoya verildi.</p>
+
+                ${trackingNumber ? `
+                <div style="background:#F5F1ED;border-left:4px solid #8B9D83;padding:20px;border-radius:0 12px 12px 0;margin:24px 0;">
+                  <p style="margin:0 0 6px 0;font-size:13px;color:#5A5A5A;text-transform:uppercase;letter-spacing:0.05em;">Kargo Takip Numarası</p>
+                  <p style="margin:0;font-size:24px;font-weight:700;font-family:monospace;color:#2C2C2C;letter-spacing:0.1em;">${trackingNumber}</p>
+                </div>
+                <p style="color:#5A5A5A;font-size:14px;">Kargo firmasının web sitesi veya mobil uygulaması üzerinden siparişinizi takip edebilirsiniz.</p>
+                ` : `
+                <div style="background:#F5F1ED;padding:20px;border-radius:12px;margin:24px 0;">
+                  <p style="margin:0;color:#5A5A5A;">Kargo takip numarası en kısa sürede iletilecektir.</p>
+                </div>
+                `}
+
+                <div style="background:#FAFAF8;border:1px solid #E8E1D9;padding:20px;border-radius:12px;margin:24px 0;">
+                  <p style="margin:0 0 8px 0;font-weight:600;">Tahmini Teslimat</p>
+                  <p style="margin:0;color:#5A5A5A;">Kargoya verildikten sonra <strong>1-3 iş günü</strong> içinde teslim edilecektir.</p>
+                </div>
+
+                <div style="text-align:center;margin:30px 0;">
+                  <a href="${siteUrl}/hesabim/siparisler" style="display:inline-block;background:#8B9D83;color:white;padding:14px 32px;text-decoration:none;border-radius:12px;font-weight:600;">Siparişimi Görüntüle</a>
+                </div>
+
+                <hr style="border:none;border-top:1px solid #E8E1D9;margin:24px 0;" />
+                <p style="font-size:13px;color:#5A5A5A;">Sorularınız için:</p>
+                <p style="font-size:13px;color:#5A5A5A;">
+                  📞 <a href="tel:+905302084747" style="color:#8B9D83;">+90 530 208 47 47</a><br>
+                  📧 <a href="mailto:info@lioradg.com.tr" style="color:#8B9D83;">info@lioradg.com.tr</a>
+                </p>
+              </div>
+              <div style="text-align:center;padding:20px;color:#5A5A5A;font-size:12px;">
+                <p>© 2025 LIORADG. Tüm hakları saklıdır.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+    })
+    return { success: true }
+  } catch (error) {
+    console.error('Shipping email error:', error)
+    return { success: false, error }
+  }
+}
+
 export async function sendContactEmail(data: {
   name: string
   email: string
