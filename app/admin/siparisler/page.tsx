@@ -11,7 +11,7 @@ async function getOrders() {
       items: {
         include: {
           product: {
-            select: { name: true },
+            select: { name: true, images: true },
           },
         },
       },

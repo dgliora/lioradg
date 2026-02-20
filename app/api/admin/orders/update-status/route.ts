@@ -9,16 +9,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 403 })
     }
 
-    const { orderId, status } = await request.json()
+    const { orderId, status, trackingNumber } = await request.json()
 
-    if (!orderId || !status) {
+    if (!orderId) {
       return NextResponse.json({ error: 'Geçersiz istek' }, { status: 400 })
     }
 
-    // Siparişi güncelle
+    const updateData: Record<string, unknown> = {}
+    if (status) updateData.status = status
+    if (trackingNumber !== undefined) updateData.trackingNumber = trackingNumber || null
+
     await prisma.order.update({
       where: { id: orderId },
-      data: { status },
+      data: updateData,
     })
 
     return NextResponse.json({ success: true })
