@@ -63,9 +63,10 @@ export function OrdersTable({ orders }: OrdersTableProps) {
 
   // Excel export
   const handleExport = () => {
-    const csvHeader = 'Sipariş No,Müşteri,Email,Ürün Sayısı,Toplam,Durum,Tarih\n'
-    const csvData = filteredOrders.map(order => {
-      return [
+    const toCell = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
+    const csvHeader = ['Sipariş No', 'Müşteri', 'Email', 'Ürün Sayısı', 'Toplam', 'Durum', 'Tarih'].map(toCell).join(';') + '\n'
+    const csvData = filteredOrders.map(order =>
+      [
         order.orderNumber,
         order.user.name,
         order.user.email,
@@ -73,10 +74,10 @@ export function OrdersTable({ orders }: OrdersTableProps) {
         order.total,
         statusMap[order.status]?.label || order.status,
         new Date(order.createdAt).toLocaleDateString('tr-TR'),
-      ].join(',')
-    }).join('\n')
+      ].map(toCell).join(';')
+    ).join('\n')
 
-    const blob = new Blob(['\uFEFF' + csvHeader + csvData], { type: 'text/csv;charset=utf-8;' })
+    const blob = new Blob(['sep=;\n\uFEFF' + csvHeader + csvData], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
     link.download = `siparisler_${new Date().toISOString().split('T')[0]}.csv`
