@@ -34,6 +34,16 @@
     @apply bg-gradient-to-r from-rose to-rose/90;
   }
 
+  /* Hero background */
+  .gradient-hero {
+    background: linear-gradient(135deg, #F5F1ED 0%, #EDE8E3 40%, #E8DFD8 70%, #F0EBE6 100%);
+  }
+
+  /* Section spacing */
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
+
   /* Shadow utilities */
   .shadow-soft {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -50,5 +60,13 @@
   /* Text utilities */
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Responsive hero font */
+  .text-hero-responsive {
+    font-size: clamp(2rem, 6vw, 4rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 }

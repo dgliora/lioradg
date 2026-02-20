@@ -21,7 +21,7 @@ export function Hero() {
       .catch(() => {})
   }, [])
   return (
-    <section className="relative min-h-screen flex items-center gradient-hero overflow-hidden">
+    <section className="relative min-h-[80vh] lg:min-h-screen flex items-center gradient-hero overflow-hidden">
       {/* Parallax Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <Parallax speed={-10} className="absolute top-20 right-20 w-96 h-96">
@@ -34,7 +34,7 @@ export function Hero() {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center min-h-[80vh]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[60vh] lg:min-h-[80vh]">
             {/* Left: Content */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -57,7 +57,7 @@ export function Hero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.8 }}
-                className="text-hero font-serif font-bold mb-8 text-neutral leading-tight"
+                className="text-[2.2rem] sm:text-[3rem] lg:text-hero font-serif font-bold mb-8 text-neutral leading-tight"
               >
                 Doğanın Gücü,
                 <br />

@@ -5,8 +5,10 @@ interface LogoLioraDGProps {
   className?: string
   width?: number
   height?: number
-  variant?: 'full' | 'icon' | 'with-tagline' // full: LIORA DG, icon: sadece DG, with-tagline: ATELIER ISTANBUL ile
-  showImage?: boolean // true ise gerçek logo görselini kullan (JPG/PNG), false ise SVG
+  variant?: 'full' | 'icon' | 'with-tagline'
+  showImage?: boolean
+  /** footer gibi koyu zeminlerde true yap — logo beyaz kutu içinde gösterilir */
+  darkBg?: boolean
 }
 
 export const LogoLioraDG: React.FC<LogoLioraDGProps> = ({
@@ -14,84 +16,38 @@ export const LogoLioraDG: React.FC<LogoLioraDGProps> = ({
   width = 180,
   height = 50,
   variant = 'full',
-  showImage = true
+  showImage = true,
+  darkBg = false,
 }) => {
-  // Gerçek logo görselini kullan (JPG/PNG)
   if (showImage) {
-    if (variant === 'with-tagline') {
-      return (
-        <Image
-          src="/images/logo/logo.jpg"
-          alt="LIORA DG - ATELIER ISTANBUL"
-          width={width}
-          height={height}
-          className={className}
-          style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
-          priority
-        />
-      )
-    }
-    
-    if (variant === 'icon') {
-      return (
-        <Image
-          src="/images/logo/dgyazisi.jpg"
-          alt="LIORA DG"
-          width={width}
-          height={height}
-          className={className}
-          style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
-          priority
-        />
-      )
-    }
+    const src = variant === 'icon' ? '/images/logo/dgyazisi.jpg' : '/images/logo/logo.jpg'
+    const alt = variant === 'icon' ? 'LIORA DG' : 'LIORA DG — ATELIER ISTANBUL'
 
-    // full variant
-    return (
+    const img = (
       <Image
-        src="/images/logo/dgyazisi.jpg"
-        alt="LIORA DG"
+        src={src}
+        alt={alt}
         width={width}
         height={height}
         className={className}
-        style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
+        style={{ objectFit: 'contain', width: 'auto', height: 'auto', maxHeight: height }}
         priority
       />
     )
+
+    // Koyu zemin: logo etrafına küçük beyaz/yarı saydam hap
+    if (darkBg) {
+      return (
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-1.5 inline-flex items-center">
+          {img}
+        </div>
+      )
+    }
+
+    return img
   }
 
-  // SVG fallback (eğer showImage=false)
-  if (variant === 'icon') {
-    // Sadece DG iç içe harf (favicon için)
-    return (
-      <svg
-        width={width}
-        height={height}
-        viewBox="0 0 200 100"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className={className}
-        aria-label="LIORA DG"
-      >
-        <title>DG</title>
-        {/* DG iç içe tasarım - gerçek logo'dan esinlenildi */}
-        <text
-          x="50"
-          y="75"
-          fontFamily="Georgia, serif"
-          fontSize="80"
-          fontWeight="700"
-          fill="currentColor"
-          letterSpacing="-8"
-          style={{ fontStyle: 'italic' }}
-        >
-          DG
-        </text>
-      </svg>
-    )
-  }
-
-  // Full logo: LIORA DG (SVG)
+  // SVG fallback
   return (
     <svg
       width={width}
@@ -103,29 +59,10 @@ export const LogoLioraDG: React.FC<LogoLioraDGProps> = ({
       aria-label="LIORA DG"
     >
       <title>LIORA DG</title>
-      
-      {/* LIORA DG - serif, zarif, DG iç içe */}
-      <text
-        x="10"
-        y="75"
-        fontFamily="Georgia, serif"
-        fontSize="70"
-        fontWeight="600"
-        fill="currentColor"
-        letterSpacing="3"
-      >
+      <text x="10" y="75" fontFamily="Georgia, serif" fontSize="70" fontWeight="600" fill="currentColor" letterSpacing="3">
         LIORA{' '}
       </text>
-      <text
-        x="310"
-        y="75"
-        fontFamily="Georgia, serif"
-        fontSize="70"
-        fontWeight="700"
-        fill="currentColor"
-        letterSpacing="-8"
-        style={{ fontStyle: 'italic' }}
-      >
+      <text x="310" y="75" fontFamily="Georgia, serif" fontSize="70" fontWeight="700" fill="currentColor" letterSpacing="-8" style={{ fontStyle: 'italic' }}>
         DG
       </text>
     </svg>
@@ -133,4 +70,3 @@ export const LogoLioraDG: React.FC<LogoLioraDGProps> = ({
 }
 
 export default LogoLioraDG
-
