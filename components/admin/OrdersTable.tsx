@@ -35,6 +35,9 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [trackingInputs, setTrackingInputs] = useState<Record<string, string>>({})
   const [savingTracking, setSavingTracking] = useState<string | null>(null)
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([])
+  const [bulkStatus, setBulkStatus] = useState('')
+  const [bulkSaving, setBulkSaving] = useState(false)
 
   // Filtrelenmiş siparişler
   const filteredOrders = orders.filter(order => {
@@ -124,6 +127,31 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
       alert('Kargo numarası kaydedilemedi')
     } finally {
       setSavingTracking(null)
+    }
+  }
+
+  const handleBulkStatusUpdate = async () => {
+    if (!bulkStatus || selectedOrders.length === 0) return
+    setBulkSaving(true)
+    try {
+      await Promise.all(
+        selectedOrders.map((id) =>
+          fetch('/api/admin/orders/update-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId: id, status: bulkStatus }),
+          })
+        )
+      )
+      setOrders((prev) =>
+        prev.map((o) => selectedOrders.includes(o.id) ? { ...o, status: bulkStatus as Order['status'] } : o)
+      )
+      setSelectedOrders([])
+      setBulkStatus('')
+    } catch {
+      alert('Toplu güncelleme başarısız')
+    } finally {
+      setBulkSaving(false)
     }
   }
 
@@ -217,12 +245,59 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
         </div>
       </Card>
 
+      {/* Toplu İşlem Barı */}
+      {selectedOrders.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl text-sm">
+          <span className="font-medium text-blue-900">{selectedOrders.length} sipariş seçildi</span>
+          <select
+            value={bulkStatus}
+            onChange={(e) => setBulkStatus(e.target.value)}
+            className="border border-blue-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+          >
+            <option value="">Durum Seç</option>
+            <option value="PENDING">⏳ Bekliyor</option>
+            <option value="CONFIRMED">✅ Onaylandı</option>
+            <option value="PROCESSING">📦 Hazırlanıyor</option>
+            <option value="SHIPPED">🚚 Kargoda</option>
+            <option value="DELIVERED">🎉 Teslim Edildi</option>
+            <option value="CANCELLED">❌ İptal</option>
+          </select>
+          <button
+            onClick={handleBulkStatusUpdate}
+            disabled={!bulkStatus || bulkSaving}
+            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg font-medium transition-colors"
+          >
+            {bulkSaving ? 'Güncelleniyor...' : 'Uygula'}
+          </button>
+          <button
+            onClick={() => setSelectedOrders([])}
+            className="ml-auto text-blue-600 hover:text-blue-800 underline"
+          >
+            Seçimi Temizle
+          </button>
+        </div>
+      )}
+
       {/* Sipariş Tablosu */}
       <Card padding="none">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr className="text-left text-sm text-gray-600">
+                <th className="px-4 py-4 font-medium w-10">
+                  <input
+                    type="checkbox"
+                    checked={selectedOrders.length === filteredOrders.length && filteredOrders.length > 0}
+                    onChange={() =>
+                      setSelectedOrders(
+                        selectedOrders.length === filteredOrders.length
+                          ? []
+                          : filteredOrders.map((o) => o.id)
+                      )
+                    }
+                    className="rounded border-gray-300"
+                  />
+                </th>
                 <th className="px-6 py-4 font-medium">Sipariş No</th>
                 <th className="px-6 py-4 font-medium">Müşteri</th>
                 <th className="px-6 py-4 font-medium">Ürünler</th>
@@ -235,7 +310,7 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
             <tbody className="divide-y divide-gray-100">
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
                     {searchQuery || selectedStatus !== 'all' || dateRange !== 'all'
                       ? 'Filtrelere uygun sipariş bulunamadı'
                       : 'Henüz sipariş bulunmuyor'}
@@ -249,6 +324,18 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
                     <>
                       <tr key={order.id} className={`hover:bg-gray-50 cursor-pointer ${isExpanded ? 'bg-gray-50' : ''}`}
                         onClick={() => setExpandedId(isExpanded ? null : order.id)}>
+                        <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={selectedOrders.includes(order.id)}
+                            onChange={() =>
+                              setSelectedOrders((prev) =>
+                                prev.includes(order.id) ? prev.filter((id) => id !== order.id) : [...prev, order.id]
+                              )
+                            }
+                            className="rounded border-gray-300"
+                          />
+                        </td>
                         <td className="px-6 py-4">
                           <p className="font-mono text-sm font-medium text-gray-900">#{order.orderNumber}</p>
                           {order.trackingNumber && (
@@ -306,7 +393,7 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
                       </tr>
                       {isExpanded && (
                         <tr key={`${order.id}-detail`} className="bg-blue-50/30">
-                          <td colSpan={7} className="px-6 py-4">
+                          <td colSpan={8} className="px-6 py-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {/* Ürünler */}
                               <div>

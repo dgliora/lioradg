@@ -20,6 +20,8 @@ export function ProductsTable({ products }: ProductsTableProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
+  const [priceMin, setPriceMin] = useState('')
+  const [priceMax, setPriceMax] = useState('')
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
 
   // Benzersiz kategoriler (ID'ye göre)
@@ -54,8 +56,11 @@ export function ProductsTable({ products }: ProductsTableProps) {
                          (selectedStatus === 'inactive' && !product.active) ||
                          (selectedStatus === 'low-stock' && product.stock > 0 && product.stock <= 10) ||
                          (selectedStatus === 'out-of-stock' && product.stock === 0)
+    const effectivePrice = product.salePrice ?? product.price
+    const matchesPrice = (!priceMin || effectivePrice >= parseFloat(priceMin)) &&
+                         (!priceMax || effectivePrice <= parseFloat(priceMax))
     
-    return matchesSearch && matchesCategory && matchesStatus
+    return matchesSearch && matchesCategory && matchesStatus && matchesPrice
   })
 
   const handleSelectAll = () => {
@@ -118,7 +123,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
     <div className="space-y-4">
       {/* Filtreler ve Arama */}
       <Card>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           {/* Arama */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -172,6 +177,38 @@ export function ProductsTable({ products }: ProductsTableProps) {
               <option value="out-of-stock">Stokta Yok ({productsForStatusCount.filter(p => p.stock === 0).length})</option>
             </select>
           </div>
+        </div>
+        {/* Fiyat Aralığı + Sıfırla */}
+        <div className="flex flex-wrap items-end gap-3 pt-2 border-t border-gray-100">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Min Fiyat (TL)</label>
+            <input
+              type="number"
+              placeholder="0"
+              value={priceMin}
+              onChange={(e) => setPriceMin(e.target.value)}
+              className="w-32 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Max Fiyat (TL)</label>
+            <input
+              type="number"
+              placeholder="Sınırsız"
+              value={priceMax}
+              onChange={(e) => setPriceMax(e.target.value)}
+              className="w-32 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
+            />
+          </div>
+          {(searchQuery || selectedCategory !== 'all' || selectedStatus !== 'all' || priceMin || priceMax) && (
+            <button
+              onClick={() => { setSearchQuery(''); setSelectedCategory('all'); setSelectedStatus('all'); setPriceMin(''); setPriceMax('') }}
+              className="text-sm text-gray-500 hover:text-gray-700 underline pb-0.5"
+            >
+              Filtreleri Temizle
+            </button>
+          )}
+          <span className="ml-auto text-sm text-gray-500 pb-0.5">{filteredProducts.length} ürün gösteriliyor</span>
         </div>
       </Card>
 

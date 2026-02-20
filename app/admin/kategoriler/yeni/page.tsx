@@ -14,7 +14,9 @@ export default function NewCategoryPage() {
     slug: '',
     description: '',
     icon: '',
-    order: 0
+    order: 0,
+    metaTitle: '',
+    metaDescription: '',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -136,6 +138,45 @@ export default function NewCategoryPage() {
                 Kategorilerin sıralama numarası (küçükten büyüğe)
               </p>
             </div>
+          </div>
+        </Card>
+
+        {/* SEO */}
+        <Card>
+          <h2 className="text-xl font-semibold text-gray-900 mb-1">SEO</h2>
+          <p className="text-sm text-gray-500 mb-5">Boş bırakırsanız kategori adı ve açıklaması kullanılır.</p>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Meta Başlık <span className="text-gray-400 font-normal">({formData.metaTitle.length}/60)</span>
+              </label>
+              <input
+                type="text"
+                value={formData.metaTitle}
+                onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value.slice(0, 60) })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent"
+                placeholder="Arama sonuçlarında görünecek başlık"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Meta Açıklama <span className="text-gray-400 font-normal">({formData.metaDescription.length}/160)</span>
+              </label>
+              <textarea
+                value={formData.metaDescription}
+                onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value.slice(0, 160) })}
+                rows={3}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage focus:border-transparent resize-none"
+                placeholder="Arama sonuçlarında görünecek açıklama"
+              />
+            </div>
+            {(formData.metaTitle || formData.name) && (
+              <div className="p-3 bg-white border border-gray-200 rounded-lg text-sm">
+                <p className="text-[#1a0dab] font-medium truncate">{formData.metaTitle || formData.name} - Lioradg</p>
+                <p className="text-[#006621] text-xs">lioradg.com.tr/kategori/{formData.slug || 'kategori-slug'}</p>
+                <p className="text-gray-600 text-xs mt-0.5 line-clamp-2">{formData.metaDescription || formData.description || 'Açıklama girilmedi'}</p>
+              </div>
+            )}
           </div>
         </Card>
 

@@ -103,6 +103,8 @@ export async function PUT(
         icon: data.icon || null,
         image: data.image || null,
         order: data.order !== undefined ? data.order : undefined,
+        metaTitle: data.metaTitle || null,
+        metaDescription: data.metaDescription || null,
       }
     })
 

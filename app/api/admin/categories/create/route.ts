@@ -57,6 +57,8 @@ export async function POST(request: NextRequest) {
         icon: data.icon || null,
         image: data.image || null,
         order: data.order || 0,
+        metaTitle: data.metaTitle || null,
+        metaDescription: data.metaDescription || null,
       }
     })
 
