@@ -8,6 +8,50 @@ interface SyncItem {
   price: number
 }
 
+// DB'deki sepeti çek (yeni sekme / gizli sekme için)
+export async function GET() {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return NextResponse.json({ items: [] })
+    }
+
+    const cart = await prisma.cart.findUnique({
+      where: { userId: session.user.id },
+      include: {
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                price: true,
+                salePrice: true,
+                images: true,
+                stock: true,
+                categoryId: true,
+              },
+            },
+          },
+        },
+      },
+    })
+
+    if (!cart) return NextResponse.json({ items: [] })
+
+    const items = cart.items.map((i) => ({
+      product: i.product,
+      quantity: i.quantity,
+    }))
+
+    return NextResponse.json({ items })
+  } catch (error) {
+    console.error('Cart load error:', error)
+    return NextResponse.json({ items: [] })
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
