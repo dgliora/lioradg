@@ -11,15 +11,44 @@ type CartWithDetails = Cart & {
   })[]
 }
 
+function getFirstImage(images: string): string {
+  try {
+    const parsed = JSON.parse(images)
+    return Array.isArray(parsed) ? parsed[0] || '' : images
+  } catch {
+    return images || ''
+  }
+}
+
 interface AbandonedCartsTableProps {
   carts: CartWithDetails[]
 }
 
 const TEMPLATES = [
-  { key: 'reminder', label: '🛒 Sepet Hatırlatma', desc: 'Sepetinizde ürünler bekliyor' },
-  { key: 'discount', label: '🎁 %10 İndirim Teklifi', desc: 'Özel indirim kuponu' },
-  { key: 'lastchance', label: '⏰ Son Şans', desc: 'Stoklar tükeniyor uyarısı' },
-  { key: 'custom', label: '✏️ Özel Mesaj', desc: 'Kendi mesajını yaz' },
+  {
+    key: 'reminder',
+    label: '🛒 Sepet Hatırlatma',
+    defaultSubject: 'Sepetinizde ürünler bekliyor! 🛒',
+    defaultMessage: 'Sepetinizdeki ürünler sizi bekliyor. Alışverişinizi tamamlamak için hâlâ vakit var!',
+  },
+  {
+    key: 'discount',
+    label: '🎁 İndirim Teklifi',
+    defaultSubject: 'Sepetiniz için özel indirim! 🎁',
+    defaultMessage: 'Sepetinizdeki ürünler hâlâ sizin için bekliyor. Özel indirim fırsatını kaçırmayın! İndirim kodunuz: SEPET10',
+  },
+  {
+    key: 'lastchance',
+    label: '⏰ Son Şans',
+    defaultSubject: 'Son şans! Sepetinizdeki ürünler tükeniyor ⏰',
+    defaultMessage: 'Sepetinizdeki ürünler stokta sınırlı sayıda bulunuyor. Kaçırmadan tamamlayın!',
+  },
+  {
+    key: 'custom',
+    label: '✏️ Özel Mesaj',
+    defaultSubject: '',
+    defaultMessage: '',
+  },
 ]
 
 function exportCSV(carts: CartWithDetails[]) {
@@ -48,9 +77,9 @@ export function AbandonedCartsTable({ carts }: AbandonedCartsTableProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [showMailPanel, setShowMailPanel] = useState(false)
-  const [template, setTemplate] = useState('reminder')
-  const [customSubject, setCustomSubject] = useState('')
-  const [customMessage, setCustomMessage] = useState('')
+  const [template, setTemplate] = useState(TEMPLATES[0].key)
+  const [editSubject, setEditSubject] = useState(TEMPLATES[0].defaultSubject)
+  const [editMessage, setEditMessage] = useState(TEMPLATES[0].defaultMessage)
   const [sending, setSending] = useState(false)
   const [sendResult, setSendResult] = useState<{ sent: number; failed: number } | null>(null)
 
@@ -88,8 +117,8 @@ export function AbandonedCartsTable({ carts }: AbandonedCartsTableProps) {
         body: JSON.stringify({
           userIds: Array.from(selected),
           template,
-          customSubject: template === 'custom' ? customSubject : '',
-          customMessage: template === 'custom' ? customMessage : '',
+          customSubject: editSubject,
+          customMessage: editMessage,
         }),
       })
       const data = await res.json()
@@ -164,7 +193,11 @@ export function AbandonedCartsTable({ carts }: AbandonedCartsTableProps) {
               {TEMPLATES.map((t) => (
                 <button
                   key={t.key}
-                  onClick={() => setTemplate(t.key)}
+                  onClick={() => {
+                    setTemplate(t.key)
+                    setEditSubject(t.defaultSubject)
+                    setEditMessage(t.defaultMessage)
+                  }}
                   className={`p-3 rounded-lg border text-left transition-colors ${
                     template === t.key
                       ? 'border-sage bg-white shadow-sm'
@@ -172,29 +205,35 @@ export function AbandonedCartsTable({ carts }: AbandonedCartsTableProps) {
                   }`}
                 >
                   <p className="text-sm font-medium text-gray-800">{t.label}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{t.desc}</p>
                 </button>
               ))}
             </div>
 
-            {template === 'custom' && (
-              <div className="space-y-3">
+            {/* Düzenlenebilir konu ve mesaj */}
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">Konu</label>
                 <input
                   type="text"
                   placeholder="E-posta konusu..."
-                  value={customSubject}
-                  onChange={(e) => setCustomSubject(e.target.value)}
+                  value={editSubject}
+                  onChange={(e) => setEditSubject(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sage"
                 />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">
+                  Mesaj <span className="text-gray-400 font-normal">(kupon kodu varsa buraya ekle)</span>
+                </label>
                 <textarea
                   placeholder="Mesaj içeriği..."
-                  value={customMessage}
-                  onChange={(e) => setCustomMessage(e.target.value)}
+                  value={editMessage}
+                  onChange={(e) => setEditMessage(e.target.value)}
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sage resize-none"
                 />
               </div>
-            )}
+            </div>
 
             {sendResult && (
               <div className={`p-3 rounded-lg text-sm ${sendResult.failed === 0 ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'}`}>
@@ -206,7 +245,7 @@ export function AbandonedCartsTable({ carts }: AbandonedCartsTableProps) {
               <p className="text-xs text-gray-500">{selected.size} müşteriye gönderilecek</p>
               <button
                 onClick={handleSendMail}
-                disabled={sending || (template === 'custom' && (!customSubject || !customMessage))}
+                disabled={sending || !editSubject || !editMessage}
                 className="px-5 py-2 bg-sage text-white rounded-lg text-sm font-medium hover:bg-sage/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {sending ? 'Gönderiliyor...' : 'Gönder'}
@@ -282,11 +321,11 @@ export function AbandonedCartsTable({ carts }: AbandonedCartsTableProps) {
                     <div className="border-t border-gray-100 px-4 py-3 bg-gray-50 ml-10">
                       <div className="space-y-2">
                         {cart.items.map((item) => {
-                          const imgs = JSON.parse(item.product.images || '[]')
+                          const img = getFirstImage(item.product.images)
                           const price = item.product.salePrice || item.product.price
                           return (
                             <div key={item.id} className="flex items-center gap-3">
-                              {imgs[0] && <img src={imgs[0]} alt={item.product.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" />}
+                              {img && <img src={img} alt={item.product.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" />}
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm text-gray-800 truncate">{item.product.name}</p>
                                 <p className="text-xs text-gray-400">{item.quantity} adet × {formatPrice(price)}</p>

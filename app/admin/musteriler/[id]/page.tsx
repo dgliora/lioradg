@@ -38,11 +38,19 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
 
   // Favori ürünler
   const productFreq: Record<string, { name: string; count: number; image: string }> = {}
+  function getFirstImage(images: string): string {
+    try {
+      const parsed = JSON.parse(images)
+      return Array.isArray(parsed) ? parsed[0] || '' : images
+    } catch {
+      return images || ''
+    }
+  }
+
   customer.orders.forEach((order) => {
     order.items.forEach((item) => {
       if (!productFreq[item.productId]) {
-        const images = JSON.parse(item.product.images || '[]')
-        productFreq[item.productId] = { name: item.product.name, count: 0, image: images[0] || '' }
+        productFreq[item.productId] = { name: item.product.name, count: 0, image: getFirstImage(item.product.images) }
       }
       productFreq[item.productId].count += item.quantity
     })
@@ -225,10 +233,9 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
                     <div className="space-y-1">
                       {order.items.map((item) => (
                         <div key={item.id} className="flex items-center gap-2 text-xs text-gray-600">
-                          {(() => {
-                            const imgs = JSON.parse(item.product.images || '[]')
-                            return imgs[0] ? <img src={imgs[0]} alt={item.product.name} className="w-6 h-6 rounded object-cover" /> : null
-                          })()}
+                          {getFirstImage(item.product.images) && (
+                            <img src={getFirstImage(item.product.images)} alt={item.product.name} className="w-6 h-6 rounded object-cover" />
+                          )}
                           <span className="flex-1 truncate">{item.product.name}</span>
                           <span className="text-gray-400">{item.quantity} adet</span>
                           <span className="font-medium">{formatPrice(item.price * item.quantity)}</span>
